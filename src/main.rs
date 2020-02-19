@@ -172,213 +172,43 @@ impl GameState for State {
 
         ctx.cls();
 
-        match newrunstate {
-            RunState::MainMenu { .. } => {}
-            RunState::GameOver { .. } => {}
-            _ => {
-                draw_map(&self.ecs, ctx);
+        draw_map(&self.ecs, ctx);
 
-                {
-                    let positions = self.ecs.read_storage::<Position>();
-                    let renderables = self.ecs.read_storage::<Renderable>();
+        {
+            let positions = self.ecs.read_storage::<Position>();
+            let renderables = self.ecs.read_storage::<Renderable>();
 
-                    let mut data = (&positions, &renderables).join().collect::<Vec<_>>();
-                    data.sort_by(|&a, &b| b.1.render_order.cmp(&a.1.render_order));
-                    for (pos, render) in data.iter() {
-                        ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph);
-                    }
-
-                    gui::draw_ui(&self.ecs, ctx);
-                }
+            let mut data = (&positions, &renderables).join().collect::<Vec<_>>();
+            data.sort_by(|&a, &b| b.1.render_order.cmp(&a.1.render_order));
+            for (pos, render) in data.iter() {
+                ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph);
             }
+
+            gui::draw_ui(&self.ecs, ctx);
         }
 
+        //execute runstate
         match newrunstate {
-            RunState::PreRun => {
-                //self.run_systems();
-                self.ecs.maintain();
-                newrunstate = RunState::AwaitingInput;
-            }
             RunState::AwaitingInput => {
                 newrunstate = player_input(self, ctx);
             }
             RunState::PlayerTurn => {
                 self.run_systems();
                 self.ecs.maintain();
-                //self.run_systems();
-                //self.ecs.maintain();
-                newrunstate = RunState::MonsterTurn;
-            }
-            RunState::MonsterTurn => {
-                //self.run_systems();
-                self.ecs.maintain();
+
                 newrunstate = RunState::AwaitingInput;
             }
-            RunState::ShowInventory => {
-                let result = gui::show_inventory(self, ctx);
-                match result.0 {
-                    gui::ItemMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
-                    gui::ItemMenuResult::NoResponse => {}
-                    gui::ItemMenuResult::Selected => {
-                        let item_entity = result.1.unwrap();
-                        let is_ranged = self.ecs.read_storage::<Ranged>();
-                        let is_item_ranged = is_ranged.get(item_entity);
-                        if let Some(is_item_ranged) = is_item_ranged {
-                            newrunstate = RunState::ShowTargeting {
-                                range: is_item_ranged.range,
-                                item: item_entity,
-                            };
-                        } else {
-                            let mut intent = self.ecs.write_storage::<WantsToUseItem>();
-                            intent
-                                .insert(
-                                    *self.ecs.fetch::<Entity>(),
-                                    WantsToUseItem {
-                                        item: item_entity,
-                                        target: None,
-                                    },
-                                )
-                                .expect("Unable to insert intent");
-                            newrunstate = RunState::PlayerTurn;
-                        }
-                    }
-                }
-            }
-
-            RunState::ObjectInteraction => {
-                let result = gui::show_object_interaction_choice(self, ctx);
-                match result.0 {
-                    gui::InteractionMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
-                    gui::InteractionMenuResult::NoResponse => {}
-                    gui::InteractionMenuResult::Selected => {
-                        // TODO provisory just ask for the creation of an object of the name
-                        let interaction_tuple = result.1.unwrap();
-                        let (x, y, interaction, interacted_entity) = interaction_tuple;
-
-                        let mut interaction_requests =
-                            self.ecs.write_resource::<InteractionResquest>();
-                        interaction_requests.request(x, y, interaction.clone(), interacted_entity);
-
-                        newrunstate = RunState::PlayerTurn;
-                    }
-                }
-            }
-            RunState::ShowDropItem => {
-                let result = gui::drop_item_menu(self, ctx);
-                match result.0 {
-                    gui::ItemMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
-                    gui::ItemMenuResult::NoResponse => {}
-                    gui::ItemMenuResult::Selected => {
-                        let item_entity = result.1.unwrap();
-                        let mut intent = self.ecs.write_storage::<WantsToDropItem>();
-                        intent
-                            .insert(
-                                *self.ecs.fetch::<Entity>(),
-                                WantsToDropItem { item: item_entity },
-                            )
-                            .expect("Unable to insert intent");
-                        newrunstate = RunState::PlayerTurn;
-                    }
-                }
-            }
-            RunState::ShowRemoveItem => {
-                let result = gui::remove_item_menu(self, ctx);
-                match result.0 {
-                    gui::ItemMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
-                    gui::ItemMenuResult::NoResponse => {}
-                    gui::ItemMenuResult::Selected => {
-                        let item_entity = result.1.unwrap();
-                        let mut intent = self.ecs.write_storage::<WantsToRemoveItem>();
-                        intent
-                            .insert(
-                                *self.ecs.fetch::<Entity>(),
-                                WantsToRemoveItem { item: item_entity },
-                            )
-                            .expect("Unable to insert intent");
-                        newrunstate = RunState::PlayerTurn;
-                    }
-                }
-            }
-            RunState::ShowTargeting { range, item } => {
-                let result = gui::ranged_target(self, ctx, range);
-                match result.0 {
-                    gui::ItemMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
-                    gui::ItemMenuResult::NoResponse => {}
-                    gui::ItemMenuResult::Selected => {
-                        let mut intent = self.ecs.write_storage::<WantsToUseItem>();
-                        intent
-                            .insert(
-                                *self.ecs.fetch::<Entity>(),
-                                WantsToUseItem {
-                                    item,
-                                    target: result.1,
-                                },
-                            )
-                            .expect("Unable to insert intent");
-                        newrunstate = RunState::PlayerTurn;
-                    }
-                }
-            }
-            RunState::MainMenu { .. } => {
-                let result = gui::main_menu(self, ctx);
-                match result {
-                    gui::MainMenuResult::NoSelection { selected } => {
-                        newrunstate = RunState::MainMenu {
-                            menu_selection: selected,
-                        }
-                    }
-                    gui::MainMenuResult::Selected { selected } => match selected {
-                        gui::MainMenuSelection::NewGame => newrunstate = RunState::PreRun,
-                        gui::MainMenuSelection::LoadGame => {
-                            saveload_system::load_game(&mut self.ecs);
-                            newrunstate = RunState::AwaitingInput;
-                            saveload_system::delete_save();
-                        }
-                        gui::MainMenuSelection::Quit => {
-                            ::std::process::exit(0);
-                        }
-                    },
-                }
-            }
-            RunState::GameOver => {
-                let result = gui::game_over(ctx);
-                match result {
-                    gui::GameOverResult::NoSelection => {}
-                    gui::GameOverResult::QuitToMenu => {
-                        self.game_over_cleanup();
-                        newrunstate = RunState::MainMenu {
-                            menu_selection: gui::MainMenuSelection::NewGame,
-                        };
-                    }
-                }
-            }
-            RunState::SaveGame => {
-                saveload_system::save_game(&mut self.ecs);
-                data_representation::world_state_log(&mut self.ecs).unwrap(); //TODO it's fuck with the log if i  write it's here, but it's better for performance
-                data_representation::general_log(&mut self.ecs).unwrap(); //TODO it's fuck with the log if i  write it's here, but it's better for performance
-                data_representation::write_genealogy(&mut self.ecs).unwrap();
-                newrunstate = RunState::MainMenu {
-                    menu_selection: gui::MainMenuSelection::LoadGame,
-                };
-            }
-            RunState::NextLevel => {
-                self.goto_next_level();
-                newrunstate = RunState::PreRun;
-            }
-            RunState::TemperatureMap => {
-                let result = gui::temperature_map(self, ctx);
-                match result {
-                    gui::TemperatureMapResult::Cancel => newrunstate = RunState::PlayerTurn,
-                    gui::TemperatureMapResult::NoResponse => {}
-                }
+            _ => {
+                newrunstate = RunState::AwaitingInput;
             }
         }
 
+        //store runstate
         {
             let mut runwriter = self.ecs.write_resource::<RunState>();
             *runwriter = newrunstate;
         }
-        birth::give_birth(&mut self.ecs);
+
         object_deleter::delete_entity_to_delete(&mut self.ecs);
     }
 }
@@ -614,100 +444,12 @@ fn main() {
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
     for room in map.rooms.iter() {
         spawner::spawn_trees(&mut gs.ecs, room);
-
-        //spawn_named(&mut gs.ecs, "Cow", 5, 2);
-        //spawn_named(&mut gs.ecs, "Cow", 100, 100);
-        spawn_named(&mut gs.ecs, "Cow", 30, 4);
-        spawn_named(&mut gs.ecs, "Cow", 30, 5);
-        spawn_named(&mut gs.ecs, "Cow", 30, 6);
-        spawn_named(&mut gs.ecs, "Cow", 30, 7);
-        spawn_named(&mut gs.ecs, "Cow", 30, 8);
-        spawn_named(&mut gs.ecs, "Cow", 30, 9);
-        spawn_named(&mut gs.ecs, "Cow", 30, 10);
-        spawn_named(&mut gs.ecs, "Cow", 30, 11);
-        spawn_named(&mut gs.ecs, "Cow", 30, 12);
-        spawn_named(&mut gs.ecs, "Cow", 30, 13);
-        spawn_named(&mut gs.ecs, "Cow", 30, 14);
-        spawn_named(&mut gs.ecs, "Wolve", 10, 10);
-        spawn_named(&mut gs.ecs, "WolveF", 10, 15);
-        /*
-        spawn_named(&mut gs.ecs, "Cow", 50, 4);
-        spawn_named(&mut gs.ecs, "Cow", 50, 5);
-        spawn_named(&mut gs.ecs, "Cow", 50, 6);
-        spawn_named(&mut gs.ecs, "Cow", 50, 7);
-        spawn_named(&mut gs.ecs, "Cow", 50, 8);
-        spawn_named(&mut gs.ecs, "Cow", 50, 9);
-        spawn_named(&mut gs.ecs, "Cow", 50, 10);
-        spawn_named(&mut gs.ecs, "Cow", 50, 11);
-        spawn_named(&mut gs.ecs, "Cow", 50, 12);
-        spawn_named(&mut gs.ecs, "Cow", 50, 13);
-        spawn_named(&mut gs.ecs, "Cow", 50, 14);
-
-        spawn_named(&mut gs.ecs, "Cow", 70, 4);
-        spawn_named(&mut gs.ecs, "Cow", 70, 5);
-        spawn_named(&mut gs.ecs, "Cow", 70, 6);
-        spawn_named(&mut gs.ecs, "Cow", 70, 7);
-        spawn_named(&mut gs.ecs, "Cow", 70, 8);
-        spawn_named(&mut gs.ecs, "Cow", 70, 9);
-        spawn_named(&mut gs.ecs, "Cow", 70, 10);
-        spawn_named(&mut gs.ecs, "Cow", 70, 11);
-        spawn_named(&mut gs.ecs, "Cow", 70, 12);
-        spawn_named(&mut gs.ecs, "Cow", 70, 13);
-        spawn_named(&mut gs.ecs, "Cow", 70, 14);
-
-        spawn_named(&mut gs.ecs, "Cow", 40, 4);
-        spawn_named(&mut gs.ecs, "Cow", 40, 5);
-        spawn_named(&mut gs.ecs, "Cow", 40, 6);
-        spawn_named(&mut gs.ecs, "Cow", 40, 7);
-        spawn_named(&mut gs.ecs, "Cow", 40, 8);
-        spawn_named(&mut gs.ecs, "Cow", 40, 9);
-        spawn_named(&mut gs.ecs, "Cow", 40, 10);
-        spawn_named(&mut gs.ecs, "Cow", 40, 11);
-        spawn_named(&mut gs.ecs, "Cow", 40, 12);
-        spawn_named(&mut gs.ecs, "Cow", 40, 13);
-        spawn_named(&mut gs.ecs, "Cow", 40, 14);
-
-        spawn_named(&mut gs.ecs, "Cow", 20, 4);
-        spawn_named(&mut gs.ecs, "Cow", 20, 5);
-        spawn_named(&mut gs.ecs, "Cow", 20, 6);
-        spawn_named(&mut gs.ecs, "Cow", 20, 7);
-        spawn_named(&mut gs.ecs, "Cow", 20, 8);
-        spawn_named(&mut gs.ecs, "Cow", 20, 9);
-        spawn_named(&mut gs.ecs, "Cow", 20, 10);
-        spawn_named(&mut gs.ecs, "Cow", 20, 11);
-        spawn_named(&mut gs.ecs, "Cow", 20, 12);
-        spawn_named(&mut gs.ecs, "Cow", 20, 13);
-        spawn_named(&mut gs.ecs, "Cow", 20, 14);
-
-        spawn_named(&mut gs.ecs, "Cow", 50, 10);
-        spawn_named(&mut gs.ecs, "Cow", 50, 11);
-        spawn_named(&mut gs.ecs, "Cow", 50, 12);
-        spawn_named(&mut gs.ecs, "Cow", 50, 13);
-        spawn_named(&mut gs.ecs, "Cow", 50, 14);
-        spawn_named(&mut gs.ecs, "Cow", 50, 15);
-        spawn_named(&mut gs.ecs, "Cow", 50, 16);
-        spawn_named(&mut gs.ecs, "Cow", 50, 17);
-        spawn_named(&mut gs.ecs, "Cow", 50, 18);
-        spawn_named(&mut gs.ecs, "Cow", 50, 19);
-
-        spawn_named(&mut gs.ecs, "Cow", 50, 30);
-        spawn_named(&mut gs.ecs, "Cow", 50, 31);
-        spawn_named(&mut gs.ecs, "Cow", 50, 32);
-        spawn_named(&mut gs.ecs, "Cow", 50, 33);
-        spawn_named(&mut gs.ecs, "Cow", 50, 34);
-        spawn_named(&mut gs.ecs, "Cow", 50, 35);
-        spawn_named(&mut gs.ecs, "Cow", 50, 36);
-        spawn_named(&mut gs.ecs, "Cow", 50, 37);
-        spawn_named(&mut gs.ecs, "Cow", 50, 38);
-        spawn_named(&mut gs.ecs, "Cow", 50, 39);*/
     }
 
     gs.ecs.insert(map);
     gs.ecs.insert(Point::new(player_x, player_y));
     gs.ecs.insert(player_entity);
-    gs.ecs.insert(RunState::MainMenu {
-        menu_selection: gui::MainMenuSelection::NewGame,
-    });
+    gs.ecs.insert(RunState::AwaitingInput);
     gs.ecs.insert(gamelog::GameLog {
         entries: vec!["Welcome to Rusty Roguelike".to_string()],
     });
