@@ -43,6 +43,10 @@ mod atomic_funtions;
 mod data_representation;
 //use std::time::Instant;
 mod network;
+use network::Config;
+use std::sync::{Arc, Mutex};
+use std::thread;
+use std::{env, process};
 
 #[macro_use]
 extern crate lazy_static;
@@ -168,11 +172,12 @@ pub fn runstate_choice(
     ctx: &mut Rltk,
     gs: &mut State,
     entity: Entity,
+    message: network::Message,
 ) -> RunState {
     let newrunstate;
     match runstate {
         RunState::AwaitingInput => {
-            newrunstate = player_input(gs, ctx, entity);
+            newrunstate = player_input(gs, ctx, entity, message);
         }
         RunState::PlayerTurn => {
             newrunstate = RunState::AwaitingInput;
@@ -211,13 +216,33 @@ impl GameState for State {
 
         let player_entity = *self.ecs.fetch::<Entity>();
 
+        //list of websocket messga with their origin uid
+        let message_list = (*self
+            .ecs
+            .fetch::<Arc<Mutex<Vec<(network::Message, String)>>>>())
+        .clone();
+
         let mut player_messages: Vec<(Entity, network::Message)> = Vec::new();
 
-        player_messages.push((player_entity, network::Message::Register));
+        {
+            let mut message_list_guard = message_list.lock().unwrap();
+
+            //todo hash map to get player entity
+
+            for (net_mes, uid) in message_list_guard.iter() {
+                println!("message list: {:?}", net_mes);
+                let mes = net_mes.clone();
+                player_messages.push((player_entity, mes));
+            }
+
+            message_list_guard.clear();
+        }
+
+        // player_messages.push((player_entity, network::Message::Register));
 
         for (entity, message) in player_messages {
             //execute runstate
-            newrunstate = runstate_choice(newrunstate, ctx, self, entity);
+            newrunstate = runstate_choice(newrunstate, ctx, self, entity, message);
         }
 
         //run game
@@ -505,6 +530,23 @@ fn main() {
     });
     gs.ecs
         .insert(gamelog::SpeciesInstantLog { entries: vec![] });
+
+    let args: Vec<String> = env::args().collect();
+    let config = Config::new(&args).unwrap_or_else(|err| {
+        println!("Error creating Config: {}", err);
+        println!("Usage: poeng_server url");
+        process::exit(1);
+    });
+
+    println!("url: {}", config.url);
+    let message_list: Arc<Mutex<Vec<(network::Message, String)>>> =
+        Arc::new(Mutex::new(Vec::new()));
+
+    gs.ecs.insert(message_list.clone());
+
+    thread::spawn(move || {
+        network::run(config, message_list);
+    });
 
     rltk::main_loop(context, gs);
 }

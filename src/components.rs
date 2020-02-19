@@ -424,7 +424,7 @@ pub struct Meat {
     pub nutriments: f32,
 }
 
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum FoodType {
     Meat,
     Animal,
@@ -435,6 +435,19 @@ pub enum FoodType {
 pub struct FoodPreference {
     //associate a level of hunger with a food type
     pub choices: BTreeMap<i32, FoodType>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum PlayerInput {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct OnlinePlayerInput {
+    pub input: PlayerInput,
 }
 
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an

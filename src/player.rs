@@ -2,8 +2,8 @@ extern crate rltk;
 use rltk::{Point, Rltk, VirtualKeyCode};
 extern crate specs;
 use super::{
-    gamelog::GameLog, CombatStats, Item, Map, Monster, Player, Position, RunState, State, TileType,
-    Viewshed, WantsToMelee, WantsToPickupItem, WINDOWHEIGHT, WINDOWWIDTH,
+    gamelog::GameLog, network, CombatStats, Item, Map, Monster, Player, Position, RunState, State,
+    TileType, Viewshed, WantsToMelee, WantsToPickupItem, WINDOWHEIGHT, WINDOWWIDTH,
 };
 use specs::prelude::*;
 use std::cmp::{max, min};
@@ -135,9 +135,25 @@ fn skip_turn(ecs: &mut World) -> RunState {
     RunState::PlayerTurn
 }
 
-pub fn player_input(gs: &mut State, ctx: &mut Rltk, entity: Entity) -> RunState {
+pub fn player_input(
+    gs: &mut State,
+    ctx: &mut Rltk,
+    entity: Entity,
+    message: network::Message,
+) -> RunState {
     // Player movement
-    match ctx.key {
+
+    //get the last input for the online player
+
+    match message {
+        network::Message::UP(uuid) => try_move_player(0, -1, &mut gs.ecs, entity),
+        network::Message::DOWN(uuid) => try_move_player(0, 1, &mut gs.ecs, entity),
+        network::Message::LEFT(uuid) => try_move_player(-1, 0, &mut gs.ecs, entity),
+        network::Message::RIGHT(uuid) => try_move_player(1, 0, &mut gs.ecs, entity),
+        _ => {}
+    }
+
+    /*match ctx.key {
         None => return RunState::AwaitingInput, // Nothing happened
         Some(key) => match key {
             VirtualKeyCode::Left | VirtualKeyCode::Numpad4 | VirtualKeyCode::H => {
@@ -206,5 +222,6 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk, entity: Entity) -> RunState 
             _ => return RunState::AwaitingInput,
         },
     }
+    */
     RunState::PlayerTurn
 }
