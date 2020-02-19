@@ -42,6 +42,7 @@ use birth::{BirthForm, BirthRegistery, BirthRequetList, Mutations};
 mod atomic_funtions;
 mod data_representation;
 //use std::time::Instant;
+mod network;
 
 #[macro_use]
 extern crate lazy_static;
@@ -162,6 +163,27 @@ impl State {
     }
 }
 
+pub fn runstate_choice(
+    runstate: RunState,
+    ctx: &mut Rltk,
+    gs: &mut State,
+    entity: Entity,
+) -> RunState {
+    let newrunstate;
+    match runstate {
+        RunState::AwaitingInput => {
+            newrunstate = player_input(gs, ctx, entity);
+        }
+        RunState::PlayerTurn => {
+            newrunstate = RunState::AwaitingInput;
+        }
+        _ => {
+            newrunstate = RunState::AwaitingInput;
+        }
+    }
+    newrunstate
+}
+
 impl GameState for State {
     fn tick(&mut self, ctx: &mut Rltk) {
         let mut newrunstate;
@@ -187,21 +209,20 @@ impl GameState for State {
             gui::draw_ui(&self.ecs, ctx);
         }
 
-        //execute runstate
-        match newrunstate {
-            RunState::AwaitingInput => {
-                newrunstate = player_input(self, ctx);
-            }
-            RunState::PlayerTurn => {
-                self.run_systems();
-                self.ecs.maintain();
+        let player_entity = *self.ecs.fetch::<Entity>();
 
-                newrunstate = RunState::AwaitingInput;
-            }
-            _ => {
-                newrunstate = RunState::AwaitingInput;
-            }
+        let mut player_messages: Vec<(Entity, network::Message)> = Vec::new();
+
+        player_messages.push((player_entity, network::Message::Register));
+
+        for (entity, message) in player_messages {
+            //execute runstate
+            newrunstate = runstate_choice(newrunstate, ctx, self, entity);
         }
+
+        //run game
+        self.run_systems();
+        self.ecs.maintain();
 
         //store runstate
         {
@@ -210,6 +231,23 @@ impl GameState for State {
         }
 
         object_deleter::delete_entity_to_delete(&mut self.ecs);
+    }
+}
+
+pub struct Player_Messages {
+    requests: Vec<(Entity, network::Message)>,
+}
+
+impl Player_Messages {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Player_Messages {
+        Player_Messages {
+            requests: Vec::new(),
+        }
+    }
+
+    pub fn request(&mut self, player_entity: Entity, message: network::Message) {
+        self.requests.push((player_entity, message));
     }
 }
 
@@ -458,6 +496,7 @@ fn main() {
     gs.ecs.insert(Date::new());
     gs.ecs.insert(BirthRequetList::new());
     gs.ecs.insert(BirthRegistery::new());
+    gs.ecs.insert(Player_Messages::new());
     gs.ecs.insert(gamelog::WorldStatLog {
         entries: vec!["Rust Roguelike World Stat log file".to_string()],
     });
