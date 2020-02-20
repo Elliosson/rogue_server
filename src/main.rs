@@ -44,9 +44,11 @@ mod data_representation;
 //use std::time::Instant;
 mod network;
 use network::Config;
+use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::{env, process};
+use uuid::Uuid;
 
 #[macro_use]
 extern crate lazy_static;
@@ -214,6 +216,8 @@ impl GameState for State {
             gui::draw_ui(&self.ecs, ctx);
         }
 
+        //TODO put all of this in a system, this will be a lot clearer
+
         let player_entity = *self.ecs.fetch::<Entity>();
 
         //list of websocket messga with their origin uid
@@ -232,6 +236,12 @@ impl GameState for State {
             for (net_mes, uid) in message_list_guard.iter() {
                 println!("message list: {:?}", net_mes);
                 let mes = net_mes.clone();
+
+                //todo read the hash map to asociate the uid with an entity
+                //attention si c'est un register on va pas avoir l'uid en faite.
+                //Donc traiter dans network les autre message et ne renvoyer que les message avec uid en premier
+                //pour le register faire un truc, pour l'instant justen créer uine nouvelle entier q chaque uid inconue
+
                 player_messages.push((player_entity, mes));
             }
 
@@ -273,6 +283,20 @@ impl Player_Messages {
 
     pub fn request(&mut self, player_entity: Entity, message: network::Message) {
         self.requests.push((player_entity, message));
+    }
+}
+
+//link the uiid with the correct player entity
+pub struct UuidPlayerHash {
+    pub hash: HashMap<Uuid, Entity>,
+}
+
+impl UuidPlayerHash {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> UuidPlayerHash {
+        UuidPlayerHash {
+            hash: HashMap::new(),
+        }
     }
 }
 
@@ -521,6 +545,7 @@ fn main() {
     gs.ecs.insert(Date::new());
     gs.ecs.insert(BirthRequetList::new());
     gs.ecs.insert(BirthRegistery::new());
+    gs.ecs.insert(UuidPlayerHash::new());
     gs.ecs.insert(Player_Messages::new());
     gs.ecs.insert(gamelog::WorldStatLog {
         entries: vec!["Rust Roguelike World Stat log file".to_string()],
