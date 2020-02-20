@@ -226,26 +226,63 @@ impl GameState for State {
             .fetch::<Arc<Mutex<Vec<(network::Message, String)>>>>())
         .clone();
 
+        {
+            let player_hash = self.ecs.fetch::<UuidPlayerHash>();
+
+            player_hash.hash.get(&"fg".to_string());
+        }
+
         let mut player_messages: Vec<(Entity, network::Message)> = Vec::new();
+
+        let mut new_player_list = Vec::new();
 
         {
             let mut message_list_guard = message_list.lock().unwrap();
 
             //todo hash map to get player entity
 
-            for (net_mes, uid) in message_list_guard.iter() {
-                println!("message list: {:?}", net_mes);
+            for (net_mes, command) in message_list_guard.iter() {
+                println!("message list: {:?}, uid {}", net_mes, command);
                 let mes = net_mes.clone();
+
+                let mut uid = "".to_string();
+
+                match mes {
+                    network::Message::RIGHT(uuid) => uid = uuid.to_string(),
+                    network::Message::LEFT(uuid) => uid = uuid.to_string(),
+                    network::Message::UP(uuid) => uid = uuid.to_string(),
+                    network::Message::DOWN(uuid) => uid = uuid.to_string(),
+                    _ => {}
+                }
+
+                let player_hash = self.ecs.fetch::<UuidPlayerHash>();
+
+                match player_hash.hash.get(&uid.clone()) {
+                    Some(entity) => {
+                        player_messages.push((*entity, mes));
+                    }
+                    None => {
+                        new_player_list.push(uid.clone());
+                    }
+                }
 
                 //todo read the hash map to asociate the uid with an entity
                 //attention si c'est un register on va pas avoir l'uid en faite.
                 //Donc traiter dans network les autre message et ne renvoyer que les message avec uid en premier
                 //pour le register faire un truc, pour l'instant justen créer uine nouvelle entier q chaque uid inconue
-
-                player_messages.push((player_entity, mes));
             }
 
             message_list_guard.clear();
+        }
+
+        //create new player
+        for uid in new_player_list {
+            let new_player;
+            {
+                new_player = spawner::player(&mut self.ecs, 5, 5);
+            }
+            let mut player_hash = self.ecs.write_resource::<UuidPlayerHash>();
+            player_hash.hash.insert(uid.clone(), new_player);
         }
 
         // player_messages.push((player_entity, network::Message::Register));
@@ -266,37 +303,6 @@ impl GameState for State {
         }
 
         object_deleter::delete_entity_to_delete(&mut self.ecs);
-    }
-}
-
-pub struct Player_Messages {
-    requests: Vec<(Entity, network::Message)>,
-}
-
-impl Player_Messages {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Player_Messages {
-        Player_Messages {
-            requests: Vec::new(),
-        }
-    }
-
-    pub fn request(&mut self, player_entity: Entity, message: network::Message) {
-        self.requests.push((player_entity, message));
-    }
-}
-
-//link the uiid with the correct player entity
-pub struct UuidPlayerHash {
-    pub hash: HashMap<Uuid, Entity>,
-}
-
-impl UuidPlayerHash {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> UuidPlayerHash {
-        UuidPlayerHash {
-            hash: HashMap::new(),
-        }
     }
 }
 
