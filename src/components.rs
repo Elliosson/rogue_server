@@ -46,6 +46,11 @@ pub struct Name {
 pub struct BlocksTile {}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Connected {
+    pub uuid: String,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct CombatStats {
     pub max_hp: i32,
     pub hp: i32,
@@ -438,6 +443,12 @@ pub struct FoodPreference {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum OnlineRunState {
+    AwaitingInput,
+    PlayerTurn,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum PlayerInput {
     UP,
     DOWN,
@@ -446,8 +457,19 @@ pub enum PlayerInput {
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct OnlinePlayer {
+    pub runstate: OnlineRunState,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct OnlinePlayerInput {
     pub input: PlayerInput,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct WantToMove {
+    pub delta_x: i32,
+    pub delta_y: i32,
 }
 
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an

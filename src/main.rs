@@ -11,7 +11,6 @@ pub use components::*;
 mod map;
 pub use map::*;
 mod player;
-use player::*;
 mod rect;
 pub use rect::Rect;
 mod visibility_system;
@@ -20,9 +19,8 @@ mod map_indexing_system;
 use map_indexing_system::MapIndexingSystem;
 mod gamelog;
 mod gui;
-mod spawner;
-use spawner::*;
 mod inventory_system;
+mod spawner;
 use inventory_system::{ItemCollectionSystem, ItemDropSystem, ItemRemoveSystem, ItemUseSystem};
 mod movement_system;
 mod object_deleter;
@@ -48,7 +46,6 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::{env, process};
-use uuid::Uuid;
 
 #[macro_use]
 extern crate lazy_static;
@@ -106,6 +103,11 @@ impl State {
         specie.run_now(&self.ecs);
         let mut vis = VisibilitySystem {};
         vis.run_now(&self.ecs);
+
+        /***player turn ****/
+        let mut online_player = OnlinePlayerSystem {};
+        online_player.run_now(&self.ecs);
+
         //let mut cow = CowAI {};
         //cow.run_now(&self.ecs);
         //let mut carnivore_ai = CarnivorousAI {};
@@ -137,6 +139,8 @@ impl State {
         object_spawn.run_now(&self.ecs);
         let mut interaction = InteractionSystem {};
         interaction.run_now(&self.ecs);
+        let mut want_move = WantToMoveSystem {};
+        want_move.run_now(&self.ecs);
         let mut go_target = GoTargetSystem {};
         go_target.run_now(&self.ecs);
         let mut movement = MovementSystem {};
@@ -163,42 +167,16 @@ impl State {
         action_point.run_now(&self.ecs);
         let mut stat = StatSystem {};
         stat.run_now(&self.ecs);
+        let mut map_send = SendMapSystem {};
+        map_send.run_now(&self.ecs);
 
         self.ecs.maintain();
         // println!("systems time = {}", now.elapsed().as_micros());
     }
 }
 
-pub fn runstate_choice(
-    runstate: RunState,
-    ctx: &mut Rltk,
-    gs: &mut State,
-    entity: Entity,
-    message: network::Message,
-) -> RunState {
-    let newrunstate;
-    match runstate {
-        RunState::AwaitingInput => {
-            newrunstate = player_input(gs, ctx, entity, message);
-        }
-        RunState::PlayerTurn => {
-            newrunstate = RunState::AwaitingInput;
-        }
-        _ => {
-            newrunstate = RunState::AwaitingInput;
-        }
-    }
-    newrunstate
-}
-
 impl GameState for State {
     fn tick(&mut self, ctx: &mut Rltk) {
-        let mut newrunstate;
-        {
-            let runstate = self.ecs.fetch::<RunState>();
-            newrunstate = *runstate;
-        }
-
         ctx.cls();
 
         draw_map(&self.ecs, ctx);
@@ -216,238 +194,15 @@ impl GameState for State {
             gui::draw_ui(&self.ecs, ctx);
         }
 
-        //TODO put all of this in a system, this will be a lot clearer
-
-        let player_entity = *self.ecs.fetch::<Entity>();
-
-        //list of websocket messga with their origin uid
-        let message_list = (*self
-            .ecs
-            .fetch::<Arc<Mutex<Vec<(network::Message, String)>>>>())
-        .clone();
-
-        {
-            let player_hash = self.ecs.fetch::<UuidPlayerHash>();
-
-            player_hash.hash.get(&"fg".to_string());
-        }
-
-        let mut player_messages: Vec<(Entity, network::Message)> = Vec::new();
-
-        let mut new_player_list = Vec::new();
-
-        {
-            let mut message_list_guard = message_list.lock().unwrap();
-
-            //todo hash map to get player entity
-
-            for (net_mes, command) in message_list_guard.iter() {
-                println!("message list: {:?}, uid {}", net_mes, command);
-                let mes = net_mes.clone();
-
-                let mut uid = "".to_string();
-
-                match mes {
-                    network::Message::RIGHT(uuid) => uid = uuid.to_string(),
-                    network::Message::LEFT(uuid) => uid = uuid.to_string(),
-                    network::Message::UP(uuid) => uid = uuid.to_string(),
-                    network::Message::DOWN(uuid) => uid = uuid.to_string(),
-                    _ => {}
-                }
-
-                let player_hash = self.ecs.fetch::<UuidPlayerHash>();
-
-                match player_hash.hash.get(&uid.clone()) {
-                    Some(entity) => {
-                        player_messages.push((*entity, mes));
-                    }
-                    None => {
-                        new_player_list.push(uid.clone());
-                    }
-                }
-
-                //todo read the hash map to asociate the uid with an entity
-                //attention si c'est un register on va pas avoir l'uid en faite.
-                //Donc traiter dans network les autre message et ne renvoyer que les message avec uid en premier
-                //pour le register faire un truc, pour l'instant justen créer uine nouvelle entier q chaque uid inconue
-            }
-
-            message_list_guard.clear();
-        }
-
-        //create new player
-        for uid in new_player_list {
-            let new_player;
-            {
-                new_player = spawner::player(&mut self.ecs, 5, 5);
-            }
-            let mut player_hash = self.ecs.write_resource::<UuidPlayerHash>();
-            player_hash.hash.insert(uid.clone(), new_player);
-        }
-
-        // player_messages.push((player_entity, network::Message::Register));
-
-        for (entity, message) in player_messages {
-            //execute runstate
-            newrunstate = runstate_choice(newrunstate, ctx, self, entity, message);
-        }
-
         //run game
         self.run_systems();
         self.ecs.maintain();
-
-        //store runstate
-        {
-            let mut runwriter = self.ecs.write_resource::<RunState>();
-            *runwriter = newrunstate;
-        }
 
         object_deleter::delete_entity_to_delete(&mut self.ecs);
     }
 }
 
-impl State {
-    fn entities_to_remove_on_level_change(&mut self) -> Vec<Entity> {
-        let entities = self.ecs.entities();
-        let player = self.ecs.read_storage::<Player>();
-        let backpack = self.ecs.read_storage::<InBackpack>();
-        let player_entity = self.ecs.fetch::<Entity>();
-        let equipped = self.ecs.read_storage::<Equipped>();
-
-        let mut to_delete: Vec<Entity> = Vec::new();
-        for entity in entities.join() {
-            let mut should_delete = true;
-
-            // Don't delete the player
-            let p = player.get(entity);
-            if let Some(_p) = p {
-                should_delete = false;
-            }
-
-            // Don't delete the player's equipment
-            let bp = backpack.get(entity);
-            if let Some(bp) = bp {
-                if bp.owner == *player_entity {
-                    should_delete = false;
-                }
-            }
-
-            let eq = equipped.get(entity);
-            if let Some(eq) = eq {
-                if eq.owner == *player_entity {
-                    should_delete = false;
-                }
-            }
-
-            if should_delete {
-                to_delete.push(entity);
-            }
-        }
-
-        to_delete
-    }
-
-    fn goto_next_level(&mut self) {
-        // Delete entities that aren't the player or his/her equipment
-        let to_delete = self.entities_to_remove_on_level_change();
-        for target in to_delete {
-            self.ecs
-                .delete_entity(target)
-                .expect("Unable to delete entity");
-        }
-
-        // Interactable a new map and place the player
-        let worldmap;
-        let current_depth;
-        {
-            let mut worldmap_resource = self.ecs.write_resource::<Map>();
-            current_depth = worldmap_resource.depth;
-            *worldmap_resource = Map::new_map_rooms_and_corridors(current_depth + 1);
-            worldmap = worldmap_resource.clone();
-        }
-
-        // Spawn bad guys
-        for room in worldmap.rooms.iter().skip(1) {
-            spawner::spawn_room(&mut self.ecs, room, current_depth + 1);
-        }
-
-        // Place the player and update resources
-        let (player_x, player_y) = worldmap.rooms[0].center();
-        let mut player_position = self.ecs.write_resource::<Point>();
-        *player_position = Point::new(player_x, player_y);
-        let mut position_components = self.ecs.write_storage::<Position>();
-        let player_entity = self.ecs.fetch::<Entity>();
-        let player_pos_comp = position_components.get_mut(*player_entity);
-        if let Some(player_pos_comp) = player_pos_comp {
-            player_pos_comp.x = player_x;
-            player_pos_comp.y = player_y;
-        }
-
-        // Mark the player's visibility as dirty
-        let mut viewshed_components = self.ecs.write_storage::<Viewshed>();
-        let vs = viewshed_components.get_mut(*player_entity);
-        if let Some(vs) = vs {
-            vs.dirty = true;
-        }
-
-        // Notify the player and give them some health
-        let mut gamelog = self.ecs.fetch_mut::<gamelog::GameLog>();
-        gamelog.entries.insert(
-            0,
-            "You descend to the next level, and take a moment to heal.".to_string(),
-        );
-        let mut player_health_store = self.ecs.write_storage::<CombatStats>();
-        let player_health = player_health_store.get_mut(*player_entity);
-        if let Some(player_health) = player_health {
-            player_health.hp = i32::max(player_health.hp, player_health.max_hp / 2);
-        }
-    }
-
-    fn game_over_cleanup(&mut self) {
-        // Delete everything
-        let mut to_delete = Vec::new();
-        for e in self.ecs.entities().join() {
-            to_delete.push(e);
-        }
-        for del in to_delete.iter() {
-            self.ecs.delete_entity(*del).expect("Deletion failed");
-        }
-
-        // Interactable a new map and place the player
-        let worldmap;
-        {
-            let mut worldmap_resource = self.ecs.write_resource::<Map>();
-            *worldmap_resource = Map::new_map_rooms_and_corridors(1);
-            worldmap = worldmap_resource.clone();
-        }
-
-        // Spawn bad guys
-        for room in worldmap.rooms.iter().skip(1) {
-            spawner::spawn_room(&mut self.ecs, room, 1);
-        }
-
-        // Place the player and update resources
-        let (player_x, player_y) = worldmap.rooms[0].center();
-        let player_entity = spawner::player(&mut self.ecs, player_x, player_y);
-        let mut player_position = self.ecs.write_resource::<Point>();
-        *player_position = Point::new(player_x, player_y);
-        let mut position_components = self.ecs.write_storage::<Position>();
-        let mut player_entity_writer = self.ecs.write_resource::<Entity>();
-        *player_entity_writer = player_entity;
-        let player_pos_comp = position_components.get_mut(player_entity);
-        if let Some(player_pos_comp) = player_pos_comp {
-            player_pos_comp.x = player_x;
-            player_pos_comp.y = player_y;
-        }
-
-        // Mark the player's visibility as dirty
-        let mut viewshed_components = self.ecs.write_storage::<Viewshed>();
-        let vs = viewshed_components.get_mut(player_entity);
-        if let Some(vs) = vs {
-            vs.dirty = true;
-        }
-    }
-}
+impl State {}
 
 fn main() {
     let mut context = Rltk::init_simple8x8(
@@ -524,6 +279,10 @@ fn main() {
     gs.ecs.register::<Meat>();
     gs.ecs.register::<Dead>();
     gs.ecs.register::<FoodPreference>();
+    gs.ecs.register::<WantToMove>();
+    gs.ecs.register::<OnlinePlayerInput>();
+    gs.ecs.register::<OnlinePlayer>();
+    gs.ecs.register::<Connected>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 
@@ -552,7 +311,7 @@ fn main() {
     gs.ecs.insert(BirthRequetList::new());
     gs.ecs.insert(BirthRegistery::new());
     gs.ecs.insert(UuidPlayerHash::new());
-    gs.ecs.insert(Player_Messages::new());
+    gs.ecs.insert(PlayerMessages::new());
     gs.ecs.insert(gamelog::WorldStatLog {
         entries: vec!["Rust Roguelike World Stat log file".to_string()],
     });
@@ -573,10 +332,15 @@ fn main() {
     let message_list: Arc<Mutex<Vec<(network::Message, String)>>> =
         Arc::new(Mutex::new(Vec::new()));
 
+    let map_to_send: Arc<Mutex<HashMap<String, Vec<(Position, Renderable)>>>> =
+        Arc::new(Mutex::new(HashMap::new()));
+
     gs.ecs.insert(message_list.clone());
 
+    gs.ecs.insert(map_to_send.clone());
+
     thread::spawn(move || {
-        network::run(config, message_list);
+        network::run(config, message_list, map_to_send);
     });
 
     rltk::main_loop(context, gs);
