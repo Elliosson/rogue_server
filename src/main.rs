@@ -45,6 +45,7 @@ use network::Config;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::thread;
+use std::time;
 use std::{env, process};
 
 #[macro_use]
@@ -55,6 +56,7 @@ rltk::add_wasm_support!();
 pub const WINDOWWIDTH: usize = 200;
 pub const WINDOWHEIGHT: usize = 120;
 pub const MOVE_COST: i32 = 100;
+pub const TICK_TIME: time::Duration = time::Duration::from_millis(200);
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum RunState {
@@ -177,6 +179,8 @@ impl State {
 
 impl GameState for State {
     fn tick(&mut self, ctx: &mut Rltk) {
+        let start = time::Instant::now();
+
         ctx.cls();
 
         draw_map(&self.ecs, ctx);
@@ -199,6 +203,17 @@ impl GameState for State {
         self.ecs.maintain();
 
         object_deleter::delete_entity_to_delete(&mut self.ecs);
+
+        let end = time::Instant::now();
+
+        let time_spend = end - start;
+
+        if time_spend > TICK_TIME {
+            let time_left = TICK_TIME - time_spend;
+            thread::sleep(time_left);
+        } else {
+            println!("WARNING: tick is too slow !")
+        }
     }
 }
 
