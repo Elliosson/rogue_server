@@ -220,13 +220,13 @@ impl GameState for State {
 impl State {}
 
 fn main() {
-    let mut context = Rltk::init_simple8x8(
-        WINDOWWIDTH as u32,
-        WINDOWHEIGHT as u32,
-        "Ecosystem simulator",
-        "resources",
-    );
-    context.with_post_scanlines(true);
+    // let mut context = Rltk::init_simple8x8(
+    //     WINDOWWIDTH as u32,
+    //     WINDOWHEIGHT as u32,
+    //     "Ecosystem simulator",
+    //     "resources",
+    // );
+    //context.with_post_scanlines(true);
     let mut gs = State { ecs: World::new() };
     gs.ecs.register::<Position>();
     gs.ecs.register::<Renderable>();
@@ -358,5 +358,44 @@ fn main() {
         network::run(config, message_list, map_to_send);
     });
 
+    game_loop(gs);
+
+    //rltk::main_loop(context, gs);
+}
+
+#[cfg(not(feature = "no_rltk"))]
+fn game_loop(mut gs: State) {
+    let mut context = Rltk::init_simple8x8(
+        WINDOWWIDTH as u32,
+        WINDOWHEIGHT as u32,
+        "Ecosystem simulator",
+        "resources",
+    );
+    context.with_post_scanlines(true);
+
     rltk::main_loop(context, gs);
+}
+
+#[cfg(feature = "no_rltk")]
+fn game_loop(mut gs: State) {
+    loop {
+        let start = time::Instant::now();
+
+        //run game
+        gs.run_systems();
+        gs.ecs.maintain();
+
+        object_deleter::delete_entity_to_delete(&mut gs.ecs);
+
+        let end = time::Instant::now();
+
+        let time_spend = end - start;
+
+        if time_spend > TICK_TIME {
+            let time_left = TICK_TIME - time_spend;
+            thread::sleep(time_left);
+        } else {
+            println!("WARNING: tick is too slow !")
+        }
+    }
 }

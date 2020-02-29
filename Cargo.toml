@@ -27,4 +27,12 @@ wasm-bindgen = "0.2.58"
 debug = true
 
 
+[features]
+# no features by default
+default = []
+
+# do not create window with rltk because it don't work on the remote desktop of my server
+no_rltk = []
+
+
 
