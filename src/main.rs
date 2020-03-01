@@ -47,6 +47,7 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time;
 use std::{env, process};
+mod local_player;
 
 #[macro_use]
 extern crate lazy_static;
@@ -56,7 +57,7 @@ rltk::add_wasm_support!();
 pub const WINDOWWIDTH: usize = 200;
 pub const WINDOWHEIGHT: usize = 120;
 pub const MOVE_COST: i32 = 100;
-pub const TICK_TIME: time::Duration = time::Duration::from_millis(200);
+pub const TICK_TIME: time::Duration = time::Duration::from_millis(50);
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum RunState {
@@ -199,6 +200,9 @@ impl GameState for State {
 
             gui::draw_ui(&self.ecs, ctx);
         }
+
+        //handle input of the local player
+        local_player::local_player_input(&self.ecs, ctx);
 
         //run game
         self.run_systems();

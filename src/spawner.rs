@@ -40,6 +40,9 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
             defense: 2,
             power: 5,
         })
+        .with(OnlinePlayer {
+            runstate: OnlineRunState::AwaitingInput,
+        })
         .marked::<SimpleMarker<SerializeMe>>()
         .build()
 }
