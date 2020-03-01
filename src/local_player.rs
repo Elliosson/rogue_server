@@ -18,6 +18,7 @@ pub fn local_player_input(ecs: &World, ctx: &mut Rltk) {
         LocalClientRunstate::BaseState => local_client_base_state(ecs, ctx),
         LocalClientRunstate::Inventory => local_client_inventory(ecs, ctx),
         LocalClientRunstate::Interaction => local_client_interaction(ecs, ctx),
+        LocalClientRunstate::Build => local_client_build(ecs, ctx),
         _ => LocalClientRunstate::BaseState,
     }
 }
@@ -49,13 +50,13 @@ pub fn local_client_base_state(ecs: &World, ctx: &mut Rltk) -> LocalClientRunsta
             }
 
             // Diagonals
-            VirtualKeyCode::Numpad9 | VirtualKeyCode::U => None,
+            VirtualKeyCode::Numpad9 => None,
 
-            VirtualKeyCode::Numpad7 | VirtualKeyCode::Y => None,
+            VirtualKeyCode::Numpad7 => None,
 
-            VirtualKeyCode::Numpad3 | VirtualKeyCode::N => None,
+            VirtualKeyCode::Numpad3 => None,
 
-            VirtualKeyCode::Numpad1 | VirtualKeyCode::B => None,
+            VirtualKeyCode::Numpad1 => None,
 
             // Skip Turn
             VirtualKeyCode::Numpad5 | VirtualKeyCode::Space => None,
@@ -143,7 +144,9 @@ pub fn local_client_inventory(ecs: &World, ctx: &mut Rltk) -> LocalClientRunstat
 pub fn local_client_interaction(ecs: &World, ctx: &mut Rltk) -> LocalClientRunstate {
     let local_player_entity = *ecs.fetch::<Entity>();
     let mut player_inputs = ecs.write_storage::<PlayerInputComp>();
+
     let mut newrunstate = LocalClientRunstate::Interaction;
+
     let result = gui::show_object_interaction_choice(ecs, ctx);
     match result.0 {
         gui::InteractionMenuResult::Cancel => newrunstate = LocalClientRunstate::BaseState,
@@ -183,4 +186,35 @@ fn get_item(ecs: &World) -> Option<Entity> {
         }
     }
     target_item
+}
+
+pub fn local_client_build(ecs: &World, ctx: &mut Rltk) -> LocalClientRunstate {
+    let local_player_entity = *ecs.fetch::<Entity>();
+    let mut player_inputs = ecs.write_storage::<PlayerInputComp>();
+
+    let mut newrunstate = LocalClientRunstate::Build;
+    let result = gui::show_building_choice(ecs, ctx);
+
+    match result.0 {
+        gui::BuildingMenuResult::Cancel => newrunstate = LocalClientRunstate::BaseState,
+        gui::BuildingMenuResult::NoResponse => {}
+        gui::BuildingMenuResult::Selected => {
+            let interaction_tuple = result.1.unwrap();
+            let (x, y, building) = interaction_tuple;
+
+            let player_entity = *ecs.fetch::<Entity>();
+
+            player_inputs
+                .insert(
+                    local_player_entity,
+                    PlayerInputComp {
+                        input: PlayerInput::BUILD(x, y, building),
+                    },
+                )
+                .expect("Unable to insert");
+
+            newrunstate = LocalClientRunstate::BaseState;
+        }
+    }
+    newrunstate
 }

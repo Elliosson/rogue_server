@@ -43,6 +43,9 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
         .with(OnlinePlayer {
             runstate: OnlineRunState::AwaitingInput,
         })
+        .with(BuildingChoice {
+            buildings: vec!["block".to_string(), "wall".to_string(), "floor".to_string()],
+        })
         .marked::<SimpleMarker<SerializeMe>>()
         .build()
 }
@@ -116,6 +119,40 @@ pub fn spawn_trees(ecs: &mut World, room: &Rect) {
             _ => {}
         }
     }
+}
+
+pub struct ToSpawnList {
+    requests: Vec<(i32, i32, String)>,
+}
+
+impl ToSpawnList {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> ToSpawnList {
+        ToSpawnList {
+            requests: Vec::new(),
+        }
+    }
+
+    pub fn request(&mut self, x: i32, y: i32, name: String) {
+        self.requests.push((x, y, name));
+    }
+}
+
+pub fn spawner_named(ecs: &mut World) {
+    let mut spawns_temps: Vec<(i32, i32, String)> = Vec::new();
+    {
+        let to_spawns = ecs.write_resource::<ToSpawnList>();
+
+        for (x, y, name) in to_spawns.requests.iter() {
+            spawns_temps.push((*x, *y, name.clone()))
+        }
+    }
+    for (x, y, name) in spawns_temps.iter() {
+        spawn_named(ecs, &name.clone(), *x, *y)
+    }
+    let mut to_spawns = ecs.write_resource::<ToSpawnList>();
+
+    to_spawns.requests.clear();
 }
 
 pub fn spawn_named(ecs: &mut World, key: &str, x: i32, y: i32) {

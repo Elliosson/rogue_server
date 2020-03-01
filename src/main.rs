@@ -22,6 +22,7 @@ mod gui;
 mod inventory_system;
 mod spawner;
 use inventory_system::{ItemCollectionSystem, ItemDropSystem, ItemRemoveSystem, ItemUseSystem};
+use spawner::ToSpawnList;
 mod movement_system;
 mod object_deleter;
 pub mod random_table;
@@ -166,6 +167,9 @@ impl State {
         death_system.run_now(&self.ecs);
         let mut gendered_reprod = GenderedReproductionSystem {};
         gendered_reprod.run_now(&self.ecs);
+
+        let mut want_build = BuildingSystem {};
+        want_build.run_now(&self.ecs);
         let mut prop_spawmer = PropSpawnerSystem {};
         prop_spawmer.run_now(&self.ecs);
         let mut aging = AgingSystem {};
@@ -212,6 +216,7 @@ impl GameState for State {
         self.run_systems();
         self.ecs.maintain();
 
+        spawner::spawner_named(&mut self.ecs);
         object_deleter::delete_entity_to_delete(&mut self.ecs);
 
         let end = time::Instant::now();
@@ -302,6 +307,8 @@ fn main() {
     gs.ecs.register::<PlayerInputComp>();
     gs.ecs.register::<OnlinePlayer>();
     gs.ecs.register::<Connected>();
+    gs.ecs.register::<BuildingChoice>();
+    gs.ecs.register::<WantBuild>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 
@@ -333,6 +340,7 @@ fn main() {
     gs.ecs.insert(PlayerMessages::new());
     gs.ecs.insert(LocalClientInfo::new());
     gs.ecs.insert(InteractionResquestListV2::new());
+    gs.ecs.insert(ToSpawnList::new());
     gs.ecs.insert(gamelog::WorldStatLog {
         entries: vec!["Rust Roguelike World Stat log file".to_string()],
     });

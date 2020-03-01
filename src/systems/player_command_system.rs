@@ -1,7 +1,7 @@
 extern crate specs;
 use crate::{
     gamelog::GameLog, InteractionResquestListV2, InteractionResquestV2, OnlinePlayer,
-    OnlineRunState, PlayerInput, PlayerInputComp, WantToMove, WantsToPickupItem,
+    OnlineRunState, PlayerInput, PlayerInputComp, WantBuild, WantToMove, WantsToPickupItem,
 };
 use specs::prelude::*;
 
@@ -18,6 +18,7 @@ impl<'a> System<'a> for PlayerCommandSystem {
         WriteStorage<'a, OnlinePlayer>,
         WriteStorage<'a, PlayerInputComp>,
         WriteStorage<'a, WantsToPickupItem>,
+        WriteStorage<'a, WantBuild>,
         WriteExpect<'a, InteractionResquestListV2>,
     );
 
@@ -29,6 +30,7 @@ impl<'a> System<'a> for PlayerCommandSystem {
             mut online_players,
             mut player_inputs,
             mut pickups,
+            mut want_builds,
             mut interaction_requestsv2,
         ) = data;
 
@@ -42,6 +44,7 @@ impl<'a> System<'a> for PlayerCommandSystem {
                 &mut want_to_moves,
                 &mut pickups,
                 &mut interaction_requestsv2,
+                &mut want_builds,
             );
             online_player.runstate = newrunstate;
         }
@@ -56,6 +59,7 @@ pub fn online_runstate_choice<'a>(
     want_to_moves: &mut WriteStorage<'a, WantToMove>,
     pickups: &mut WriteStorage<'a, WantsToPickupItem>,
     interations_req: &mut WriteExpect<'a, InteractionResquestListV2>,
+    want_builds: &mut WriteStorage<'a, WantBuild>,
 ) -> OnlineRunState {
     let newrunstate;
     match runstate {
@@ -66,6 +70,7 @@ pub fn online_runstate_choice<'a>(
                 want_to_moves,
                 pickups,
                 interations_req,
+                want_builds,
             );
         }
         OnlineRunState::PlayerTurn => {
@@ -81,6 +86,7 @@ pub fn online_player_input<'a>(
     want_to_move: &mut WriteStorage<'a, WantToMove>,
     pickups: &mut WriteStorage<'a, WantsToPickupItem>,
     interations_req: &mut WriteExpect<'a, InteractionResquestListV2>,
+    want_builds: &mut WriteStorage<'a, WantBuild>,
 ) -> OnlineRunState {
     // Player movement
 
@@ -145,6 +151,11 @@ pub fn online_player_input<'a>(
         }
         PlayerInput::INTERACT(x, y, name, target) => {
             interations_req.request(x, y, name, target, entity);
+        }
+        PlayerInput::BUILD(x, y, name) => {
+            want_builds
+                .insert(entity, WantBuild { x, y, name })
+                .expect("Unable to insert ");
         }
         _ => {}
     }

@@ -3,9 +3,9 @@ use rltk::{Console, Point, Rltk, VirtualKeyCode, RGB};
 extern crate specs;
 use super::{
     gamelog::{GameLog, SpeciesInstantLog},
-    Aging, CombatStats, Date, EnergyReserve, Equipped, Female, InBackpack, InteractableObject,
-    Interaction, Male, Map, Name, Player, Position, Reproduction, RunState, Specie, Speed, State,
-    Viewshed, MAPWIDTH, WINDOWHEIGHT, WINDOWWIDTH,
+    Aging, BuildingChoice, CombatStats, Date, EnergyReserve, Equipped, Female, InBackpack,
+    InteractableObject, Interaction, Male, Map, Name, Player, Position, Reproduction, RunState,
+    Specie, Speed, State, Viewshed, MAPWIDTH, WINDOWHEIGHT, WINDOWWIDTH,
 };
 use specs::prelude::*;
 
@@ -817,6 +817,116 @@ pub fn show_object_interaction_choice(
                         );
                     }
                     (InteractionMenuResult::NoResponse, None)
+                }
+            }
+        }
+    }
+}
+
+#[derive(PartialEq, Copy, Clone)]
+pub enum BuildingMenuResult {
+    Cancel,
+    NoResponse,
+    Selected,
+}
+//get all interaction on player position, print them, and get the choice
+pub fn show_building_choice(
+    ecs: &World,
+    ctx: &mut Rltk,
+) -> (BuildingMenuResult, Option<(i32, i32, String)>) {
+    //get storage
+    let names = ecs.read_storage::<Name>();
+    let interactables = ecs.read_storage::<InteractableObject>();
+    let positions = ecs.read_storage::<Position>();
+    let entities = ecs.entities();
+    let player_entity = *ecs.fetch::<Entity>();
+    let player_pos = positions.get(player_entity).unwrap();
+    let buildings = ecs.read_storage::<BuildingChoice>();
+
+    //TODO for know just 10 buiding
+    let count = 10;
+
+    //Draw the box to print the possible interaction
+    let mut y = (25 - (count / 2)) as i32;
+    ctx.draw_box(
+        15,
+        y - 2,
+        31,
+        (count + 3) as i32,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+    );
+    ctx.print_color(
+        18,
+        y - 2,
+        RGB::named(rltk::YELLOW),
+        RGB::named(rltk::BLACK),
+        "Building Choice",
+    );
+    ctx.print_color(
+        18,
+        y + count as i32 + 1,
+        RGB::named(rltk::YELLOW),
+        RGB::named(rltk::BLACK),
+        "ESCAPE to cancel",
+    );
+
+    let mut j = 0;
+    let mut possible_buildings: Vec<String> = Vec::new();
+
+    // get all building possible to build for this entity
+    let building_choice = buildings.get(player_entity).unwrap();
+
+    //get all possible interaction
+    for building in &building_choice.buildings {
+        //print name of interaction
+        ctx.set(
+            17,
+            y,
+            RGB::named(rltk::WHITE),
+            RGB::named(rltk::BLACK),
+            rltk::to_cp437('('),
+        );
+        ctx.set(
+            18,
+            y,
+            RGB::named(rltk::YELLOW),
+            RGB::named(rltk::BLACK),
+            97 + j as u8,
+        );
+        ctx.set(
+            19,
+            y,
+            RGB::named(rltk::WHITE),
+            RGB::named(rltk::BLACK),
+            rltk::to_cp437(')'),
+        );
+        ctx.print(21, y, &format!("{}", building));
+        y += 1;
+        j += 1;
+
+        possible_buildings.push(building.clone());
+    }
+
+    match ctx.key {
+        None => (BuildingMenuResult::NoResponse, None),
+        Some(key) => {
+            match key {
+                VirtualKeyCode::Escape => (BuildingMenuResult::Cancel, None),
+                _ => {
+                    let selection = rltk::letter_to_option(key);
+                    if selection > -1 && selection < count as i32 {
+                        //TODO transmettre une entieté d'interaction au lieu de transmettre un nom
+                        return (
+                            BuildingMenuResult::Selected,
+                            Some((
+                                player_pos.x,
+                                player_pos.y,
+                                possible_buildings[selection as usize].clone(),
+                            )),
+                        );
+                    }
+                    (BuildingMenuResult::NoResponse, None)
                 }
             }
         }

@@ -458,6 +458,7 @@ pub enum PlayerInput {
     INVENTORY,
     PICKUP(Entity),
     INTERACT(i32, i32, String, Entity),
+    BUILD(i32, i32, String),
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
@@ -495,6 +496,18 @@ impl LocalClientInfo {
             local_runstate: LocalClientRunstate::BaseState,
         }
     }
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct BuildingChoice {
+    pub buildings: Vec<String>,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct WantBuild {
+    pub x: i32,
+    pub y: i32,
+    pub name: String,
 }
 
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
