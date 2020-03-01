@@ -48,3 +48,7 @@ mod send_map_system;
 pub use send_map_system::SendMapSystem;
 mod player_command_system;
 pub use player_command_system::PlayerCommandSystem;
+mod interactionv2_system;
+pub use interactionv2_system::{
+    InteractionResquestListV2, InteractionResquestV2, Interationv2System,
+};

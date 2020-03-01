@@ -1,6 +1,7 @@
 extern crate specs;
 use crate::{
     gamelog::GameLog, OnlinePlayer, OnlineRunState, PlayerInput, PlayerInputComp, WantToMove,
+    WantsToPickupItem,
 };
 use specs::prelude::*;
 
@@ -16,10 +17,12 @@ impl<'a> System<'a> for PlayerCommandSystem {
         WriteStorage<'a, WantToMove>,
         WriteStorage<'a, OnlinePlayer>,
         WriteStorage<'a, PlayerInputComp>,
+        WriteStorage<'a, WantsToPickupItem>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (entities, _log, mut want_to_moves, mut online_players, mut player_inputs) = data;
+        let (entities, _log, mut want_to_moves, mut online_players, mut player_inputs, mut pickups) =
+            data;
 
         for (entity, player_input) in (&entities, &player_inputs).join() {
             let mut online_player = online_players.get_mut(entity).unwrap();
@@ -29,6 +32,7 @@ impl<'a> System<'a> for PlayerCommandSystem {
                 entity,
                 player_input.input.clone(),
                 &mut want_to_moves,
+                &mut pickups,
             );
             online_player.runstate = newrunstate;
         }
@@ -41,11 +45,12 @@ pub fn online_runstate_choice<'a>(
     entity: Entity,
     message: PlayerInput,
     want_to_moves: &mut WriteStorage<'a, WantToMove>,
+    pickups: &mut WriteStorage<'a, WantsToPickupItem>,
 ) -> OnlineRunState {
     let newrunstate;
     match runstate {
         OnlineRunState::AwaitingInput => {
-            newrunstate = online_player_input(entity, message.clone(), want_to_moves);
+            newrunstate = online_player_input(entity, message.clone(), want_to_moves, pickups);
         }
         OnlineRunState::PlayerTurn => {
             newrunstate = OnlineRunState::AwaitingInput;
@@ -58,6 +63,7 @@ pub fn online_player_input<'a>(
     entity: Entity,
     message: PlayerInput,
     want_to_move: &mut WriteStorage<'a, WantToMove>,
+    pickups: &mut WriteStorage<'a, WantsToPickupItem>,
 ) -> OnlineRunState {
     // Player movement
 
@@ -109,8 +115,19 @@ pub fn online_player_input<'a>(
                 .expect("Unable to insert");
         }
         PlayerInput::INVENTORY => {}
+        PlayerInput::PICKUP(item) => {
+            pickups
+                .insert(
+                    entity,
+                    WantsToPickupItem {
+                        collected_by: entity,
+                        item,
+                    },
+                )
+                .expect("Unable to insert want to pickup");
+        }
         _ => {}
     }
 
-    OnlineRunState::PlayerTurn
+    OnlineRunState::AwaitingInput
 }

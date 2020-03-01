@@ -1,7 +1,8 @@
 //This file is handling inputs of the local player
 //this way we can play the game directly on the server
 use super::{
-    gui, LocalClientInfo, LocalClientRunstate, PlayerInput, PlayerInputComp, Ranged, WantsToUseItem,
+    gui, InteractionResquestListV2, Item, LocalClientInfo, LocalClientRunstate, PlayerInput,
+    PlayerInputComp, Position, Ranged, WantsToUseItem,
 };
 
 extern crate rltk;
@@ -16,12 +17,13 @@ pub fn local_player_input(ecs: &World, ctx: &mut Rltk) {
     client_info.local_runstate = match client_info.local_runstate {
         LocalClientRunstate::BaseState => local_client_base_state(ecs, ctx),
         LocalClientRunstate::Inventory => local_client_inventory(ecs, ctx),
+        LocalClientRunstate::Interaction => local_client_interaction(ecs, ctx),
     }
 }
 
 pub fn local_client_base_state(ecs: &World, ctx: &mut Rltk) -> LocalClientRunstate {
     let mut player_inputs = ecs.write_storage::<PlayerInputComp>();
-    let local_player_entity = ecs.fetch::<Entity>();
+    let local_player_entity = *ecs.fetch::<Entity>();
 
     let mut newrunstate = LocalClientRunstate::BaseState;
 
@@ -61,7 +63,14 @@ pub fn local_client_base_state(ecs: &World, ctx: &mut Rltk) -> LocalClientRunsta
             VirtualKeyCode::Period => None,
 
             // Picking up items
-            // VirtualKeyCode::G => get_item(&mut gs.ecs),
+            VirtualKeyCode::G => {
+                let target_item = get_item(ecs);
+                if let Some(item) = target_item {
+                    Some(PlayerInput::PICKUP(item))
+                } else {
+                    None
+                }
+            }
             VirtualKeyCode::I => {
                 //we must print the inventory here since the inventory in only print client side
                 //this is the getion of the gui that is client side normaly
@@ -73,11 +82,11 @@ pub fn local_client_base_state(ecs: &World, ctx: &mut Rltk) -> LocalClientRunsta
             // VirtualKeyCode::D => return RunState::ShowDropItem,
             // VirtualKeyCode::R => return RunState::ShowRemoveItem,
 
-            // // Environement interaction
-            // VirtualKeyCode::F => {
-            //     //interact(&mut gs.ecs); //TODO suppresse when we have a true systeme
-            //     return RunState::ObjectInteraction;
-            // }
+            // Environement interaction
+            VirtualKeyCode::F => {
+                newrunstate = LocalClientRunstate::Interaction;
+                Some(PlayerInput::NONE)
+            }
 
             // //Show Temperature Map
             // VirtualKeyCode::T => {
@@ -91,7 +100,7 @@ pub fn local_client_base_state(ecs: &World, ctx: &mut Rltk) -> LocalClientRunsta
     };
     if let Some(input) = input_op {
         player_inputs
-            .insert(*local_player_entity, PlayerInputComp { input })
+            .insert(local_player_entity, PlayerInputComp { input })
             .expect("Unable to insert");
     }
 
@@ -122,4 +131,47 @@ pub fn local_client_inventory(ecs: &World, ctx: &mut Rltk) -> LocalClientRunstat
     }
 
     newrunstate
+}
+
+pub fn local_client_interaction(ecs: &World, ctx: &mut Rltk) -> LocalClientRunstate {
+    let mut newrunstate = LocalClientRunstate::Interaction;
+    let result = gui::show_object_interaction_choice(ecs, ctx);
+    match result.0 {
+        gui::InteractionMenuResult::Cancel => newrunstate = LocalClientRunstate::BaseState,
+        gui::InteractionMenuResult::NoResponse => {}
+        gui::InteractionMenuResult::Selected => {
+            let interaction_tuple = result.1.unwrap();
+            let (x, y, interaction, interacted_entity) = interaction_tuple;
+
+            let player_entity = *ecs.fetch::<Entity>();
+
+            let mut interaction_requestsv2 = ecs.write_resource::<InteractionResquestListV2>();
+            interaction_requestsv2.request(
+                x,
+                y,
+                interaction.name,
+                interacted_entity,
+                player_entity,
+            );
+
+            newrunstate = LocalClientRunstate::BaseState;
+        }
+    }
+    newrunstate
+}
+
+fn get_item(ecs: &World) -> Option<Entity> {
+    let mut target_item: Option<Entity> = None;
+    let positions = ecs.read_storage::<Position>();
+    let items = ecs.read_storage::<Item>();
+    let local_player_entity = *ecs.fetch::<Entity>();
+    let player_pos = positions.get(local_player_entity).unwrap();
+    let entities = ecs.entities();
+
+    for (item_entity, _item, position) in (&entities, &items, &positions).join() {
+        if position.x == player_pos.x && position.y == player_pos.y {
+            target_item = Some(item_entity);
+        }
+    }
+    target_item
 }

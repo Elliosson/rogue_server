@@ -332,14 +332,14 @@
             "interactable_object": {
                 "interactions": [
                     {
-                        "name": "Pick Apple",
+                        "name": "pick_apple",
                         "object_to_build": [
                             "Apple"
                         ],
                         "destructif": false
                     },
                     {
-                        "name": "Chop Tree",
+                        "name": "chop_tree",
                         "object_to_build": [
                             "Wood"
                         ],

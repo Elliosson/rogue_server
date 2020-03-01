@@ -712,18 +712,19 @@ pub enum InteractionMenuResult {
 }
 //get all interaction on player position, print them, and get the choice
 pub fn show_object_interaction_choice(
-    gs: &mut State,
+    ecs: &World,
     ctx: &mut Rltk,
 ) -> (
     InteractionMenuResult,
     Option<(i32, i32, Interaction, Entity)>,
 ) {
     //get storage
-    let names = gs.ecs.read_storage::<Name>();
-    let interactables = gs.ecs.read_storage::<InteractableObject>();
-    let positions = gs.ecs.read_storage::<Position>();
-    let entities = gs.ecs.entities();
-    let player_pos = gs.ecs.fetch::<Point>();
+    let names = ecs.read_storage::<Name>();
+    let interactables = ecs.read_storage::<InteractableObject>();
+    let positions = ecs.read_storage::<Position>();
+    let entities = ecs.entities();
+    let player_entity = *ecs.fetch::<Entity>();
+    let player_pos = positions.get(player_entity).unwrap();
 
     //TODO for know just 10 interactions
     let count = 10;

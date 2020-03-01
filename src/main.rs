@@ -142,8 +142,12 @@ impl State {
         item_remove.run_now(&self.ecs);
         let mut object_spawn = ObjectSpawnSystem {};
         object_spawn.run_now(&self.ecs);
-        let mut interaction = InteractionSystem {};
-        interaction.run_now(&self.ecs);
+
+        //let mut interaction = InteractionSystem {};
+        //interaction.run_now(&self.ecs);
+        let mut interactionv2 = Interationv2System {};
+        interactionv2.run_now(&self.ecs);
+
         let mut want_move = WantToMoveSystem {};
         want_move.run_now(&self.ecs);
         let mut go_target = GoTargetSystem {};
@@ -328,6 +332,7 @@ fn main() {
     gs.ecs.insert(UuidPlayerHash::new());
     gs.ecs.insert(PlayerMessages::new());
     gs.ecs.insert(LocalClientInfo::new());
+    gs.ecs.insert(InteractionResquestListV2::new());
     gs.ecs.insert(gamelog::WorldStatLog {
         entries: vec!["Rust Roguelike World Stat log file".to_string()],
     });

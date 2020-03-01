@@ -448,7 +448,7 @@ pub enum OnlineRunState {
     PlayerTurn,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, ConvertSaveload, Clone)]
 pub enum PlayerInput {
     NONE,
     UP,
@@ -456,6 +456,7 @@ pub enum PlayerInput {
     LEFT,
     RIGHT,
     INVENTORY,
+    PICKUP(Entity),
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
@@ -463,7 +464,7 @@ pub struct OnlinePlayer {
     pub runstate: OnlineRunState,
 }
 
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+#[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct PlayerInputComp {
     pub input: PlayerInput,
 }
@@ -478,6 +479,7 @@ pub struct WantToMove {
 pub enum LocalClientRunstate {
     BaseState,
     Inventory,
+    Interaction,
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
