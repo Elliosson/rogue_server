@@ -208,11 +208,12 @@ impl GameState for State {
 
         let time_spend = end - start;
 
-        if time_spend > TICK_TIME {
+        if TICK_TIME > time_spend {
             let time_left = TICK_TIME - time_spend;
             thread::sleep(time_left);
         } else {
-            println!("WARNING: tick is too slow !")
+            println!("WARNING: tick is too slow !");
+            println!("{:?}", time_spend);
         }
     }
 }
@@ -220,13 +221,6 @@ impl GameState for State {
 impl State {}
 
 fn main() {
-    // let mut context = Rltk::init_simple8x8(
-    //     WINDOWWIDTH as u32,
-    //     WINDOWHEIGHT as u32,
-    //     "Ecosystem simulator",
-    //     "resources",
-    // );
-    //context.with_post_scanlines(true);
     let mut gs = State { ecs: World::new() };
     gs.ecs.register::<Position>();
     gs.ecs.register::<Renderable>();
@@ -391,11 +385,11 @@ fn game_loop(mut gs: State) {
 
         let time_spend = end - start;
 
-        if time_spend > TICK_TIME {
+        if TICK_TIME > time_spend {
             let time_left = TICK_TIME - time_spend;
             thread::sleep(time_left);
         } else {
-            println!("WARNING: tick is too slow !")
+            println!("WARNING: tick is too slow !");
         }
     }
 }
