@@ -109,6 +109,8 @@ impl State {
         /***player turn ****/
         let mut online_player = OnlinePlayerSystem {};
         online_player.run_now(&self.ecs);
+        let mut player_command = PlayerCommandSystem {};
+        player_command.run_now(&self.ecs);
 
         //let mut cow = CowAI {};
         //cow.run_now(&self.ecs);
@@ -289,7 +291,7 @@ fn main() {
     gs.ecs.register::<Dead>();
     gs.ecs.register::<FoodPreference>();
     gs.ecs.register::<WantToMove>();
-    gs.ecs.register::<OnlinePlayerInput>();
+    gs.ecs.register::<PlayerInputComp>();
     gs.ecs.register::<OnlinePlayer>();
     gs.ecs.register::<Connected>();
 

@@ -1,8 +1,8 @@
 extern crate specs;
 use crate::{
     gamelog::{GameLog, WorldStatLog},
-    network, CombatStats, Connected, Name, OnlinePlayer, OnlineRunState, Position, Renderable,
-    SerializeMe, Viewshed, WantToMove,
+    network, CombatStats, Connected, Name, OnlinePlayer, OnlineRunState, PlayerInput,
+    PlayerInputComp, Position, Renderable, SerializeMe, Viewshed,
 };
 use rltk::RGB;
 use specs::prelude::*;
@@ -22,7 +22,6 @@ impl<'a> System<'a> for OnlinePlayerSystem {
         WriteExpect<'a, WorldStatLog>,
         WriteExpect<'a, UuidPlayerHash>,
         WriteExpect<'a, Arc<Mutex<Vec<(network::Message, String)>>>>,
-        WriteStorage<'a, WantToMove>,
         WriteStorage<'a, Position>,
         WriteStorage<'a, Renderable>,
         WriteStorage<'a, CombatStats>,
@@ -31,6 +30,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
         WriteStorage<'a, SimpleMarker<SerializeMe>>,
         WriteExpect<'a, SimpleMarkerAllocator<SerializeMe>>,
         WriteStorage<'a, Connected>,
+        WriteStorage<'a, PlayerInputComp>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -41,7 +41,6 @@ impl<'a> System<'a> for OnlinePlayerSystem {
             mut _world_logs,
             mut player_hash,
             message_mutex,
-            mut want_to_moves,
             mut positions,
             mut renderables,
             mut combat_stats,
@@ -50,6 +49,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
             mut storage,
             mut alloc,
             mut connecteds,
+            mut player_inputs,
         ) = data;
 
         let mut player_messages: Vec<(Entity, network::Message)> = Vec::new();
@@ -66,18 +66,34 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                 let mes = net_mes.clone();
 
                 let mut uid = "".to_string();
-
+                let input;
                 match mes {
-                    network::Message::RIGHT(uuid) => uid = uuid.to_string(),
-                    network::Message::LEFT(uuid) => uid = uuid.to_string(),
-                    network::Message::UP(uuid) => uid = uuid.to_string(),
-                    network::Message::DOWN(uuid) => uid = uuid.to_string(),
-                    _ => {}
+                    network::Message::RIGHT(uuid) => {
+                        uid = uuid.to_string();
+                        input = PlayerInput::RIGHT
+                    }
+                    network::Message::LEFT(uuid) => {
+                        uid = uuid.to_string();
+                        input = PlayerInput::LEFT
+                    }
+                    network::Message::UP(uuid) => {
+                        uid = uuid.to_string();
+                        input = PlayerInput::UP
+                    }
+                    network::Message::DOWN(uuid) => {
+                        uid = uuid.to_string();
+                        input = PlayerInput::DOWN
+                    }
+                    _ => input = PlayerInput::NONE,
                 }
 
                 match player_hash.hash.get(&uid.clone()) {
                     Some(entity) => {
                         player_messages.push((*entity, mes));
+
+                        player_inputs
+                            .insert(*entity, PlayerInputComp { input })
+                            .expect("Unable to insert");
 
                         // if we received message of the player he is connected
                         //TODO have a timeout for the deconnection
@@ -120,99 +136,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
 
             player_hash.hash.insert(uid.clone(), new_player);
         }
-
-        // player_messages.push((player_entity, network::Message::Register));
-
-        for (entity, message) in player_messages {
-            let mut online_player = online_players.get_mut(entity).unwrap();
-            //execute runstate
-            let newrunstate = online_runstate_choice(
-                online_player.runstate.clone(),
-                entity,
-                message,
-                &mut want_to_moves,
-            );
-            online_player.runstate = newrunstate;
-        }
     }
-}
-
-pub fn online_runstate_choice<'a>(
-    runstate: OnlineRunState,
-    entity: Entity,
-    message: network::Message,
-    want_to_moves: &mut WriteStorage<'a, WantToMove>,
-) -> OnlineRunState {
-    let newrunstate;
-    match runstate {
-        OnlineRunState::AwaitingInput => {
-            newrunstate = online_player_input(entity, message, want_to_moves);
-        }
-        OnlineRunState::PlayerTurn => {
-            newrunstate = OnlineRunState::AwaitingInput;
-        }
-    }
-    newrunstate
-}
-
-pub fn online_player_input<'a>(
-    entity: Entity,
-    message: network::Message,
-    want_to_move: &mut WriteStorage<'a, WantToMove>,
-) -> OnlineRunState {
-    // Player movement
-
-    //get the last input for the online player
-
-    match message {
-        network::Message::UP(_uuid) => {
-            want_to_move
-                .insert(
-                    entity,
-                    WantToMove {
-                        delta_x: 0,
-                        delta_y: -1,
-                    },
-                )
-                .expect("Unable to insert");
-        }
-        network::Message::DOWN(_uuid) => {
-            want_to_move
-                .insert(
-                    entity,
-                    WantToMove {
-                        delta_x: 0,
-                        delta_y: 1,
-                    },
-                )
-                .expect("Unable to insert");
-        }
-        network::Message::LEFT(_uuid) => {
-            want_to_move
-                .insert(
-                    entity,
-                    WantToMove {
-                        delta_x: -1,
-                        delta_y: 0,
-                    },
-                )
-                .expect("Unable to insert");
-        }
-        network::Message::RIGHT(_uuid) => {
-            want_to_move
-                .insert(
-                    entity,
-                    WantToMove {
-                        delta_x: 1,
-                        delta_y: 0,
-                    },
-                )
-                .expect("Unable to insert");
-        }
-        _ => {}
-    }
-
-    OnlineRunState::PlayerTurn
 }
 
 pub struct PlayerMessages {

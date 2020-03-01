@@ -450,6 +450,7 @@ pub enum OnlineRunState {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum PlayerInput {
+    NONE,
     UP,
     DOWN,
     LEFT,
@@ -462,7 +463,7 @@ pub struct OnlinePlayer {
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct OnlinePlayerInput {
+pub struct PlayerInputComp {
     pub input: PlayerInput,
 }
 

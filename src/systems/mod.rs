@@ -46,3 +46,5 @@ mod want_to_move_system;
 pub use want_to_move_system::WantToMoveSystem;
 mod send_map_system;
 pub use send_map_system::SendMapSystem;
+mod player_command_system;
+pub use player_command_system::PlayerCommandSystem;
