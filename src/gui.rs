@@ -213,11 +213,11 @@ pub enum ItemMenuResult {
     Selected,
 }
 
-pub fn show_inventory(gs: &mut State, ctx: &mut Rltk) -> (ItemMenuResult, Option<Entity>) {
-    let player_entity = gs.ecs.fetch::<Entity>();
-    let names = gs.ecs.read_storage::<Name>();
-    let backpack = gs.ecs.read_storage::<InBackpack>();
-    let entities = gs.ecs.entities();
+pub fn show_inventory(ecs: &World, ctx: &mut Rltk) -> (ItemMenuResult, Option<Entity>) {
+    let player_entity = ecs.fetch::<Entity>();
+    let names = ecs.read_storage::<Name>();
+    let backpack = ecs.read_storage::<InBackpack>();
+    let entities = ecs.entities();
 
     let inventory = (&backpack, &names)
         .join()

@@ -108,6 +108,7 @@ pub fn online_player_input<'a>(
                 )
                 .expect("Unable to insert");
         }
+        PlayerInput::INVENTORY => {}
         _ => {}
     }
 

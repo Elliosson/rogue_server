@@ -327,6 +327,7 @@ fn main() {
     gs.ecs.insert(BirthRegistery::new());
     gs.ecs.insert(UuidPlayerHash::new());
     gs.ecs.insert(PlayerMessages::new());
+    gs.ecs.insert(LocalClientInfo::new());
     gs.ecs.insert(gamelog::WorldStatLog {
         entries: vec!["Rust Roguelike World Stat log file".to_string()],
     });

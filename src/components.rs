@@ -455,6 +455,7 @@ pub enum PlayerInput {
     DOWN,
     LEFT,
     RIGHT,
+    INVENTORY,
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
@@ -471,6 +472,25 @@ pub struct PlayerInputComp {
 pub struct WantToMove {
     pub delta_x: i32,
     pub delta_y: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum LocalClientRunstate {
+    BaseState,
+    Inventory,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct LocalClientInfo {
+    pub local_runstate: LocalClientRunstate,
+}
+
+impl LocalClientInfo {
+    pub fn new() -> Self {
+        LocalClientInfo {
+            local_runstate: LocalClientRunstate::BaseState,
+        }
+    }
 }
 
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
