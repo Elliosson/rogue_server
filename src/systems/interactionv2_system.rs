@@ -1,8 +1,5 @@
 extern crate specs;
-use crate::{
-    gamelog::{GameLog, WorldStatLog},
-    ObjectBuilder, ToDelete,
-};
+use crate::{gamelog::GameLog, ObjectBuilder, ToDelete};
 use specs::prelude::*;
 
 pub struct Interationv2System {}
@@ -10,7 +7,6 @@ pub struct Interationv2System {}
 impl<'a> System<'a> for Interationv2System {
     #[allow(clippy::type_complexity)]
     type SystemData = (
-        Entities<'a>,
         WriteExpect<'a, GameLog>,
         WriteExpect<'a, InteractionResquestListV2>,
         WriteExpect<'a, ObjectBuilder>,
@@ -18,8 +14,7 @@ impl<'a> System<'a> for Interationv2System {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (entities, _log, mut interaction_request_list, mut object_builder, mut to_deletes) =
-            data;
+        let (_log, mut interaction_request_list, mut object_builder, mut to_deletes) = data;
 
         for interation_request in &interaction_request_list.requests {
             match interation_request.interaction.as_str() {

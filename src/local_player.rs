@@ -1,8 +1,8 @@
 //This file is handling inputs of the local player
 //this way we can play the game directly on the server
 use super::{
-    gui, InteractionResquestListV2, Item, LocalClientInfo, LocalClientRunstate, PlayerInput,
-    PlayerInputComp, Position, WantsToUseItem,
+    gui, Item, LocalClientInfo, LocalClientRunstate, PlayerInput, PlayerInputComp, Position,
+    WantsToUseItem,
 };
 
 extern crate rltk;
@@ -155,8 +155,6 @@ pub fn local_client_interaction(ecs: &World, ctx: &mut Rltk) -> LocalClientRunst
             let interaction_tuple = result.1.unwrap();
             let (x, y, interaction, interacted_entity) = interaction_tuple;
 
-            let player_entity = *ecs.fetch::<Entity>();
-
             player_inputs
                 .insert(
                     local_player_entity,
@@ -201,8 +199,6 @@ pub fn local_client_build(ecs: &World, ctx: &mut Rltk) -> LocalClientRunstate {
         gui::BuildingMenuResult::Selected => {
             let interaction_tuple = result.1.unwrap();
             let (x, y, building) = interaction_tuple;
-
-            let player_entity = *ecs.fetch::<Entity>();
 
             player_inputs
                 .insert(

@@ -1,7 +1,7 @@
 extern crate specs;
 use crate::{
-    gamelog::GameLog, InteractionResquestListV2, InteractionResquestV2, OnlinePlayer,
-    OnlineRunState, PlayerInput, PlayerInputComp, WantBuild, WantToMove, WantsToPickupItem,
+    gamelog::GameLog, InteractionResquestListV2, OnlinePlayer, OnlineRunState, PlayerInput,
+    PlayerInputComp, WantBuild, WantToMove, WantsToPickupItem,
 };
 use specs::prelude::*;
 

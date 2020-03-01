@@ -44,7 +44,7 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
             runstate: OnlineRunState::AwaitingInput,
         })
         .with(BuildingChoice {
-            buildings: vec!["block".to_string(), "wall".to_string(), "floor".to_string()],
+            buildings: vec!["block".to_string()],
         })
         .marked::<SimpleMarker<SerializeMe>>()
         .build()
