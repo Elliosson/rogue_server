@@ -457,6 +457,7 @@ pub enum PlayerInput {
     RIGHT,
     INVENTORY,
     PICKUP(Entity),
+    INTERACT(i32, i32, String, Entity),
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
@@ -480,6 +481,7 @@ pub enum LocalClientRunstate {
     BaseState,
     Inventory,
     Interaction,
+    Build,
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]

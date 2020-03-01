@@ -1,7 +1,7 @@
 extern crate specs;
 use crate::{
-    gamelog::GameLog, OnlinePlayer, OnlineRunState, PlayerInput, PlayerInputComp, WantToMove,
-    WantsToPickupItem,
+    gamelog::GameLog, InteractionResquestListV2, InteractionResquestV2, OnlinePlayer,
+    OnlineRunState, PlayerInput, PlayerInputComp, WantToMove, WantsToPickupItem,
 };
 use specs::prelude::*;
 
@@ -18,11 +18,19 @@ impl<'a> System<'a> for PlayerCommandSystem {
         WriteStorage<'a, OnlinePlayer>,
         WriteStorage<'a, PlayerInputComp>,
         WriteStorage<'a, WantsToPickupItem>,
+        WriteExpect<'a, InteractionResquestListV2>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (entities, _log, mut want_to_moves, mut online_players, mut player_inputs, mut pickups) =
-            data;
+        let (
+            entities,
+            _log,
+            mut want_to_moves,
+            mut online_players,
+            mut player_inputs,
+            mut pickups,
+            mut interaction_requestsv2,
+        ) = data;
 
         for (entity, player_input) in (&entities, &player_inputs).join() {
             let mut online_player = online_players.get_mut(entity).unwrap();
@@ -33,6 +41,7 @@ impl<'a> System<'a> for PlayerCommandSystem {
                 player_input.input.clone(),
                 &mut want_to_moves,
                 &mut pickups,
+                &mut interaction_requestsv2,
             );
             online_player.runstate = newrunstate;
         }
@@ -46,11 +55,18 @@ pub fn online_runstate_choice<'a>(
     message: PlayerInput,
     want_to_moves: &mut WriteStorage<'a, WantToMove>,
     pickups: &mut WriteStorage<'a, WantsToPickupItem>,
+    interations_req: &mut WriteExpect<'a, InteractionResquestListV2>,
 ) -> OnlineRunState {
     let newrunstate;
     match runstate {
         OnlineRunState::AwaitingInput => {
-            newrunstate = online_player_input(entity, message.clone(), want_to_moves, pickups);
+            newrunstate = online_player_input(
+                entity,
+                message.clone(),
+                want_to_moves,
+                pickups,
+                interations_req,
+            );
         }
         OnlineRunState::PlayerTurn => {
             newrunstate = OnlineRunState::AwaitingInput;
@@ -64,6 +80,7 @@ pub fn online_player_input<'a>(
     message: PlayerInput,
     want_to_move: &mut WriteStorage<'a, WantToMove>,
     pickups: &mut WriteStorage<'a, WantsToPickupItem>,
+    interations_req: &mut WriteExpect<'a, InteractionResquestListV2>,
 ) -> OnlineRunState {
     // Player movement
 
@@ -125,6 +142,9 @@ pub fn online_player_input<'a>(
                     },
                 )
                 .expect("Unable to insert want to pickup");
+        }
+        PlayerInput::INTERACT(x, y, name, target) => {
+            interations_req.request(x, y, name, target, entity);
         }
         _ => {}
     }
