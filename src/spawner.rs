@@ -440,13 +440,9 @@ fn _tree(ecs: &mut World, x: i32, y: i32) {
             interactions: vec![
                 Interaction {
                     name: "Pick Apple".to_string(),
-                    object_to_build: vec!["Apple".to_string()],
-                    destructif: false,
                 },
                 Interaction {
                     name: "Chop Tree".to_string(),
-                    object_to_build: vec!["Wood".to_string()],
-                    destructif: true,
                 },
             ],
         })

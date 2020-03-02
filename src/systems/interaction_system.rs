@@ -19,7 +19,7 @@ impl<'a> System<'a> for InteractionSystem {
         let (_entities, mut object_builder, mut interaction_request, mut to_deletes) = data;
 
         //parcours all interaction request
-        for (x, y, interaction, interacted_entity) in &interaction_request.requests {
+        /*for (x, y, interaction, interacted_entity) in &interaction_request.requests {
             //build object
             for to_build in &interaction.object_to_build {
                 //ask for building the object
@@ -32,7 +32,7 @@ impl<'a> System<'a> for InteractionSystem {
                     .insert(*interacted_entity, ToDelete {})
                     .expect("Unable to insert delete entity");
             }
-        }
+        }*/
 
         interaction_request.requests.clear();
     }

@@ -82,17 +82,11 @@ pub struct InteractableObject {
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Interaction {
     pub name: String,
-    pub object_to_build: Vec<String>,
-    pub destructif: bool,
 }
 
 impl Interaction {
     pub fn new(name: String) -> Interaction {
-        Interaction {
-            name: name,
-            object_to_build: Vec::new(),
-            destructif: false,
-        }
+        Interaction { name: name }
     }
 }
 
