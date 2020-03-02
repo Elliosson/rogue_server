@@ -54,3 +54,5 @@ pub use interactionv2_system::{
 };
 mod building_system;
 pub use building_system::BuildingSystem;
+mod player_info_system;
+pub use player_info_system::PlayerInfoSystem;

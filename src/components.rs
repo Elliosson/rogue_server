@@ -504,6 +504,35 @@ pub struct WantBuild {
     pub name: String,
 }
 
+//Special component for network, Do NOT serialize, it's could go badly
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct PlayerInfo {
+    pub inventaire: Vec<InventaireItem>,
+    pub close_interations: Vec<CloseInteration>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct InventaireItem {
+    pub name: String,
+    pub index: u32,
+    pub generation: i32,
+
+    #[serde(skip_serializing)]
+    #[serde(skip_deserializing)]
+    pub entity: Option<Entity>, //entity do not implement default, so I use option to be able to skip serialization, it suck
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct CloseInteration {
+    pub interaction_name: String,
+    pub index: u32,
+    pub generation: i32,
+
+    #[serde(skip_serializing)]
+    #[serde(skip_deserializing)]
+    pub entity: Option<Entity>, //entity do not implement default, so I use option to be able to skip serialization, it suck
+}
+
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.
 pub struct SerializeMe;
