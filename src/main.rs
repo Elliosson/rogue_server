@@ -183,6 +183,11 @@ impl State {
         let mut map_send = SendMapSystem {};
         map_send.run_now(&self.ecs);
 
+        let mut player_info = PlayerInfoSystem {};
+        player_info.run_now(&self.ecs);
+        let mut player_json = PlayerJsonSystem {};
+        player_json.run_now(&self.ecs);
+
         self.ecs.maintain();
         // println!("systems time = {}", now.elapsed().as_micros());
     }
@@ -309,6 +314,7 @@ fn main() {
     gs.ecs.register::<Connected>();
     gs.ecs.register::<BuildingChoice>();
     gs.ecs.register::<WantBuild>();
+    gs.ecs.register::<PlayerInfo>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 

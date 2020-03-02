@@ -5,6 +5,7 @@ use crate::{
 };
 use specs::prelude::*;
 
+//Collect player information that will be send thought network
 pub struct PlayerInfoSystem {}
 
 impl<'a> System<'a> for PlayerInfoSystem {
@@ -30,7 +31,7 @@ impl<'a> System<'a> for PlayerInfoSystem {
             mut player_infos,
             backpacks,
             interactable_objects,
-            connecteds,
+            _connecteds,
             online_players,
             items,
             names,
@@ -41,8 +42,8 @@ impl<'a> System<'a> for PlayerInfoSystem {
         //insert  a new player info in every conected player
         //effectively clean the thing
         player_infos.clear();
-        for (entity, _connected, _online_player) in (&entities, &connecteds, &online_players).join()
-        {
+        //Todo check in player is connected and find a way to handle local player
+        for (entity, _online_player) in (&entities, &online_players).join() {
             player_infos
                 .insert(
                     entity,
@@ -69,14 +70,9 @@ impl<'a> System<'a> for PlayerInfoSystem {
         }
 
         //fill player interactions
-        for (_entity, _connected, _online_player, pos, player_info) in (
-            &entities,
-            &connecteds,
-            &online_players,
-            &positions,
-            &mut player_infos,
-        )
-            .join()
+        //Todo check in player is connected and find a way to handle local player
+        for (_entity, _online_player, pos, player_info) in
+            (&entities, &online_players, &positions, &mut player_infos).join()
         {
             let entities_on_pos = &map.tile_content[map.xy_idx(pos.x, pos.y)];
 

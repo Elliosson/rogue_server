@@ -56,3 +56,5 @@ mod building_system;
 pub use building_system::BuildingSystem;
 mod player_info_system;
 pub use player_info_system::PlayerInfoSystem;
+mod player_json_system;
+pub use player_json_system::PlayerJsonSystem;
