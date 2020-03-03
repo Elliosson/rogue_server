@@ -111,6 +111,8 @@ impl State {
         /***player turn ****/
         let mut online_player = OnlinePlayerSystem {};
         online_player.run_now(&self.ecs);
+        let mut entity_matching = IdEntityInterfaceMatching {};
+        entity_matching.run_now(&self.ecs);
         let mut player_command = PlayerCommandSystem {};
         player_command.run_now(&self.ecs);
 
@@ -315,6 +317,7 @@ fn main() {
     gs.ecs.register::<BuildingChoice>();
     gs.ecs.register::<WantBuild>();
     gs.ecs.register::<PlayerInfo>();
+    gs.ecs.register::<EntityToConvert>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 

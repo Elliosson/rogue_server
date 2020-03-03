@@ -11,6 +11,7 @@ pub enum Message {
     LEFT(Uuid),
     Exit(Uuid),
     Map(Uuid),
+    Interact(Uuid, i32, i32, String, u32, i32), //x, y, name, id, gen
 }
 
 impl Message {

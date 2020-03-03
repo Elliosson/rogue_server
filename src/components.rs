@@ -534,6 +534,19 @@ pub struct CloseInteration {
     pub entity: Option<Entity>, //entity do not implement default, so I use option to be able to skip serialization, it suck
 }
 
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct EntityToConvert {
+    pub command: CommandToConvert,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum CommandToConvert {
+    INVENTORY,
+    PICKUP(u32, i32),
+    INTERACT(i32, i32, String, u32, i32),
+    BUILD(i32, i32, String),
+}
+
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.
 pub struct SerializeMe;

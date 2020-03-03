@@ -1,7 +1,7 @@
 extern crate specs;
 use crate::{
     gamelog::{GameLog, WorldStatLog},
-    network, CombatStats, Connected, Name, OnlinePlayer, OnlineRunState, PlayerInput,
+    network, CombatStats, Connected, Name, OnlinePlayer, OnlineRunState, PlayerInfo, PlayerInput,
     PlayerInputComp, Position, Renderable, SerializeMe, Viewshed,
 };
 use rltk::RGB;
@@ -31,6 +31,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
         WriteExpect<'a, SimpleMarkerAllocator<SerializeMe>>,
         WriteStorage<'a, Connected>,
         WriteStorage<'a, PlayerInputComp>,
+        WriteStorage<'a, PlayerInfo>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -50,6 +51,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
             mut alloc,
             mut connecteds,
             mut player_inputs,
+            player_infos,
         ) = data;
 
         let mut player_messages: Vec<(Entity, network::Message)> = Vec::new();
@@ -67,7 +69,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
 
                 let mut uid = "".to_string();
                 let input;
-                match mes {
+                match mes.clone() {
                     network::Message::RIGHT(uuid) => {
                         uid = uuid.to_string();
                         input = PlayerInput::RIGHT
@@ -83,6 +85,11 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                     network::Message::DOWN(uuid) => {
                         uid = uuid.to_string();
                         input = PlayerInput::DOWN
+                    }
+                    network::Message::Interact(uuid, x, y, name, id, gen) => {
+                        uid = uuid.to_string();
+                        //todo change
+                        input = PlayerInput::NONE
                     }
                     _ => input = PlayerInput::NONE,
                 }

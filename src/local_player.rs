@@ -1,8 +1,8 @@
 //This file is handling inputs of the local player
 //this way we can play the game directly on the server
 use super::{
-    gui, Item, LocalClientInfo, LocalClientRunstate, PlayerInput, PlayerInputComp, Position,
-    WantsToUseItem,
+    gui, CommandToConvert, EntityToConvert, Item, LocalClientInfo, LocalClientRunstate,
+    PlayerInput, PlayerInputComp, Position, WantsToUseItem,
 };
 
 extern crate rltk;
@@ -143,7 +143,7 @@ pub fn local_client_inventory(ecs: &World, ctx: &mut Rltk) -> LocalClientRunstat
 
 pub fn local_client_interaction(ecs: &World, ctx: &mut Rltk) -> LocalClientRunstate {
     let local_player_entity = *ecs.fetch::<Entity>();
-    let mut player_inputs = ecs.write_storage::<PlayerInputComp>();
+    let mut command_converts = ecs.write_storage::<EntityToConvert>();
 
     let mut newrunstate = LocalClientRunstate::Interaction;
 
@@ -155,15 +155,16 @@ pub fn local_client_interaction(ecs: &World, ctx: &mut Rltk) -> LocalClientRunst
             let interaction_tuple = result.1.unwrap();
             let (x, y, interaction) = interaction_tuple;
 
-            player_inputs
+            command_converts
                 .insert(
                     local_player_entity,
-                    PlayerInputComp {
-                        input: PlayerInput::INTERACT(
+                    EntityToConvert {
+                        command: CommandToConvert::INTERACT(
                             x,
                             y,
                             interaction.interaction_name,
-                            interaction.entity.unwrap(), //todo suppress
+                            interaction.index,
+                            interaction.generation,
                         ),
                     },
                 )

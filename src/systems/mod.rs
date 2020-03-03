@@ -58,3 +58,6 @@ mod player_info_system;
 pub use player_info_system::PlayerInfoSystem;
 mod player_json_system;
 pub use player_json_system::PlayerJsonSystem;
+
+mod id_to_entity_interface_matching;
+pub use id_to_entity_interface_matching::IdEntityInterfaceMatching;
