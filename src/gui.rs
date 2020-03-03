@@ -3,9 +3,9 @@ use rltk::{Console, Point, Rltk, VirtualKeyCode, RGB};
 extern crate specs;
 use super::{
     gamelog::{GameLog, SpeciesInstantLog},
-    Aging, BuildingChoice, CombatStats, Date, EnergyReserve, Equipped, Female, InBackpack,
-    InteractableObject, Interaction, Male, Map, Name, Player, Position, Reproduction, RunState,
-    Specie, Speed, State, Viewshed, MAPWIDTH, WINDOWHEIGHT, WINDOWWIDTH,
+    Aging, BuildingChoice, CloseInteration, CombatStats, Date, EnergyReserve, Equipped, Female,
+    InBackpack, InteractableObject, Male, Map, Name, Player, PlayerInfo, Position, Reproduction,
+    RunState, Specie, Speed, State, Viewshed, MAPWIDTH, WINDOWHEIGHT, WINDOWWIDTH,
 };
 use specs::prelude::*;
 
@@ -714,17 +714,16 @@ pub enum InteractionMenuResult {
 pub fn show_object_interaction_choice(
     ecs: &World,
     ctx: &mut Rltk,
-) -> (
-    InteractionMenuResult,
-    Option<(i32, i32, Interaction, Entity)>,
-) {
+) -> (InteractionMenuResult, Option<(i32, i32, CloseInteration)>) {
     //get storage
     let names = ecs.read_storage::<Name>();
     let interactables = ecs.read_storage::<InteractableObject>();
     let positions = ecs.read_storage::<Position>();
+    let player_infos = ecs.read_storage::<PlayerInfo>();
     let entities = ecs.entities();
     let player_entity = *ecs.fetch::<Entity>();
     let player_pos = positions.get(player_entity).unwrap();
+    let player_info = player_infos.get(player_entity).unwrap();
 
     //TODO for know just 10 interactions
     let count = 10;
@@ -755,46 +754,47 @@ pub fn show_object_interaction_choice(
     );
 
     let mut j = 0;
-    let mut possible_interactions: Vec<Interaction> = Vec::new();
-    let mut interacted_entity: Vec<Entity> = Vec::new();
-    // get of interactable object
-    for (entity, interactable, position, name) in
-        (&entities, &interactables, &positions, &names).join()
-    {
-        //only take object on player position
-        if position.x == player_pos.x && position.y == player_pos.y {
-            //get all possible interaction
-            for interaction in &interactable.interactions {
-                //print name of interaction
-                ctx.set(
-                    17,
-                    y,
-                    RGB::named(rltk::WHITE),
-                    RGB::named(rltk::BLACK),
-                    rltk::to_cp437('('),
-                );
-                ctx.set(
-                    18,
-                    y,
-                    RGB::named(rltk::YELLOW),
-                    RGB::named(rltk::BLACK),
-                    97 + j as u8,
-                );
-                ctx.set(
-                    19,
-                    y,
-                    RGB::named(rltk::WHITE),
-                    RGB::named(rltk::BLACK),
-                    rltk::to_cp437(')'),
-                );
-                ctx.print(21, y, &format!("{}: {}", name.name, interaction.name)); //TODO for know interaction are just names
-                y += 1;
-                j += 1;
+    let mut possible_interactions: Vec<CloseInteration> = Vec::new();
 
-                possible_interactions.push(interaction.clone());
-                interacted_entity.push(entity);
-            }
-        }
+    // get of interactable object
+
+    for interaction in player_info.close_interations.iter() {
+        //get all possible interaction
+
+        //print name of interaction
+        ctx.set(
+            17,
+            y,
+            RGB::named(rltk::WHITE),
+            RGB::named(rltk::BLACK),
+            rltk::to_cp437('('),
+        );
+        ctx.set(
+            18,
+            y,
+            RGB::named(rltk::YELLOW),
+            RGB::named(rltk::BLACK),
+            97 + j as u8,
+        );
+        ctx.set(
+            19,
+            y,
+            RGB::named(rltk::WHITE),
+            RGB::named(rltk::BLACK),
+            rltk::to_cp437(')'),
+        );
+        ctx.print(
+            21,
+            y,
+            &format!(
+                "{}: {}",
+                interaction.object_name, interaction.interaction_name
+            ),
+        ); //TODO for know interaction are just names
+        y += 1;
+        j += 1;
+
+        possible_interactions.push(interaction.clone());
     }
 
     match ctx.key {
@@ -812,7 +812,6 @@ pub fn show_object_interaction_choice(
                                 player_pos.x,
                                 player_pos.y,
                                 possible_interactions[selection as usize].clone(),
-                                interacted_entity[selection as usize],
                             )),
                         );
                     }

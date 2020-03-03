@@ -71,8 +71,14 @@ impl<'a> System<'a> for PlayerInfoSystem {
 
         //fill player interactions
         //Todo check in player is connected and find a way to handle local player
-        for (_entity, _online_player, pos, player_info) in
-            (&entities, &online_players, &positions, &mut player_infos).join()
+        for (_entity, _online_player, pos, player_info, name) in (
+            &entities,
+            &online_players,
+            &positions,
+            &mut player_infos,
+            &names,
+        )
+            .join()
         {
             let entities_on_pos = &map.tile_content[map.xy_idx(pos.x, pos.y)];
 
@@ -81,6 +87,7 @@ impl<'a> System<'a> for PlayerInfoSystem {
                     for intereraction in interactable.interactions.iter() {
                         player_info.close_interations.push(CloseInteration {
                             interaction_name: intereraction.name.clone(),
+                            object_name: name.name.clone(),
                             index: on_pos_entity.id(),
                             generation: on_pos_entity.gen().id(),
                             entity: Some(*on_pos_entity),

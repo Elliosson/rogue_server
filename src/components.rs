@@ -525,6 +525,7 @@ pub struct InventaireItem {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CloseInteration {
     pub interaction_name: String,
+    pub object_name: String,
     pub index: u32,
     pub generation: i32,
 

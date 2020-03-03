@@ -153,13 +153,18 @@ pub fn local_client_interaction(ecs: &World, ctx: &mut Rltk) -> LocalClientRunst
         gui::InteractionMenuResult::NoResponse => {}
         gui::InteractionMenuResult::Selected => {
             let interaction_tuple = result.1.unwrap();
-            let (x, y, interaction, interacted_entity) = interaction_tuple;
+            let (x, y, interaction) = interaction_tuple;
 
             player_inputs
                 .insert(
                     local_player_entity,
                     PlayerInputComp {
-                        input: PlayerInput::INTERACT(x, y, interaction.name, interacted_entity),
+                        input: PlayerInput::INTERACT(
+                            x,
+                            y,
+                            interaction.interaction_name,
+                            interaction.entity.unwrap(), //todo suppress
+                        ),
                     },
                 )
                 .expect("Unable to insert");
