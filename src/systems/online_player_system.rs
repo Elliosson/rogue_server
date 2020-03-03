@@ -68,33 +68,48 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                 let mes = net_mes.clone();
 
                 let mut uid = "".to_string();
+                let mut player_entity: Option<&Entity> = None;
                 let input;
                 match mes.clone() {
                     network::Message::RIGHT(uuid) => {
                         uid = uuid.to_string();
+                        player_entity = player_hash.hash.get(&uid.clone());
                         input = PlayerInput::RIGHT
                     }
                     network::Message::LEFT(uuid) => {
                         uid = uuid.to_string();
+                        player_entity = player_hash.hash.get(&uid.clone());
                         input = PlayerInput::LEFT
                     }
                     network::Message::UP(uuid) => {
                         uid = uuid.to_string();
+                        player_entity = player_hash.hash.get(&uid.clone());
                         input = PlayerInput::UP
                     }
                     network::Message::DOWN(uuid) => {
                         uid = uuid.to_string();
+                        player_entity = player_hash.hash.get(&uid.clone());
                         input = PlayerInput::DOWN
                     }
                     network::Message::Interact(uuid, x, y, name, id, gen) => {
                         uid = uuid.to_string();
-                        //todo change
-                        input = PlayerInput::NONE
+                        player_entity = player_hash.hash.get(&uid.clone());
+                        if let Some(entity) = player_entity {
+                            let player_info = player_infos.get(*entity).unwrap();
+                            let interacted_entity = get_interacted_entity(id, gen, player_info);
+                            if let Some(inte_entity) = interacted_entity {
+                                input = PlayerInput::INTERACT(x, y, name.clone(), inte_entity)
+                            } else {
+                                input = PlayerInput::NONE
+                            }
+                        } else {
+                            input = PlayerInput::NONE
+                        }
                     }
                     _ => input = PlayerInput::NONE,
                 }
 
-                match player_hash.hash.get(&uid.clone()) {
+                match player_entity {
                     Some(entity) => {
                         player_messages.push((*entity, mes));
 
@@ -144,6 +159,17 @@ impl<'a> System<'a> for OnlinePlayerSystem {
             player_hash.hash.insert(uid.clone(), new_player);
         }
     }
+}
+
+fn get_interacted_entity(id: u32, gen: i32, player_info: &PlayerInfo) -> Option<Entity> {
+    let mut interacted_entity: Option<Entity> = None;
+    for interaction in player_info.close_interations.iter() {
+        if id == interaction.index && gen == interaction.generation {
+            interacted_entity = Some(interaction.entity.unwrap()); // interaction.entity should not be an option but because of serialization shit I have to
+            break;
+        }
+    }
+    interacted_entity
 }
 
 pub struct PlayerMessages {
