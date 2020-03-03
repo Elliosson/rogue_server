@@ -24,10 +24,12 @@ pub fn run(
     config: Config,
     message_list: Arc<Mutex<Vec<(Message, String)>>>,
     map_to_send: Arc<Mutex<HashMap<String, Vec<(Position, Renderable)>>>>,
+    player_info_to_send: Arc<Mutex<HashMap<String, String>>>,
 ) {
     ws::listen(config.url, move |out| {
         let message_list = message_list.clone();
         let map_to_send_clone = map_to_send.clone();
+        let player_info_to_send_clone = player_info_to_send.clone();
 
         move |msg: ws::Message| {
             let message_list = message_list.clone();
@@ -51,9 +53,15 @@ pub fn run(
             };
 
             out.send(ws::Message::Text(match Message::from(msg) {
-                Some((msg, command)) => {
-                    format!("{} {}", command, response(msg, map_to_send_clone.clone()))
-                }
+                Some((msg, command)) => format!(
+                    "{} {}",
+                    command,
+                    response(
+                        msg,
+                        map_to_send_clone.clone(),
+                        player_info_to_send_clone.clone()
+                    )
+                ),
                 None => "err".to_string(),
             }))
         }
@@ -64,8 +72,10 @@ pub fn run(
 fn response(
     msg: Message,
     map_to_send: Arc<Mutex<HashMap<String, Vec<(Position, Renderable)>>>>,
+    player_info_to_send: Arc<Mutex<HashMap<String, String>>>,
 ) -> String {
     let map_guard = map_to_send.lock().unwrap();
+    let player_info_guard = player_info_to_send.lock().unwrap();
 
     match msg {
         Message::Register => {
@@ -94,6 +104,13 @@ fn response(
             }
 
             string_to_send
+        }
+        Message::PlayerInfo(uuid) => {
+            if let Some(my_player_info) = player_info_guard.get(&uuid.to_string()) {
+                my_player_info.clone() // my_player_info is a string
+            } else {
+                "nok".to_string()
+            }
         }
         _ => "ok".to_string(),
     }

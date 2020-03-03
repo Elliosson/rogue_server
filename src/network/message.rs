@@ -12,6 +12,7 @@ pub enum Message {
     Exit(Uuid),
     Map(Uuid),
     Interact(Uuid, i32, i32, String, u32, i32), //x, y, name, id, gen
+    PlayerInfo(Uuid),
 }
 
 impl Message {
@@ -34,6 +35,7 @@ impl Message {
                 "down" => Some(Message::DOWN(id)),
                 "right" => Some(Message::RIGHT(id)),
                 "left" => Some(Message::LEFT(id)),
+                "player_info" => Some(Message::PlayerInfo(id)),
                 "exit" => Some(Message::Exit(id)),
                 "interact" => {
                     let interact: Vec<&str> = parts.collect();

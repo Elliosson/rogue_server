@@ -373,12 +373,16 @@ fn main() {
     let map_to_send: Arc<Mutex<HashMap<String, Vec<(Position, Renderable)>>>> =
         Arc::new(Mutex::new(HashMap::new()));
 
+    let player_info_to_send: Arc<Mutex<HashMap<String, String>>> =
+        Arc::new(Mutex::new(HashMap::new()));
+
     gs.ecs.insert(message_list.clone());
 
     gs.ecs.insert(map_to_send.clone());
+    gs.ecs.insert(player_info_to_send.clone());
 
     thread::spawn(move || {
-        network::run(config, message_list, map_to_send);
+        network::run(config, message_list, map_to_send, player_info_to_send);
     });
 
     game_loop(gs);
