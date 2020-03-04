@@ -1,7 +1,7 @@
 extern crate specs;
 use crate::{
     gamelog::GameLog, CloseInteration, Connected, InBackpack, InteractableObject, InventaireItem,
-    Item, Map, Name, OnlinePlayer, PlayerInfo, Position,
+    Item, Map, MyInfo, Name, OnlinePlayer, PlayerInfo, Position,
 };
 use specs::prelude::*;
 
@@ -43,13 +43,16 @@ impl<'a> System<'a> for PlayerInfoSystem {
         //effectively clean the thing
         player_infos.clear();
         //Todo check in player is connected and find a way to handle local player
-        for (entity, _online_player) in (&entities, &online_players).join() {
+        for (entity, _online_player, pos) in (&entities, &online_players, &positions).join() {
             player_infos
                 .insert(
                     entity,
                     PlayerInfo {
                         inventaire: Vec::new(),
                         close_interations: Vec::new(),
+                        my_info: MyInfo {
+                            pos: Position { x: pos.x, y: pos.y },
+                        },
                     },
                 )
                 .expect("Unable to insert");

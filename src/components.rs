@@ -10,7 +10,7 @@ use specs::saveload::{ConvertSaveload, Marker};
 use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-#[derive(Component, ConvertSaveload, Clone)]
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Position {
     pub x: i32,
     pub y: i32,
@@ -509,6 +509,11 @@ pub struct WantBuild {
 pub struct PlayerInfo {
     pub inventaire: Vec<InventaireItem>,
     pub close_interations: Vec<CloseInteration>,
+    pub my_info: MyInfo,
+}
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct MyInfo {
+    pub pos: Position,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
