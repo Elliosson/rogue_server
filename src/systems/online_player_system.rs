@@ -1,7 +1,7 @@
 extern crate specs;
 use crate::{
     gamelog::{GameLog, WorldStatLog},
-    network, BuildingChoice, CombatStats, Connected, Name, OnlinePlayer, OnlineRunState,
+    network, BuildingChoice, CombatStats, Connected, Item, Map, Name, OnlinePlayer, OnlineRunState,
     PlayerInfo, PlayerInput, PlayerInputComp, Position, Renderable, SerializeMe, Viewshed,
 };
 use rltk::RGB;
@@ -33,6 +33,8 @@ impl<'a> System<'a> for OnlinePlayerSystem {
         WriteStorage<'a, PlayerInputComp>,
         WriteStorage<'a, PlayerInfo>,
         WriteStorage<'a, BuildingChoice>,
+        WriteStorage<'a, Item>,
+        WriteExpect<'a, Map>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -54,6 +56,8 @@ impl<'a> System<'a> for OnlinePlayerSystem {
             mut player_inputs,
             player_infos,
             mut building_choices,
+            items,
+            map,
         ) = data;
 
         let mut player_messages: Vec<(Entity, network::Message)> = Vec::new();
@@ -66,7 +70,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
             //todo hash map to get player entity
 
             for (net_mes, command) in message_list_guard.iter() {
-                println!("message list: {:?}, uid {}", net_mes, command);
+                //println!("message list: {:?}, uid {}", net_mes, command);
                 let mes = net_mes.clone();
 
                 let mut uid = "".to_string();
@@ -92,6 +96,28 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                         uid = uuid.to_string();
                         player_entity = player_hash.hash.get(&uid.clone());
                         input = PlayerInput::DOWN
+                    }
+                    network::Message::PickUp(uuid) => {
+                        uid = uuid.to_string();
+                        player_entity = player_hash.hash.get(&uid.clone());
+                        let mut target_item = None;
+
+                        if let Some(entity) = player_entity {
+                            if let Some(pos) = positions.get(*entity) {
+                                for item_entity in map.tile_content[map.xy_idx(pos.x, pos.y)].iter()
+                                {
+                                    if let Some(_item) = items.get(*item_entity) {
+                                        target_item = Some(item_entity);
+                                    }
+                                }
+                            }
+                        }
+
+                        if let Some(target) = target_item {
+                            input = PlayerInput::PICKUP(*target)
+                        } else {
+                            input = PlayerInput::NONE
+                        }
                     }
                     network::Message::Build(uuid, x, y, name) => {
                         uid = uuid.to_string();
