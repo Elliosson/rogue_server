@@ -13,6 +13,7 @@ pub enum Message {
     Map(Uuid),
     Interact(Uuid, i32, i32, String, u32, i32), //x, y, name, id, gen
     PlayerInfo(Uuid),
+    Build(Uuid, i32, i32, String),
 }
 
 impl Message {
@@ -37,6 +38,13 @@ impl Message {
                 "left" => Some(Message::LEFT(id)),
                 "player_info" => Some(Message::PlayerInfo(id)),
                 "exit" => Some(Message::Exit(id)),
+                "build" => {
+                    let build: Vec<&str> = parts.collect();
+                    let x: i32 = build[0].parse().unwrap();
+                    let y: i32 = build[1].parse().unwrap();
+                    let name: String = build[2].parse().unwrap();
+                    Some(Message::Build(id, x, y, name))
+                }
                 "interact" => {
                     let interact: Vec<&str> = parts.collect();
                     let x: i32 = interact[0].parse().unwrap();

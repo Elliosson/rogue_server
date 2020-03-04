@@ -877,7 +877,7 @@ pub fn show_building_choice(
     let building_choice = buildings.get(player_entity).unwrap();
 
     //get all possible interaction
-    for building in &building_choice.buildings {
+    for building in &building_choice.plans {
         //print name of interaction
         ctx.set(
             17,

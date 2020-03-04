@@ -1,8 +1,8 @@
 extern crate specs;
 use crate::{
     gamelog::{GameLog, WorldStatLog},
-    network, CombatStats, Connected, Name, OnlinePlayer, OnlineRunState, PlayerInfo, PlayerInput,
-    PlayerInputComp, Position, Renderable, SerializeMe, Viewshed,
+    network, BuildingChoice, CombatStats, Connected, Name, OnlinePlayer, OnlineRunState,
+    PlayerInfo, PlayerInput, PlayerInputComp, Position, Renderable, SerializeMe, Viewshed,
 };
 use rltk::RGB;
 use specs::prelude::*;
@@ -32,6 +32,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
         WriteStorage<'a, Connected>,
         WriteStorage<'a, PlayerInputComp>,
         WriteStorage<'a, PlayerInfo>,
+        WriteStorage<'a, BuildingChoice>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -52,6 +53,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
             mut connecteds,
             mut player_inputs,
             player_infos,
+            mut building_choices,
         ) = data;
 
         let mut player_messages: Vec<(Entity, network::Message)> = Vec::new();
@@ -90,6 +92,11 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                         uid = uuid.to_string();
                         player_entity = player_hash.hash.get(&uid.clone());
                         input = PlayerInput::DOWN
+                    }
+                    network::Message::Build(uuid, x, y, name) => {
+                        uid = uuid.to_string();
+                        player_entity = player_hash.hash.get(&uid.clone());
+                        input = PlayerInput::BUILD(x, y, name)
                     }
                     network::Message::Interact(uuid, x, y, name, id, gen) => {
                         uid = uuid.to_string();
@@ -149,6 +156,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                     &mut viewsheds,
                     &mut online_players,
                     &mut names,
+                    &mut building_choices,
                     &mut storage,
                     &mut alloc,
                     5,
@@ -204,6 +212,7 @@ impl UuidPlayerHash {
 }
 
 /// Spawns the player and returns his/her entity object.
+/// TODO faire un vair system de spawn qui va chercher dans le json
 pub fn spawn_online_player<'a>(
     entities: &mut Entities<'a>,
     positions: &mut WriteStorage<'a, Position>,
@@ -212,6 +221,7 @@ pub fn spawn_online_player<'a>(
     viewsheds: &mut WriteStorage<'a, Viewshed>,
     online_players: &mut WriteStorage<'a, OnlinePlayer>,
     names: &mut WriteStorage<'a, Name>,
+    building_choices: &mut WriteStorage<'a, BuildingChoice>,
     storage: &mut WriteStorage<'a, SimpleMarker<SerializeMe>>,
     alloc: &mut WriteExpect<'a, SimpleMarkerAllocator<SerializeMe>>,
     player_x: i32,
@@ -263,6 +273,12 @@ pub fn spawn_online_player<'a>(
                 power: 5,
             },
             combat_stats,
+        )
+        .with(
+            BuildingChoice {
+                plans: vec!["block".to_string()],
+            },
+            building_choices,
         )
         .marked(storage, alloc)
         .build()

@@ -1,7 +1,8 @@
 extern crate specs;
 use crate::{
-    gamelog::GameLog, CloseInteration, Connected, InBackpack, InteractableObject, InventaireItem,
-    Item, Map, MyInfo, Name, OnlinePlayer, PlayerInfo, Position,
+    gamelog::GameLog, BuildingChoice, BuildingPlan, CloseInteration, Connected, InBackpack,
+    InteractableObject, InventaireItem, Item, Map, MyInfo, Name, OnlinePlayer, PlayerInfo,
+    Position,
 };
 use specs::prelude::*;
 
@@ -21,6 +22,7 @@ impl<'a> System<'a> for PlayerInfoSystem {
         ReadStorage<'a, Item>,
         ReadStorage<'a, Name>,
         ReadStorage<'a, Position>,
+        ReadStorage<'a, BuildingChoice>,
         ReadExpect<'a, Map>,
     );
 
@@ -36,6 +38,7 @@ impl<'a> System<'a> for PlayerInfoSystem {
             items,
             names,
             positions,
+            building_choices,
             map,
         ) = data;
 
@@ -53,6 +56,7 @@ impl<'a> System<'a> for PlayerInfoSystem {
                         my_info: MyInfo {
                             pos: Position { x: pos.x, y: pos.y },
                         },
+                        possible_builds: Vec::new(),
                     },
                 )
                 .expect("Unable to insert");
@@ -96,6 +100,18 @@ impl<'a> System<'a> for PlayerInfoSystem {
                             entity: Some(*on_pos_entity),
                         })
                     }
+                }
+            }
+        }
+
+        //fill building plan
+        //TODO harmonize name
+        for (entity, building_choice) in (&entities, &building_choices).join() {
+            if let Some(player_info) = player_infos.get_mut(entity) {
+                for plan in building_choice.plans.iter() {
+                    player_info
+                        .possible_builds
+                        .push(BuildingPlan { name: plan.clone() });
                 }
             }
         }

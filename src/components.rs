@@ -494,7 +494,7 @@ impl LocalClientInfo {
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct BuildingChoice {
-    pub buildings: Vec<String>,
+    pub plans: Vec<String>,
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
@@ -510,7 +510,14 @@ pub struct PlayerInfo {
     pub inventaire: Vec<InventaireItem>,
     pub close_interations: Vec<CloseInteration>,
     pub my_info: MyInfo,
+    pub possible_builds: Vec<BuildingPlan>,
 }
+
+#[derive(Component, Serialize, Deserialize, Debug, Clone)]
+pub struct BuildingPlan {
+    pub name: String,
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MyInfo {
     pub pos: Position,
