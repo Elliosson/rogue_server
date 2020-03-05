@@ -280,7 +280,7 @@ pub fn spawn_online_player<'a>(
         .with(
             Viewshed {
                 visible_tiles: Vec::new(),
-                range: 8,
+                range: 30,
                 dirty: true,
             },
             viewsheds,
