@@ -3,57 +3,11 @@ use rltk::{Point, Rltk, VirtualKeyCode};
 extern crate specs;
 use super::{
     gamelog::GameLog, network, CombatStats, Item, Map, Monster, Player, Position, RunState, State,
-    TileType, Viewshed, WantsToMelee, WantsToPickupItem, WINDOWHEIGHT, WINDOWWIDTH,
+    TileType, Viewshed, WantsToMelee, WantsToPickupItem, MAPHEIGHT, MAPWIDTH, WINDOWHEIGHT,
+    WINDOWWIDTH,
 };
 use specs::prelude::*;
 use std::cmp::{max, min};
-
-pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World, entity: Entity) {
-    let mut positions = ecs.write_storage::<Position>();
-    let players = ecs.read_storage::<Player>();
-    let mut viewsheds = ecs.write_storage::<Viewshed>();
-
-    let combat_stats = ecs.read_storage::<CombatStats>();
-    let map = ecs.fetch::<Map>();
-    let mut wants_to_melee = ecs.write_storage::<WantsToMelee>();
-
-    let mut pos = positions.get_mut(entity).unwrap();
-    let mut viewshed = viewsheds.get_mut(entity).unwrap();
-
-    if pos.x + delta_x < 1
-        || pos.x + delta_x > map.width - 1
-        || pos.y + delta_y < 1
-        || pos.y + delta_y > map.height - 1
-    {
-        return;
-    }
-    let destination_idx = map.xy_idx(pos.x + delta_x, pos.y + delta_y);
-
-    for potential_target in map.tile_content[destination_idx].iter() {
-        let target = combat_stats.get(*potential_target);
-        if let Some(_target) = target {
-            wants_to_melee
-                .insert(
-                    entity,
-                    WantsToMelee {
-                        target: *potential_target,
-                    },
-                )
-                .expect("Add target failed");
-            return;
-        }
-    }
-
-    if !map.blocked[destination_idx] {
-        pos.x = min(WINDOWWIDTH as i32 - 1, max(0, pos.x + delta_x));
-        pos.y = min(WINDOWHEIGHT as i32 - 1, max(0, pos.y + delta_y));
-
-        viewshed.dirty = true;
-        let mut ppos = ecs.write_resource::<Point>();
-        ppos.x = pos.x;
-        ppos.y = pos.y;
-    }
-}
 
 pub fn try_next_level(ecs: &mut World) -> bool {
     let player_pos = ecs.fetch::<Point>();

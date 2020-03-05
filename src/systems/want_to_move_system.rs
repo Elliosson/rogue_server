@@ -1,5 +1,5 @@
 extern crate specs;
-use crate::{Map, Position, Viewshed, WantToMove, WINDOWHEIGHT, WINDOWWIDTH};
+use crate::{Map, Position, Viewshed, WantToMove, MAPHEIGHT, MAPWIDTH};
 use specs::prelude::*;
 use std::cmp::{max, min};
 
@@ -31,11 +31,8 @@ impl<'a> System<'a> for WantToMoveSystem {
             let destination_idx =
                 map.xy_idx(pos.x + want_to_move.delta_x, pos.y + want_to_move.delta_y);
             if !map.blocked[destination_idx] {
-                pos.x = min(WINDOWWIDTH as i32 - 1, max(0, pos.x + want_to_move.delta_x));
-                pos.y = min(
-                    WINDOWHEIGHT as i32 - 1,
-                    max(0, pos.y + want_to_move.delta_y),
-                );
+                pos.x = min(MAPWIDTH as i32 - 1, max(0, pos.x + want_to_move.delta_x));
+                pos.y = min(MAPHEIGHT as i32 - 1, max(0, pos.y + want_to_move.delta_y));
                 viewshed.dirty = true;
             }
         }

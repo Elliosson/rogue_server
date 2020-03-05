@@ -199,16 +199,34 @@ impl GameState for State {
     fn tick(&mut self, ctx: &mut Rltk) {
         ctx.cls();
 
-        draw_map(&self.ecs, ctx);
+        //draw_map(&self.ecs, ctx);
 
         {
             let positions = self.ecs.read_storage::<Position>();
             let renderables = self.ecs.read_storage::<Renderable>();
+            let player_entity = self.ecs.fetch::<Entity>();
+            let player_pos = positions.get(*player_entity).unwrap();
 
             let mut data = (&positions, &renderables).join().collect::<Vec<_>>();
             data.sort_by(|&a, &b| b.1.render_order.cmp(&a.1.render_order));
             for (pos, render) in data.iter() {
-                ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph);
+                let vision_square = 20;
+                let entity_screen_x = pos.x - player_pos.x + vision_square;
+                let entity_screen_y = pos.y - player_pos.y + vision_square;
+
+                if entity_screen_x > 0
+                    && entity_screen_x < vision_square * 2
+                    && entity_screen_y > 0
+                    && entity_screen_y < vision_square * 2
+                {
+                    ctx.set(
+                        entity_screen_x,
+                        entity_screen_y,
+                        render.fg,
+                        render.bg,
+                        render.glyph,
+                    );
+                }
             }
 
             gui::draw_ui(&self.ecs, ctx);

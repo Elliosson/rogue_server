@@ -7,8 +7,8 @@ use crate::TileType;
 use serde::{Deserialize, Serialize};
 use specs::prelude::*;
 
-pub const MAPWIDTH: usize = 150;
-pub const MAPHEIGHT: usize = 83;
+pub const MAPWIDTH: usize = 300;
+pub const MAPHEIGHT: usize = 300;
 pub const MAPCOUNT: usize = MAPHEIGHT * MAPWIDTH;
 
 #[derive(Default, Serialize, Deserialize, Clone)]

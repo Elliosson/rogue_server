@@ -972,7 +972,7 @@ pub fn temperature_map(gs: &mut State, ctx: &mut Rltk) -> TemperatureMapResult {
         ctx.set_bg(x, y, bg);
         // Move the coordinates
         x += 1;
-        if x > MAPWIDTH as i32 - 1 {
+        if x > WINDOWWIDTH as i32 - 1 - 20 {
             x = 0;
             y += 1;
         }
