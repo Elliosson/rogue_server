@@ -197,8 +197,6 @@ impl State {
 
 impl GameState for State {
     fn tick(&mut self, ctx: &mut Rltk) {
-        let start = time::Instant::now();
-
         ctx.cls();
 
         draw_map(&self.ecs, ctx);
@@ -219,24 +217,7 @@ impl GameState for State {
         //handle input of the local player
         local_player::local_player_input(&self.ecs, ctx);
 
-        //run game
-        self.run_systems();
-        self.ecs.maintain();
-
-        spawner::spawner_named(&mut self.ecs);
-        object_deleter::delete_entity_to_delete(&mut self.ecs);
-
-        let end = time::Instant::now();
-
-        let time_spend = end - start;
-
-        if TICK_TIME > time_spend {
-            let time_left = TICK_TIME - time_spend;
-            thread::sleep(time_left);
-        } else {
-            println!("WARNING: tick is too slow !");
-            println!("{:?}", time_spend);
-        }
+        common_tick(self);
     }
 }
 
@@ -390,6 +371,29 @@ fn main() {
     //rltk::main_loop(context, gs);
 }
 
+//tick common to the server with and without windows
+fn common_tick(gs: &mut State) {
+    let start = time::Instant::now();
+
+    //run game
+    gs.run_systems();
+    gs.ecs.maintain();
+
+    spawner::spawner_named(&mut gs.ecs);
+    object_deleter::delete_entity_to_delete(&mut gs.ecs);
+
+    let end = time::Instant::now();
+
+    let time_spend = end - start;
+
+    if TICK_TIME > time_spend {
+        let time_left = TICK_TIME - time_spend;
+        thread::sleep(time_left);
+    } else {
+        println!("WARNING: tick is too slow ! : {:?}", time_spend);
+    }
+}
+
 #[cfg(not(feature = "no_rltk"))]
 fn game_loop(mut gs: State) {
     let mut context = Rltk::init_simple8x8(
@@ -406,23 +410,6 @@ fn game_loop(mut gs: State) {
 #[cfg(feature = "no_rltk")]
 fn game_loop(mut gs: State) {
     loop {
-        let start = time::Instant::now();
-
-        //run game
-        gs.run_systems();
-        gs.ecs.maintain();
-
-        object_deleter::delete_entity_to_delete(&mut gs.ecs);
-
-        let end = time::Instant::now();
-
-        let time_spend = end - start;
-
-        if TICK_TIME > time_spend {
-            let time_left = TICK_TIME - time_spend;
-            thread::sleep(time_left);
-        } else {
-            println!("WARNING: tick is too slow !");
-        }
+        common_tick(&mut gs);
     }
 }
