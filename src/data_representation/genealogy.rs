@@ -12,7 +12,7 @@ pub fn write_genealogy(ecs: &mut World) -> std::io::Result<()> {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn write_genealogy(ecs: &mut World) -> std::io::Result<()> {
+pub fn _write_genealogy(ecs: &mut World) -> std::io::Result<()> {
     let registery = ecs.fetch::<BirthRegistery>();
 
     let mut file = File::create("birth_registery.dot")?;

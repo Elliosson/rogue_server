@@ -5,7 +5,6 @@ use crate::{
     Renderable, Reproduction, Specie, Speed, TemperatureSensitive,
 };
 use specs::prelude::*;
-use std::collections::BTreeMap;
 
 pub struct StatSystem {}
 
@@ -31,5 +30,5 @@ impl<'a> System<'a> for StatSystem {
         ReadStorage<'a, Aging>,
     );
 
-    fn run(&mut self, data: Self::SystemData) {}
+    fn run(&mut self, _data: Self::SystemData) {}
 }

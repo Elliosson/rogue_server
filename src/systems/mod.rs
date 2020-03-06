@@ -12,8 +12,6 @@ mod vegetable_grow_system;
 pub use vegetable_grow_system::VegetableGrowSystem;
 mod object_spawn_system;
 pub use object_spawn_system::{ObjectBuilder, ObjectSpawnSystem};
-mod interaction_system;
-pub use interaction_system::{InteractionResquest, InteractionSystem};
 mod date_system;
 pub use date_system::{Date, DateSystem};
 mod stat_system;

@@ -13,7 +13,7 @@ pub fn world_state_log(ecs: &mut World) -> std::io::Result<()> {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn world_state_log(ecs: &mut World) -> std::io::Result<()> {
+pub fn _world_state_log(ecs: &mut World) -> std::io::Result<()> {
     let logs = ecs.fetch_mut::<gamelog::WorldStatLog>();
     let date = ecs.fetch::<Date>();
 

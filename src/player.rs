@@ -1,15 +1,13 @@
 extern crate rltk;
-use rltk::{Point, Rltk, VirtualKeyCode};
+use rltk::Point;
 extern crate specs;
 use super::{
-    gamelog::GameLog, network, CombatStats, Item, Map, Monster, Player, Position, RunState, State,
-    TileType, Viewshed, WantsToMelee, WantsToPickupItem, MAPHEIGHT, MAPWIDTH, WINDOWHEIGHT,
-    WINDOWWIDTH,
+    gamelog::GameLog, CombatStats, Item, Map, Monster, Position, RunState, TileType, Viewshed,
+    WantsToPickupItem,
 };
 use specs::prelude::*;
-use std::cmp::{max, min};
 
-pub fn try_next_level(ecs: &mut World) -> bool {
+pub fn _try_next_level(ecs: &mut World) -> bool {
     let player_pos = ecs.fetch::<Point>();
     let map = ecs.fetch::<Map>();
     let player_idx = map.xy_idx(player_pos.x, player_pos.y);
@@ -24,7 +22,7 @@ pub fn try_next_level(ecs: &mut World) -> bool {
     }
 }
 
-fn get_item(ecs: &mut World) {
+fn _get_item(ecs: &mut World) {
     let player_pos = ecs.fetch::<Point>();
     let player_entity = ecs.fetch::<Entity>();
     let entities = ecs.entities();
@@ -58,7 +56,7 @@ fn get_item(ecs: &mut World) {
     }
 }
 
-fn skip_turn(ecs: &mut World) -> RunState {
+fn _skip_turn(ecs: &mut World) -> RunState {
     let player_entity = ecs.fetch::<Entity>();
     let viewshed_components = ecs.read_storage::<Viewshed>();
     let monsters = ecs.read_storage::<Monster>();

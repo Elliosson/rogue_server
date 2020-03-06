@@ -5,7 +5,7 @@ use super::{
     gamelog::{GameLog, SpeciesInstantLog},
     Aging, BuildingChoice, CloseInteration, CombatStats, Date, EnergyReserve, Equipped, Female,
     InBackpack, InteractableObject, Male, Map, Name, Player, PlayerInfo, Position, Reproduction,
-    RunState, Specie, Speed, State, Viewshed, MAPWIDTH, WINDOWHEIGHT, WINDOWWIDTH,
+    RunState, Specie, Speed, State, Viewshed, WINDOWHEIGHT, WINDOWWIDTH,
 };
 use specs::prelude::*;
 
@@ -300,7 +300,7 @@ pub fn show_inventory(ecs: &World, ctx: &mut Rltk) -> (ItemMenuResult, Option<En
     }
 }
 
-pub fn drop_item_menu(gs: &mut State, ctx: &mut Rltk) -> (ItemMenuResult, Option<Entity>) {
+pub fn _drop_item_menu(gs: &mut State, ctx: &mut Rltk) -> (ItemMenuResult, Option<Entity>) {
     let player_entity = gs.ecs.fetch::<Entity>();
     let names = gs.ecs.read_storage::<Name>();
     let backpack = gs.ecs.read_storage::<InBackpack>();
@@ -387,7 +387,7 @@ pub fn drop_item_menu(gs: &mut State, ctx: &mut Rltk) -> (ItemMenuResult, Option
     }
 }
 
-pub fn remove_item_menu(gs: &mut State, ctx: &mut Rltk) -> (ItemMenuResult, Option<Entity>) {
+pub fn _remove_item_menu(gs: &mut State, ctx: &mut Rltk) -> (ItemMenuResult, Option<Entity>) {
     let player_entity = gs.ecs.fetch::<Entity>();
     let names = gs.ecs.read_storage::<Name>();
     let backpack = gs.ecs.read_storage::<Equipped>();
@@ -474,7 +474,7 @@ pub fn remove_item_menu(gs: &mut State, ctx: &mut Rltk) -> (ItemMenuResult, Opti
     }
 }
 
-pub fn ranged_target(
+pub fn _ranged_target(
     gs: &mut State,
     ctx: &mut Rltk,
     range: i32,
@@ -546,7 +546,7 @@ pub enum MainMenuResult {
     Selected { selected: MainMenuSelection },
 }
 
-pub fn main_menu(gs: &mut State, ctx: &mut Rltk) -> MainMenuResult {
+pub fn _main_menu(gs: &mut State, ctx: &mut Rltk) -> MainMenuResult {
     let save_exists = super::saveload_system::does_save_exist();
     let runstate = gs.ecs.fetch::<RunState>();
 
@@ -671,7 +671,7 @@ pub enum GameOverResult {
     QuitToMenu,
 }
 
-pub fn game_over(ctx: &mut Rltk) -> GameOverResult {
+pub fn _game_over(ctx: &mut Rltk) -> GameOverResult {
     ctx.print_color_centered(
         15,
         RGB::named(rltk::YELLOW),
@@ -938,7 +938,7 @@ pub enum TemperatureMapResult {
     NoResponse,
 }
 
-pub fn temperature_map(gs: &mut State, ctx: &mut Rltk) -> TemperatureMapResult {
+pub fn _temperature_map(gs: &mut State, ctx: &mut Rltk) -> TemperatureMapResult {
     let map = gs.ecs.fetch::<Map>();
 
     let mut x = 0;

@@ -335,7 +335,6 @@ fn main() {
         entries: vec!["Welcome to Rusty Roguelike".to_string()],
     });
     gs.ecs.insert(ObjectBuilder::new());
-    gs.ecs.insert(InteractionResquest::new());
     gs.ecs.insert(Date::new());
     gs.ecs.insert(BirthRequetList::new());
     gs.ecs.insert(BirthRegistery::new());
