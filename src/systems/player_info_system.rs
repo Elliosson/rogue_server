@@ -61,7 +61,6 @@ impl<'a> System<'a> for PlayerInfoSystem {
                 )
                 .expect("Unable to insert");
         }
-
         //TODO these function are hightly ineficiant, to refactor if needed
         //fill inventory
         for (entity, backpack, _item, name) in (&entities, &backpacks, &items, &names).join() {
@@ -103,7 +102,6 @@ impl<'a> System<'a> for PlayerInfoSystem {
                 }
             }
         }
-
         //fill building plan
         //TODO harmonize name
         for (entity, building_choice) in (&entities, &building_choices).join() {

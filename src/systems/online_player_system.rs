@@ -77,6 +77,19 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                 let mut player_entity: Option<&Entity> = None;
                 let input;
                 match mes.clone() {
+                    network::Message::Registered(uuid) => {
+                        uid = uuid.to_string();
+                        player_entity = player_hash.hash.get(&uid.clone());
+                        match player_entity {
+                            Some(_entity) => {
+                                println!("ERROR: someone want to register with an already use uuid")
+                            }
+                            None => {
+                                new_player_list.push(uid.clone());
+                            }
+                        }
+                        input = PlayerInput::NONE;
+                    }
                     network::Message::RIGHT(uuid) => {
                         uid = uuid.to_string();
                         player_entity = player_hash.hash.get(&uid.clone());
@@ -156,9 +169,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                             .insert(*entity, Connected { uuid: uid.clone() })
                             .expect("Unable to insert");
                     }
-                    None => {
-                        new_player_list.push(uid.clone());
-                    }
+                    None => {}
                 }
 
                 //todo read the hash map to asociate the uid with an entity

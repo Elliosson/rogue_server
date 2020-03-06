@@ -42,28 +42,26 @@ pub fn run(
             println!("message: {}", msg);
 
             //push the message in a struct that will be read by the game to do an action
-            match Message::from(msg) {
-                Some((msg, command)) => {
-                    println!("message: {:?}", msg);
-                    message_guard.push((msg, command));
+
+            let response_to_send = match Message::from(msg) {
+                //msg is a string in enter
+                Some((message, command)) => {
+                    println!("message: {:?}", message);
+                    let (response, message_to_system) = response(
+                        message,
+                        map_to_send_clone.clone(),
+                        player_info_to_send_clone.clone(),
+                    );
+                    message_guard.push((message_to_system, command.clone()));
+                    format!("{} {}", command, response)
                 }
                 None => {
                     println!("None message");
+                    "err".to_string()
                 }
             };
 
-            out.send(ws::Message::Text(match Message::from(msg) {
-                Some((msg, command)) => format!(
-                    "{} {}",
-                    command,
-                    response(
-                        msg,
-                        map_to_send_clone.clone(),
-                        player_info_to_send_clone.clone()
-                    )
-                ),
-                None => "err".to_string(),
-            }))
+            out.send(ws::Message::Text(response_to_send))
         }
     })
     .unwrap();
@@ -73,14 +71,16 @@ fn response(
     msg: Message,
     map_to_send: Arc<Mutex<HashMap<String, Vec<(Position, Renderable)>>>>,
     player_info_to_send: Arc<Mutex<HashMap<String, String>>>,
-) -> String {
+) -> (String, Message) {
     let map_guard = map_to_send.lock().unwrap();
     let player_info_guard = player_info_to_send.lock().unwrap();
 
     match msg {
+        //this is very tricky because since the uuid is created here we don't return the same message that the on we received
         Message::Register => {
             println!("register");
-            Uuid::new_v4().to_string()
+            let uuid = Uuid::new_v4();
+            (uuid.to_string(), Message::Registered(uuid))
         }
         Message::Map(uuid) => {
             let mut string_to_send = " ".to_string();
@@ -103,15 +103,15 @@ fn response(
                 }
             }
 
-            string_to_send
+            (string_to_send, msg)
         }
         Message::PlayerInfo(uuid) => {
             if let Some(my_player_info) = player_info_guard.get(&uuid.to_string()) {
-                my_player_info.clone() // my_player_info is a string
+                (my_player_info.clone(), msg) // my_player_info is a string
             } else {
-                "nok".to_string()
+                ("nok".to_string(), msg)
             }
         }
-        _ => "ok".to_string(),
+        _ => ("ok".to_string(), msg),
     }
 }

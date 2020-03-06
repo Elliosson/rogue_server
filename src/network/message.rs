@@ -3,6 +3,7 @@ use uuid::Uuid;
 #[derive(Debug, Clone)]
 pub enum Message {
     Register,
+    Registered(Uuid),
     Play(Uuid),
     Positions(Uuid),
     UP(Uuid),
@@ -18,6 +19,7 @@ pub enum Message {
 }
 
 impl Message {
+    //the return String command contain : play, register or map etc
     pub fn from(msg: &str) -> Option<(Message, String)> {
         if msg.starts_with("register") {
             Some((Message::Register, "register".to_string()))
