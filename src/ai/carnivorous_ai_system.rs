@@ -71,9 +71,11 @@ impl<'a> System<'a> for CarnivorousAI {
             let mut found_herbivores: Vec<Entity> = Vec::new();
             for visible_tile in viewshed.visible_tiles.iter() {
                 let idx = map.xy_idx(visible_tile.x, visible_tile.y);
-                for maybe_herbivore in map.tile_content[idx].iter() {
-                    if let Some(_herbivore) = herbivores.get(*maybe_herbivore) {
-                        found_herbivores.push(*maybe_herbivore);
+                if let Some(tile_content) = map.tile_content.get(&idx) {
+                    for maybe_herbivore in tile_content.iter() {
+                        if let Some(_herbivore) = herbivores.get(*maybe_herbivore) {
+                            found_herbivores.push(*maybe_herbivore);
+                        }
                     }
                 }
             }

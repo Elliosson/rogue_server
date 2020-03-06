@@ -69,7 +69,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
 
             //todo hash map to get player entity
 
-            for (net_mes, command) in message_list_guard.iter() {
+            for (net_mes, _command) in message_list_guard.iter() {
                 //println!("message list: {:?}, uid {}", net_mes, command);
                 let mes = net_mes.clone();
 
@@ -117,10 +117,13 @@ impl<'a> System<'a> for OnlinePlayerSystem {
 
                         if let Some(entity) = player_entity {
                             if let Some(pos) = positions.get(*entity) {
-                                for item_entity in map.tile_content[map.xy_idx(pos.x, pos.y)].iter()
+                                if let Some(tile_content) =
+                                    map.tile_content.get(&map.xy_idx(pos.x, pos.y))
                                 {
-                                    if let Some(_item) = items.get(*item_entity) {
-                                        target_item = Some(item_entity);
+                                    for item_entity in tile_content.iter() {
+                                        if let Some(_item) = items.get(*item_entity) {
+                                            target_item = Some(item_entity);
+                                        }
                                     }
                                 }
                             }

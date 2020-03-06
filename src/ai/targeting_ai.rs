@@ -84,8 +84,10 @@ impl<'a> System<'a> for TargetingAI {
 
             for visible_tile in viewshed.visible_tiles.iter() {
                 let idx = map.xy_idx(visible_tile.x, visible_tile.y);
-                for maybe_food in map.tile_content[idx].iter() {
-                    viewed_food.push(*maybe_food);
+                if let Some(tile_content) = map.tile_content.get(&idx) {
+                    for maybe_food in tile_content.iter() {
+                        viewed_food.push(*maybe_food);
+                    }
                 }
             }
 

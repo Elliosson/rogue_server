@@ -105,14 +105,16 @@ impl<'a> System<'a> for GenderedReproductionSystem {
 
                 for visible_tile in viewshed.visible_tiles.iter() {
                     let idx = map.xy_idx(visible_tile.x, visible_tile.y);
-                    for maybe_mate in map.tile_content[idx].iter() {
-                        //Check that the mate is not himself
-                        if maybe_mate.id() != entity.id() {
-                            if let Some(mate_specie) = species.get(*maybe_mate) {
-                                if mate_specie.name == specie.name {
-                                    if let Some(_male) = males.get(*maybe_mate) {
-                                        //add in possible mate
-                                        possible_mates.push(*maybe_mate);
+                    if let Some(tile_content) = map.tile_content.get(&idx) {
+                        for maybe_mate in tile_content.iter() {
+                            //Check that the mate is not himself
+                            if maybe_mate.id() != entity.id() {
+                                if let Some(mate_specie) = species.get(*maybe_mate) {
+                                    if mate_specie.name == specie.name {
+                                        if let Some(_male) = males.get(*maybe_mate) {
+                                            //add in possible mate
+                                            possible_mates.push(*maybe_mate);
+                                        }
                                     }
                                 }
                             }

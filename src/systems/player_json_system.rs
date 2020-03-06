@@ -43,7 +43,7 @@ impl<'a> System<'a> for PlayerJsonSystem {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn player_json(player_inf: String) -> std::io::Result<()> {
+pub fn _player_json(player_inf: String) -> std::io::Result<()> {
     let mut file = File::create("player_info.txt")?;
 
     write!(file, "{}", player_inf)?;

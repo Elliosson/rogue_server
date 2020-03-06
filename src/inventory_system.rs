@@ -105,8 +105,10 @@ impl<'a> System<'a> for ItemUseSystem {
                         None => {
                             // Single target in tile
                             let idx = map.xy_idx(target.x, target.y);
-                            for mob in map.tile_content[idx].iter() {
-                                targets.push(*mob);
+                            if let Some(tile_content) = map.tile_content.get(&idx) {
+                                for mob in tile_content.iter() {
+                                    targets.push(*mob);
+                                }
                             }
                         }
                         Some(area_effect) => {
@@ -118,8 +120,10 @@ impl<'a> System<'a> for ItemUseSystem {
                             });
                             for tile_idx in blast_tiles.iter() {
                                 let idx = map.xy_idx(tile_idx.x, tile_idx.y);
-                                for mob in map.tile_content[idx].iter() {
-                                    targets.push(*mob);
+                                if let Some(tile_content) = map.tile_content.get(&idx) {
+                                    for mob in tile_content.iter() {
+                                        targets.push(*mob);
+                                    }
                                 }
                             }
                         }

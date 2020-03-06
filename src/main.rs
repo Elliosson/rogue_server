@@ -95,14 +95,14 @@ impl State {
         date.run_now(&self.ecs);
         let mut food_pref = FoodPreferenceSystem {};
         food_pref.run_now(&self.ecs);
-        let mut temperature = TemperatureSystem {};
-        temperature.run_now(&self.ecs);
-        let mut humidity = HumiditySystem {};
-        humidity.run_now(&self.ecs);
-        let mut temperature_sens = TemperatureSensitivitySystem {};
-        temperature_sens.run_now(&self.ecs);
-        let mut humidity_sens = HumiditySensitivitySystem {};
-        humidity_sens.run_now(&self.ecs);
+        //let mut temperature = TemperatureSystem {};
+        //temperature.run_now(&self.ecs);
+        //let mut humidity = HumiditySystem {};
+        //humidity.run_now(&self.ecs);
+        //let mut temperature_sens = TemperatureSensitivitySystem {};
+        //temperature_sens.run_now(&self.ecs);
+        //let mut humidity_sens = HumiditySensitivitySystem {};
+        //humidity_sens.run_now(&self.ecs);
         let mut specie = SpecieSystem {};
         specie.run_now(&self.ecs);
         let mut vis = VisibilitySystem {};
@@ -116,18 +116,12 @@ impl State {
         let mut player_command = PlayerCommandSystem {};
         player_command.run_now(&self.ecs);
 
-        //let mut cow = CowAI {};
-        //cow.run_now(&self.ecs);
-        //let mut carnivore_ai = CarnivorousAI {};
-        //carnivore_ai.run_now(&self.ecs);
         let mut eating_killing_ai = EatingKillingAI {};
         eating_killing_ai.run_now(&self.ecs);
 
         let mut targeting_ai = TargetingAI {};
         targeting_ai.run_now(&self.ecs);
 
-        //let mut omnivore_ai = OmnivoreAI {};
-        //omnivore_ai.run_now(&self.ecs);
         let mut flee_ai = FleeAI {};
         flee_ai.run_now(&self.ecs);
         let mut search_partner = SearchParterAI {};
@@ -146,8 +140,6 @@ impl State {
         let mut object_spawn = ObjectSpawnSystem {};
         object_spawn.run_now(&self.ecs);
 
-        //let mut interaction = InteractionSystem {};
-        //interaction.run_now(&self.ecs);
         let mut interactionv2 = Interationv2System {};
         interactionv2.run_now(&self.ecs);
 
@@ -163,8 +155,6 @@ impl State {
         veg_grow.run_now(&self.ecs);
         let mut energy = EnergySystem {};
         energy.run_now(&self.ecs);
-        //let mut solo_reprod = ReproductionSystem {};
-        //solo_reprod.run_now(&self.ecs);
         let mut death_system = DeathSystem {};
         death_system.run_now(&self.ecs);
         let mut gendered_reprod = GenderedReproductionSystem {};
@@ -328,9 +318,14 @@ fn main() {
     let player_entity = spawner::player(&mut gs.ecs, player_x, player_y);
 
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
+
+    let tree_start = time::Instant::now();
     for room in map.rooms.iter() {
         spawner::spawn_trees(&mut gs.ecs, room);
     }
+    let tree_end = time::Instant::now();
+
+    println!("tree time {:?}", tree_end - tree_start);
 
     gs.ecs.insert(map);
     gs.ecs.insert(Point::new(player_x, player_y));
@@ -413,7 +408,7 @@ fn common_tick(gs: &mut State) {
 }
 
 #[cfg(not(feature = "no_rltk"))]
-fn game_loop(mut gs: State) {
+fn game_loop(gs: State) {
     let mut context = Rltk::init_simple8x8(
         WINDOWWIDTH as u32,
         WINDOWHEIGHT as u32,

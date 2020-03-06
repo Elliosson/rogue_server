@@ -86,18 +86,18 @@ impl<'a> System<'a> for PlayerInfoSystem {
         )
             .join()
         {
-            let entities_on_pos = &map.tile_content[map.xy_idx(pos.x, pos.y)];
-
-            for on_pos_entity in entities_on_pos.iter() {
-                if let Some(interactable) = interactable_objects.get(*on_pos_entity) {
-                    for intereraction in interactable.interactions.iter() {
-                        player_info.close_interations.push(CloseInteration {
-                            interaction_name: intereraction.name.clone(),
-                            object_name: name.name.clone(),
-                            index: on_pos_entity.id(),
-                            generation: on_pos_entity.gen().id(),
-                            entity: Some(*on_pos_entity),
-                        })
+            if let Some(entities_on_pos) = map.tile_content.get(&map.xy_idx(pos.x, pos.y)) {
+                for on_pos_entity in entities_on_pos.iter() {
+                    if let Some(interactable) = interactable_objects.get(*on_pos_entity) {
+                        for intereraction in interactable.interactions.iter() {
+                            player_info.close_interations.push(CloseInteration {
+                                interaction_name: intereraction.name.clone(),
+                                object_name: name.name.clone(),
+                                index: on_pos_entity.id(),
+                                generation: on_pos_entity.gen().id(),
+                                entity: Some(*on_pos_entity),
+                            })
+                        }
                     }
                 }
             }

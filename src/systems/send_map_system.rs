@@ -33,9 +33,12 @@ impl<'a> System<'a> for SendMapSystem {
             for vis in viewshed.visible_tiles.iter() {
                 let idx = map.xy_idx(vis.x, vis.y);
 
-                for entity in map.tile_content[idx].iter() {
-                    if let Some(renderable) = renderables.get(*entity) {
-                        my_viewed_map.push((Position { x: vis.x, y: vis.y }, renderable.clone()));
+                if let Some(tile_content) = map.tile_content.get(&idx) {
+                    for entity in tile_content.iter() {
+                        if let Some(renderable) = renderables.get(*entity) {
+                            my_viewed_map
+                                .push((Position { x: vis.x, y: vis.y }, renderable.clone()));
+                        }
                     }
                 }
             }

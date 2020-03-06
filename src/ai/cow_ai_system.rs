@@ -70,9 +70,11 @@ impl<'a> System<'a> for CowAI {
             let mut found_leaf: Vec<Entity> = Vec::new();
             for visible_tile in viewshed.visible_tiles.iter() {
                 let idx = map.xy_idx(visible_tile.x, visible_tile.y);
-                for maybe_leaf in map.tile_content[idx].iter() {
-                    if let Some(_leaf) = leafs.get(*maybe_leaf) {
-                        found_leaf.push(*maybe_leaf);
+                if let Some(tile_content) = map.tile_content.get(&idx) {
+                    for maybe_leaf in tile_content.iter() {
+                        if let Some(_leaf) = leafs.get(*maybe_leaf) {
+                            found_leaf.push(*maybe_leaf);
+                        }
                     }
                 }
             }

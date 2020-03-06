@@ -19,7 +19,6 @@ pub fn local_player_input(ecs: &World, ctx: &mut Rltk) {
         LocalClientRunstate::Inventory => local_client_inventory(ecs, ctx),
         LocalClientRunstate::Interaction => local_client_interaction(ecs, ctx),
         LocalClientRunstate::Build => local_client_build(ecs, ctx),
-        _ => LocalClientRunstate::BaseState,
     }
 }
 

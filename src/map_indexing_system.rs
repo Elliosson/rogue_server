@@ -28,7 +28,8 @@ impl<'a> System<'a> for MapIndexingSystem {
 
             // Push the entity to the appropriate index slot. It's a Copy
             // type, so we don't need to clone it (we want to avoid moving it out of the ECS!)
-            map.tile_content[idx].push(entity);
+            let tile_content = map.tile_content.entry(idx).or_insert(Vec::new());
+            tile_content.push(entity);
         }
     }
 }

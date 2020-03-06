@@ -1,7 +1,7 @@
 extern crate specs;
 use crate::{
     gamelog::{GameLog, GeneralLog},
-    Dead, DeathCause, EnergyReserve, Hunger, ToDelete,
+    Dead, DeathCause, EnergyReserve, Hunger,
 };
 use specs::prelude::*;
 
@@ -14,13 +14,11 @@ impl<'a> System<'a> for EnergySystem {
         WriteExpect<'a, GameLog>,
         WriteExpect<'a, GeneralLog>,
         WriteStorage<'a, EnergyReserve>,
-        WriteStorage<'a, ToDelete>,
         WriteStorage<'a, Dead>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (entities, mut log, mut general_log, mut energy_reserves, mut to_deletes, mut deads) =
-            data;
+        let (entities, mut log, mut general_log, mut energy_reserves, mut deads) = data;
 
         for (entity, mut en_res) in (&entities, &mut energy_reserves).join() {
             //consumption of energy

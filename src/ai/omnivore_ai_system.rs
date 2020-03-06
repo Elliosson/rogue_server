@@ -154,15 +154,17 @@ impl<'a> System<'a> for OmnivoreAI {
 
             for visible_tile in viewshed.visible_tiles.iter() {
                 let idx = map.xy_idx(visible_tile.x, visible_tile.y);
-                for maybe_food in map.tile_content[idx].iter() {
-                    if let Some(_leaf) = leafs.get(*maybe_food) {
-                        found_leaf.push(*maybe_food);
-                    }
-                    if let Some(specie) = species.get(*maybe_food) {
-                        if specie.name == my_specie.name {
-                            found_same_specie.push(*maybe_food);
-                        } else {
-                            found_other_specie.push(*maybe_food);
+                if let Some(tile_content) = map.tile_content.get(&idx) {
+                    for maybe_food in tile_content.iter() {
+                        if let Some(_leaf) = leafs.get(*maybe_food) {
+                            found_leaf.push(*maybe_food);
+                        }
+                        if let Some(specie) = species.get(*maybe_food) {
+                            if specie.name == my_specie.name {
+                                found_same_specie.push(*maybe_food);
+                            } else {
+                                found_other_specie.push(*maybe_food);
+                            }
                         }
                     }
                 }

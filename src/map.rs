@@ -6,9 +6,10 @@ extern crate specs;
 use crate::TileType;
 use serde::{Deserialize, Serialize};
 use specs::prelude::*;
+use std::collections::HashMap;
 
-pub const MAPWIDTH: usize = 300;
-pub const MAPHEIGHT: usize = 300;
+pub const MAPWIDTH: usize = 1000;
+pub const MAPHEIGHT: usize = 1000;
 pub const MAPCOUNT: usize = MAPHEIGHT * MAPWIDTH;
 
 #[derive(Default, Serialize, Deserialize, Clone)]
@@ -24,7 +25,7 @@ pub struct Map {
 
     #[serde(skip_serializing)]
     #[serde(skip_deserializing)]
-    pub tile_content: Vec<Vec<Entity>>,
+    pub tile_content: HashMap<usize, Vec<Entity>>,
     pub tile_temperature: Vec<f32>,
     pub tile_humidity: Vec<f32>,
 }
@@ -82,9 +83,7 @@ impl Map {
     }
 
     pub fn clear_content_index(&mut self) {
-        for content in self.tile_content.iter_mut() {
-            content.clear();
-        }
+        self.tile_content.clear()
     }
 
     /// Make a simple new map
@@ -97,7 +96,7 @@ impl Map {
             revealed_tiles: vec![false; MAPCOUNT],
             visible_tiles: vec![false; MAPCOUNT],
             blocked: vec![false; MAPCOUNT],
-            tile_content: vec![Vec::new(); MAPCOUNT],
+            tile_content: HashMap::new(),
             tile_temperature: vec![0.0; MAPCOUNT],
             tile_humidity: vec![0.0; MAPCOUNT],
             depth: 0,
@@ -122,7 +121,7 @@ impl Map {
             revealed_tiles: vec![false; MAPCOUNT],
             visible_tiles: vec![false; MAPCOUNT],
             blocked: vec![false; MAPCOUNT],
-            tile_content: vec![Vec::new(); MAPCOUNT],
+            tile_content: HashMap::new(),
             tile_temperature: vec![0.0; MAPCOUNT],
             tile_humidity: vec![0.0; MAPCOUNT],
             depth: new_depth,

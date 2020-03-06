@@ -1,8 +1,5 @@
 extern crate specs;
-use crate::{
-    gamelog::{GameLog, WorldStatLog},
-    Name, ToSpawnList, WantBuild,
-};
+use crate::{gamelog::GameLog, ToSpawnList, WantBuild};
 use specs::prelude::*;
 
 pub struct BuildingSystem {}
@@ -20,7 +17,7 @@ impl<'a> System<'a> for BuildingSystem {
         let (entities, _log, mut want_builds, mut to_spawns) = data;
 
         //TODO for now no verification of the right to build
-        for (entity, want_build) in (&entities, &want_builds).join() {
+        for (_entity, want_build) in (&entities, &want_builds).join() {
             to_spawns.request(want_build.x, want_build.y, want_build.name.clone());
         }
         want_builds.clear()

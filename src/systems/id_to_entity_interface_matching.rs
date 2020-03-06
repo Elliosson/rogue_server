@@ -1,7 +1,6 @@
 extern crate specs;
 use crate::{
-    gamelog::GameLog, CommandToConvert, EntityToConvert, Name, PlayerInfo, PlayerInput,
-    PlayerInputComp,
+    gamelog::GameLog, CommandToConvert, EntityToConvert, PlayerInfo, PlayerInput, PlayerInputComp,
 };
 use specs::prelude::*;
 
@@ -16,14 +15,13 @@ impl<'a> System<'a> for IdEntityInterfaceMatching {
     type SystemData = (
         Entities<'a>,
         WriteExpect<'a, GameLog>,
-        ReadStorage<'a, Name>,
         ReadStorage<'a, PlayerInfo>,
         WriteStorage<'a, EntityToConvert>,
         WriteStorage<'a, PlayerInputComp>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (entities, _log, names, player_infos, mut to_converts, mut player_inputs_comps) = data;
+        let (entities, _log, player_infos, mut to_converts, mut player_inputs_comps) = data;
 
         for (entity, player_info, to_convert) in (&entities, &player_infos, &to_converts).join() {
             match to_convert.command.clone() {

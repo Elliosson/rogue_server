@@ -26,16 +26,16 @@ impl<'a> System<'a> for FoodPreferenceSystem {
             //println!("food pref");
             let mut choices = BTreeMap::new();
             choices.insert(
-                ((carnivore.digestion * 0.55 * 1.1 * energy.max_reserve as f32) as i32),
+                (carnivore.digestion * 0.55 * 1.1 * energy.max_reserve as f32) as i32,
                 FoodType::Meat,
             );
             //*0.9 is for prioritify eating meat over killing
             choices.insert(
-                ((carnivore.digestion * 0.55 * energy.max_reserve as f32) as i32),
+                (carnivore.digestion * 0.55 * energy.max_reserve as f32) as i32,
                 FoodType::Animal,
             );
             choices.insert(
-                ((herbivore.digestion * 0.55 * energy.max_reserve as f32) as i32),
+                (herbivore.digestion * 0.55 * energy.max_reserve as f32) as i32,
                 FoodType::Vegetable,
             );
             food_prefs
