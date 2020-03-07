@@ -27,6 +27,8 @@ impl<'a> System<'a> for HumiditySensitivitySystem {
         )
             .join()
         {
+            //TODO be redone with hash map
+            /*
             //get humidity
             let idx = map.xy_idx(pos.x, pos.y);
             let humidity = map.tile_humidity[idx];
@@ -38,6 +40,7 @@ impl<'a> System<'a> for HumiditySensitivitySystem {
                 * hum_sens.k;
 
             eng_res.reserve -= energy_consuption;
+            */
         }
     }
 }

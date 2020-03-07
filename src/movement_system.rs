@@ -44,8 +44,8 @@ impl<'a> System<'a> for MovementSystem {
                 let dest_idx = movement.dest_idx as usize;
                 let is_blocking = blockers.get(entity);
                 if is_blocking.is_some() {
-                    map.blocked[start_idx] = false;
-                    map.blocked[dest_idx] = true;
+                    map.set_blocked(start_idx, false);
+                    map.set_blocked(dest_idx, true);
                 }
                 pos.x = movement.dest_idx % map.width;
                 pos.y = movement.dest_idx / map.width;

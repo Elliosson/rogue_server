@@ -6,7 +6,7 @@ use super::{
     WantsToPickupItem,
 };
 use specs::prelude::*;
-
+/*
 pub fn _try_next_level(ecs: &mut World) -> bool {
     let player_pos = ecs.fetch::<Point>();
     let map = ecs.fetch::<Map>();
@@ -21,7 +21,7 @@ pub fn _try_next_level(ecs: &mut World) -> bool {
         false
     }
 }
-
+*/
 fn _get_item(ecs: &mut World) {
     let player_pos = ecs.fetch::<Point>();
     let player_entity = ecs.fetch::<Entity>();

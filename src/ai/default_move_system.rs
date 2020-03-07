@@ -20,6 +20,7 @@ impl<'a> System<'a> for DefaultMoveAI {
         let (mut turns, mut move_mode, positions, mut map, mut rng, mut apply_move, entities) =
             data;
 
+        /*
         let mut turn_done: Vec<Entity> = Vec::new();
         for (entity, pos, mut mode, _myturn) in
             (&entities, &positions, &mut move_mode, &turns).join()
@@ -43,7 +44,7 @@ impl<'a> System<'a> for DefaultMoveAI {
 
                     if x > 0 && x < map.width - 1 && y > 0 && y < map.height - 1 {
                         let dest_idx = map.xy_idx(x, y);
-                        if !map.blocked[dest_idx] {
+                        if !map.is_blocked(dest_idx) {
                             apply_move
                                 .insert(
                                     entity,
@@ -61,13 +62,22 @@ impl<'a> System<'a> for DefaultMoveAI {
                     if let Some(path) = path {
                         // We have a target - go there
                         if path.len() > 1 {
-                            if !map.blocked[path[1] as usize] {
+                            if let Some(blocked) = map.blocked.get(&(path[1] as usize)) {
+                                if !blocked {
+                                    apply_move
+                                        .insert(entity, ApplyMove { dest_idx: path[1] })
+                                        .expect("Unable to insert");
+                                    path.remove(0); // Remove the first step in the path
+                                    turn_done.push(entity);
+                                }
+                            } else {
                                 apply_move
                                     .insert(entity, ApplyMove { dest_idx: path[1] })
                                     .expect("Unable to insert");
                                 path.remove(0); // Remove the first step in the path
                                 turn_done.push(entity);
                             }
+
                         // Otherwise we wait a turn to see if the path clears up
                         } else {
                             mode.mode = Movement::RandomWaypoint { path: None };
@@ -97,5 +107,6 @@ impl<'a> System<'a> for DefaultMoveAI {
         for done in turn_done.iter() {
             turns.remove(*done);
         }
+        */
     }
 }

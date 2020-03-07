@@ -944,7 +944,7 @@ pub fn _temperature_map(gs: &mut State, ctx: &mut Rltk) -> TemperatureMapResult 
     let mut x = 0;
     let mut y = 0;
 
-    for (_idx, temperature) in map.tile_temperature.iter().enumerate() {
+    for (_idx, temperature) in map.tile_temperature.iter() {
         let bg;
         if *temperature < -10.0 {
             bg = RGB::named(rltk::BLUE1);

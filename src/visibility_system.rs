@@ -27,6 +27,7 @@ impl<'a> System<'a> for VisibilitySystem {
                     .visible_tiles
                     .retain(|p| p.x > 0 && p.x < map.width - 1 && p.y > 0 && p.y < map.height - 1);
 
+                /*
                 // If this is the player, reveal what they can see
                 let _p: Option<&Player> = player.get(ent);
                 if let Some(_p) = _p {
@@ -39,6 +40,7 @@ impl<'a> System<'a> for VisibilitySystem {
                         map.visible_tiles[idx] = true;
                     }
                 }
+                */
             }
         }
     }

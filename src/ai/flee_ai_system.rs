@@ -37,7 +37,7 @@ impl<'a> System<'a> for FleeAI {
             let flee_pos = algo::dummy_flee(pos.x, pos.y, enemy_pos.0, enemy_pos.1);
             let flee_target = map.xy_idx(flee_pos.0, flee_pos.1) as i32;
 
-            if !map.blocked[flee_target as usize] {
+            if !map.is_blocked(flee_target as usize) {
                 apply_move
                     .insert(
                         entity,

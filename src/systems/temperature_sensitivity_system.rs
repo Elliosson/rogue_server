@@ -29,14 +29,16 @@ impl<'a> System<'a> for TemperatureSensitivitySystem {
         {
             //get temperature
             let idx = map.xy_idx(pos.x, pos.y);
-            let temp = map.tile_temperature[idx];
 
-            //For now he just have a consuption proportionnal to square the distance with the optimum
-            //the k factor will moderate le curb of the square
-            let energy_consuption =
-                (temp as f32 - temp_sens.optimum) * (temp as f32 - temp_sens.optimum) * temp_sens.k;
+            if let Some(temp) = map.tile_temperature.get(&idx) {
+                //For now he just have a consuption proportionnal to square the distance with the optimum
+                //the k factor will moderate le curb of the square
+                let energy_consuption = (*temp as f32 - temp_sens.optimum)
+                    * (*temp as f32 - temp_sens.optimum)
+                    * temp_sens.k;
 
-            eng_res.reserve -= energy_consuption;
+                eng_res.reserve -= energy_consuption;
+            }
         }
     }
 }

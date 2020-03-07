@@ -27,6 +27,8 @@ impl<'a> System<'a> for HumiditySystem {
         let mim_humidity: f32 = 20.0;
         let humidity_variation: f32 = 80.0;
 
+        //todo be redone with hashmap
+        /*
         let len = map.tile_humidity.iter().count();
         for i in 0..len {
             let (x, _y) = map.idx_xy(i);
@@ -38,5 +40,6 @@ impl<'a> System<'a> for HumiditySystem {
             let tile_humidity = longitude_hum;
             map.tile_humidity[i] = tile_humidity;
         }
+        */
     }
 }

@@ -62,8 +62,8 @@ impl<'a> System<'a> for GoTargetSystem {
                     //path_map.blocked[dest_idx] = false;
                     //I can't copy the map because it's too heavy. This is a quick fix to unbloc the destination
                     //TODO I must create a astar that permit to go on a blocked destination
-                    let temp_map_blocked = map.blocked[dest_idx];
-                    map.blocked[dest_idx] = false;
+                    let temp_map_blocked = map.is_blocked(dest_idx);
+                    map.set_blocked(dest_idx, false);
 
                     //println!("first part time = {}", now2.elapsed().as_micros());
 
@@ -75,8 +75,8 @@ impl<'a> System<'a> for GoTargetSystem {
                         &mut *map,
                         max_step, //Max step for search, TODO thonk of a way to automatically find an acceptable number
                     );
-                    map.blocked[dest_idx] = temp_map_blocked; //TODO remove it's ugly
-                                                              //println!("a* search time = {}", now3.elapsed().as_micros());
+                    map.set_blocked(dest_idx, temp_map_blocked); //TODO remove it's ugly
+                                                                 //println!("a* search time = {}", now3.elapsed().as_micros());
                 }
 
                 //println!("2 part time = {}", now2.elapsed().as_micros());
@@ -111,8 +111,8 @@ impl<'a> System<'a> for GoTargetSystem {
                                 let start_idx = map.xy_idx(pos.x, pos.y);
                                 let is_blocking = blockers.get(entity);
                                 if is_blocking.is_some() {
-                                    map.blocked[start_idx] = false;
-                                    map.blocked[*dest_idx as usize] = true;
+                                    map.set_blocked(start_idx, false);
+                                    map.set_blocked(*dest_idx as usize, true);
                                 }
                                 pos.x = dest_idx % map.width;
                                 pos.y = dest_idx / map.width;

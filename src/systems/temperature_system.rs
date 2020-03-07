@@ -34,6 +34,8 @@ impl<'a> System<'a> for TemperatureSystem {
 
         let day_temp: f32 = day_ref * saisonal_variation;
 
+        //todo be redone with hash map
+        /*
         let len = map.tile_temperature.iter().count();
         for i in 0..len {
             let (_x, y) = map.idx_xy(i);
@@ -45,5 +47,6 @@ impl<'a> System<'a> for TemperatureSystem {
             let tile_temp = day_temp + latitude_temp;
             map.tile_temperature[i] = tile_temp;
         }
+        */
     }
 }
