@@ -62,7 +62,7 @@ pub fn spawn_trees(ecs: &mut World, room: &Rect) {
     {
         let mut rng = ecs.write_resource::<RandomNumberGenerator>();
         //let num_spawns = rng.roll_dice(600, 50);
-        let num_spawns = 1000000;
+        let num_spawns = 10000;
 
         for _i in 0..num_spawns {
             let mut added = false;
@@ -125,7 +125,7 @@ pub struct ToSpawnList {
 
 impl ToSpawnList {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> ToSpawnList {
+    pub fn new() -> Self {
         ToSpawnList {
             requests: Vec::new(),
         }
@@ -133,6 +133,23 @@ impl ToSpawnList {
 
     pub fn request(&mut self, x: i32, y: i32, name: String) {
         self.requests.push((x, y, name));
+    }
+}
+
+pub struct ToConstructList {
+    requests: Vec<(i32, i32, String, Entity)>,
+}
+
+impl ToConstructList {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        ToConstructList {
+            requests: Vec::new(),
+        }
+    }
+
+    pub fn request(&mut self, x: i32, y: i32, name: String, entity: Entity) {
+        self.requests.push((x, y, name, entity));
     }
 }
 
@@ -153,14 +170,35 @@ pub fn spawner_named(ecs: &mut World) {
     to_spawns.requests.clear();
 }
 
+pub fn constructer_named(ecs: &mut World) {
+    println!("pass constructer named");
+    let mut spawns_temps: Vec<(i32, i32, String, Entity)> = Vec::new();
+    {
+        let to_spawns = ecs.write_resource::<ToConstructList>();
+
+        for (x, y, name, entity) in to_spawns.requests.iter() {
+            spawns_temps.push((*x, *y, name.clone(), *entity))
+        }
+    }
+    for (x, y, name, entity) in spawns_temps.iter() {
+        construct_named(ecs, &name.clone(), *x, *y, *entity)
+    }
+    let mut to_spawns = ecs.write_resource::<ToConstructList>();
+
+    to_spawns.requests.clear();
+}
+
 // like create named but with an already existing entity
+//todo destroy entity id not builded, this could pose probleme honestly, I have to think about this
+//TODO factorize avec spawn
 pub fn construct_named(ecs: &mut World, key: &str, x: i32, y: i32, entity: Entity) {
+    println!("pass constructe {}", key);
     let raws: &RawMaster = &RAWS.lock().unwrap();
     //let mut entity_builder = ecs.create_entity();
     //entity_builder.entity = entity; //TODO that seem ungly, I don't now if it's ok
-    let entity_builder = EntityBuilderPerso::new(entity, ecs);
     let mut dirty = Vec::new();
-    if raws.prop_index.contains_key(key) {
+    if raws.prop_index.contains_key(key) || raws.item_index.contains_key(key) {
+        let entity_builder = EntityBuilderPerso::new(entity, ecs);
         let spawn_result = spawn_named_entity(
             raws,
             entity_builder.marked::<SimpleMarker<SerializeMe>>(),
@@ -176,17 +214,23 @@ pub fn construct_named(ecs: &mut World, key: &str, x: i32, y: i32, entity: Entit
             tile_content.push(entity);
             map.dirty.append(&mut dirty);
         } else {
-            println!("WARNING: We don't know how to spawn [{}]!", key);
+            println!(
+                "ERROR: An enitity is left with no componant .We don't know how to spawn [{}]!",
+                key
+            );
         }
     } else {
-        println!("WARNING: No keys {} !", key);
+        println!(
+            "ERROR: An enitity is left with no componant. No keys {} !",
+            key
+        );
     }
 }
 
 pub fn spawn_named(ecs: &mut World, key: &str, x: i32, y: i32) {
     let raws: &RawMaster = &RAWS.lock().unwrap();
     let mut dirty = Vec::new();
-    if raws.prop_index.contains_key(key) {
+    if raws.prop_index.contains_key(key) || raws.item_index.contains_key(key) {
         let spawn_result = spawn_named_entity(
             raws,
             ecs.create_entity().marked::<SimpleMarker<SerializeMe>>(),

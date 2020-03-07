@@ -8,8 +8,8 @@ use serde::{Deserialize, Serialize};
 use specs::prelude::*;
 use std::collections::HashMap;
 
-pub const MAPWIDTH: usize = 10000;
-pub const MAPHEIGHT: usize = 10000;
+pub const MAPWIDTH: usize = 1000;
+pub const MAPHEIGHT: usize = 1000;
 pub const MAPCOUNT: usize = MAPHEIGHT * MAPWIDTH;
 
 #[derive(Default, Serialize, Deserialize, Clone)]

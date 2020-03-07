@@ -2,7 +2,8 @@ extern crate specs;
 use crate::{
     gamelog::{GameLog, WorldStatLog},
     network, BuildingChoice, CombatStats, Connected, Item, Map, Name, OnlinePlayer, OnlineRunState,
-    PlayerInfo, PlayerInput, PlayerInputComp, Position, Renderable, SerializeMe, Viewshed,
+    PlayerInfo, PlayerInput, PlayerInputComp, Position, Renderable, SerializeMe, ToConstructList,
+    Viewshed,
 };
 use rltk::RGB;
 use specs::prelude::*;
@@ -35,6 +36,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
         WriteStorage<'a, BuildingChoice>,
         WriteStorage<'a, Item>,
         WriteExpect<'a, Map>,
+        WriteExpect<'a, ToConstructList>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -58,6 +60,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
             mut building_choices,
             items,
             mut map,
+            mut to_construct,
         ) = data;
 
         let mut player_messages: Vec<(Entity, network::Message)> = Vec::new();
@@ -200,6 +203,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                     &mut storage,
                     &mut alloc,
                     &mut map,
+                    &mut to_construct,
                     5,
                     5,
                 );
@@ -266,9 +270,14 @@ pub fn spawn_online_player<'a>(
     storage: &mut WriteStorage<'a, SimpleMarker<SerializeMe>>,
     alloc: &mut WriteExpect<'a, SimpleMarkerAllocator<SerializeMe>>,
     map: &mut WriteExpect<'a, Map>,
+    to_construct: &mut WriteExpect<'a, ToConstructList>,
     player_x: i32,
     player_y: i32,
 ) -> Entity {
+    let entity = entities.create();
+    to_construct.request(player_x, player_y, "Online Player".to_string(), entity);
+    entity
+    /*
     entities
         .build_entity()
         .with(Position::new(player_x, player_y, &mut map.dirty), positions)
@@ -317,5 +326,5 @@ pub fn spawn_online_player<'a>(
             building_choices,
         )
         .marked(storage, alloc)
-        .build()
+        .build()*/
 }

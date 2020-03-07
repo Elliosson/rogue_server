@@ -326,7 +326,7 @@
                 "glyph": "8",
                 "fg": "#008000",
                 "bg": "#000000",
-                "order": 2
+                "order": 3
             },
             "interactable{}": true,
             "interactable_object": {
@@ -593,6 +593,33 @@
                 "order": 2
             },
             "blocks_tile": true
+        },
+        {
+            "name": "Online Player",
+            "renderable": {
+                "glyph": "@",
+                "fg": "#FFFFFF",
+                "bg": "#000000",
+                "order": 0
+            },
+            "online_player": {
+                "runstate": "AwaitingInput"
+            },
+            "viewshed": {
+                "range": 30
+            },
+            "blocks_tile": true,
+            "combat": {
+                "max_hp": 0,
+                "hp": 30,
+                "defense": 2,
+                "power": 2
+            },
+            "building_choice": {
+                "plans": [
+                    "block"
+                ]
+            }
         }
     ]
 }

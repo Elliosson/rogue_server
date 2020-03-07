@@ -35,18 +35,21 @@ impl<'a> System<'a> for PlayerCommandSystem {
         ) = data;
 
         for (entity, player_input) in (&entities, &player_inputs).join() {
-            let mut online_player = online_players.get_mut(entity).unwrap();
-            //execute runstate
-            let newrunstate = online_runstate_choice(
-                online_player.runstate.clone(),
-                entity,
-                player_input.input.clone(),
-                &mut want_to_moves,
-                &mut pickups,
-                &mut interaction_requestsv2,
-                &mut want_builds,
-            );
-            online_player.runstate = newrunstate;
+            if let Some(online_player) = online_players.get_mut(entity) {
+                //execute runstate
+                let newrunstate = online_runstate_choice(
+                    online_player.runstate.clone(),
+                    entity,
+                    player_input.input.clone(),
+                    &mut want_to_moves,
+                    &mut pickups,
+                    &mut interaction_requestsv2,
+                    &mut want_builds,
+                );
+                online_player.runstate = newrunstate;
+            } else {
+                println!("Warning: Input from a non OnlinePlayer")
+            }
         }
         player_inputs.clear();
     }

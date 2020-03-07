@@ -22,7 +22,7 @@ mod gui;
 mod inventory_system;
 mod spawner;
 use inventory_system::{ItemCollectionSystem, ItemDropSystem, ItemRemoveSystem, ItemUseSystem};
-use spawner::ToSpawnList;
+use spawner::{ToConstructList, ToSpawnList};
 mod movement_system;
 mod object_deleter;
 pub mod random_table;
@@ -318,7 +318,7 @@ fn main() {
         map.rooms[0].center()
     };
 
-    let player_entity = spawner::player(&mut gs.ecs, player_x, player_y);
+    let player_entity = spawner::player(&mut gs.ecs, 5, 5);
 
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
 
@@ -347,6 +347,7 @@ fn main() {
     gs.ecs.insert(LocalClientInfo::new());
     gs.ecs.insert(InteractionResquestListV2::new());
     gs.ecs.insert(ToSpawnList::new());
+    gs.ecs.insert(ToConstructList::new());
     gs.ecs.insert(gamelog::WorldStatLog {
         entries: vec!["Rust Roguelike World Stat log file".to_string()],
     });
@@ -396,6 +397,7 @@ fn common_tick(gs: &mut State) {
     gs.ecs.maintain();
 
     spawner::spawner_named(&mut gs.ecs);
+    spawner::constructer_named(&mut gs.ecs);
     object_deleter::delete_entity_to_delete(&mut gs.ecs);
 
     let end = time::Instant::now();

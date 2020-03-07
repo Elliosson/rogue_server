@@ -438,6 +438,19 @@ pub fn spawn_named_prop<T: Builder>(
             eb = eb.with(combat.clone());
         }
 
+        // BuildingChoice
+        if let Some(building_choice) = &prop_template.building_choice {
+            eb = eb.with(building_choice.clone());
+        }
+
+        // OnlinePlayer
+        if let Some(online_player) = &prop_template.online_player {
+            println!("create an online player");
+            eb = eb.with(online_player.clone());
+        } else {
+            println!("No online player");
+        }
+
         return Some(eb.build());
     }
     None
@@ -452,11 +465,16 @@ pub fn spawn_named_entity<T: Builder>(
     dirty: &mut Vec<(i32, i32)>,
 ) -> Option<Entity> {
     if raws.item_index.contains_key(key) {
+        println!("item: Key {}  found", key);
         return spawn_named_item(raws, new_entity, key, pos, dirty);
     } else if raws.mob_index.contains_key(key) {
+        println!("mob: Key {}  found", key);
         return spawn_named_mob(raws, new_entity, key, pos, dirty);
     } else if raws.prop_index.contains_key(key) {
+        println!("props: Key {}  found", key);
         return spawn_named_prop(raws, new_entity, key, pos, dirty);
+    } else {
+        println!("ERROR: Key {} not found", key);
     }
 
     None
@@ -642,6 +660,19 @@ pub fn spawn_born(
         // Animal
         if let Some(animal) = &prop_template.animal {
             eb = eb.with(animal.clone());
+        }
+
+        // BuildingChoice
+        if let Some(building_choice) = &prop_template.building_choice {
+            eb = eb.with(building_choice.clone());
+        }
+
+        // OnlinePlayer
+        if let Some(online_player) = &prop_template.online_player {
+            println!("create an online player");
+            eb = eb.with(online_player.clone());
+        } else {
+            println!("No online player");
         }
 
         // Sexe

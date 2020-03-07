@@ -1,6 +1,6 @@
 extern crate specs;
 use crate::raws::*;
-use crate::{components::*, Name};
+use crate::{components::*, Name, ToSpawnList};
 use specs::prelude::*;
 
 //Trully item spawn system, to rename or to extend
@@ -15,12 +15,22 @@ impl<'a> System<'a> for ObjectSpawnSystem {
         WriteStorage<'a, Name>,
         WriteStorage<'a, Item>,
         WriteExpect<'a, ObjectBuilder>,
+        WriteExpect<'a, ToSpawnList>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (entities, mut positions, mut renderables, mut names, mut items, mut object_builder) =
-            data;
+        let (
+            entities,
+            mut positions,
+            mut renderables,
+            mut names,
+            mut items,
+            mut object_builder,
+            mut to_spawn,
+        ) = data;
         for request in object_builder.requests.iter() {
+            to_spawn.request(request.x, request.y, request.name.clone());
+            /*
             //Get raw(json data) and build the object according to the json
             let raws: &RawMaster = &RAWS.lock().unwrap();
             spawn_named_item_ingame(
@@ -38,6 +48,7 @@ impl<'a> System<'a> for ObjectSpawnSystem {
                     y: request.y,
                 },
             )
+            */
         }
 
         object_builder.requests.clear();
