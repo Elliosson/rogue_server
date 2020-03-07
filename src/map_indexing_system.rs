@@ -14,7 +14,7 @@ impl<'a> System<'a> for MapIndexingSystem {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut map, positions, blockers, entities) = data;
+        let (mut map, positions, blockers, _entities) = data;
 
         //hashset prevent duplicate
         let mut dirty_entities: HashSet<Entity> = HashSet::new();

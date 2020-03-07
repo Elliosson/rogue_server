@@ -1,7 +1,7 @@
 extern crate rltk;
 use super::Rect;
-use rltk::{Algorithm2D, BaseMap, Console, Point, RandomNumberGenerator, Rltk, RGB};
-use std::cmp::{max, min};
+use rltk::{Algorithm2D, BaseMap, Console, Point, Rltk, RGB};
+
 extern crate specs;
 use crate::TileType;
 use serde::{Deserialize, Serialize};
@@ -62,7 +62,7 @@ impl Map {
     fn apply_room_to_map(&mut self, room: &Rect) {
         for y in room.y1 + 1..=room.y2 {
             for x in room.x1 + 1..=room.x2 {
-                let idx = self.xy_idx(x, y);
+                let _idx = self.xy_idx(x, y);
                 //self.tiles[idx] = TileType::Floor;
             }
         }

@@ -8,7 +8,7 @@ use super::{
 use crate::components::*;
 use crate::specs::saveload::{MarkedBuilder, SimpleMarker};
 use specs::prelude::*;
-use specs::EntityBuilder;
+
 use std::collections::HashMap;
 
 /// Spawns the player and returns his/her entity object.
@@ -171,7 +171,6 @@ pub fn spawner_named(ecs: &mut World) {
 }
 
 pub fn constructer_named(ecs: &mut World) {
-    println!("pass constructer named");
     let mut spawns_temps: Vec<(i32, i32, String, Entity)> = Vec::new();
     {
         let to_spawns = ecs.write_resource::<ToConstructList>();

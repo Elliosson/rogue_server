@@ -36,7 +36,7 @@ impl<'a> System<'a> for MovementSystem {
         ) = data;
 
         // Apply broad movement
-        for (entity, movement, mut pos, speed) in
+        for (entity, movement, pos, speed) in
             (&entities, &apply_move, &mut position, &mut speeds).join()
         {
             if speed.move_point >= MOVE_COST {

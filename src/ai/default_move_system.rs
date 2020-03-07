@@ -1,5 +1,5 @@
 extern crate specs;
-use crate::{tile_walkable, ApplyMove, Map, MoveMode, Movement, MyTurn, Position};
+use crate::{ApplyMove, Map, MoveMode, Movement, MyTurn, Position};
 use specs::prelude::*;
 
 pub struct DefaultMoveAI {}

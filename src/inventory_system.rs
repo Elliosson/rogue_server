@@ -314,7 +314,7 @@ impl<'a> System<'a> for ItemDropSystem {
         ) = data;
 
         for (entity, to_drop) in (&entities, &wants_drop).join() {
-            let mut dropper_pos = {
+            let dropper_pos = {
                 let dropped_pos = positions.get(entity).unwrap();
 
                 Position::new(dropped_pos.x(), dropped_pos.y(), &mut map.dirty)

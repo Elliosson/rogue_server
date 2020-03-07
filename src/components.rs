@@ -2,7 +2,7 @@ extern crate specs;
 use specs::prelude::*;
 extern crate rltk;
 extern crate specs_derive;
-use super::{Map, MOVE_COST};
+use super::MOVE_COST;
 use rltk::RGB;
 use serde::{Deserialize, Serialize};
 use specs::error::NoError;

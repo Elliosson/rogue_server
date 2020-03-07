@@ -32,7 +32,7 @@ use movement_system::MovementSystem;
 pub mod ai;
 use ai::*;
 mod tiletype;
-use tiletype::{tile_walkable, TileType};
+use tiletype::TileType;
 pub mod systems;
 use systems::*;
 mod algo;

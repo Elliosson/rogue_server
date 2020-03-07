@@ -1,16 +1,13 @@
 extern crate specs;
 use crate::{
     gamelog::{GameLog, WorldStatLog},
-    network, BuildingChoice, CombatStats, Connected, Item, Map, Name, OnlinePlayer, OnlineRunState,
-    PlayerInfo, PlayerInput, PlayerInputComp, Position, Renderable, SerializeMe, ToConstructList,
-    Viewshed,
+    network, Connected, Item, Map, PlayerInfo, PlayerInput, PlayerInputComp, Position,
+    ToConstructList,
 };
-use rltk::RGB;
+
 use specs::prelude::*;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-
-use crate::specs::saveload::{SimpleMarker, SimpleMarkerAllocator};
 
 pub struct OnlinePlayerSystem {}
 
@@ -19,21 +16,13 @@ impl<'a> System<'a> for OnlinePlayerSystem {
     type SystemData = (
         Entities<'a>,
         WriteExpect<'a, GameLog>,
-        WriteStorage<'a, Name>,
         WriteExpect<'a, WorldStatLog>,
         WriteExpect<'a, UuidPlayerHash>,
         WriteExpect<'a, Arc<Mutex<Vec<(network::Message, String)>>>>,
         WriteStorage<'a, Position>,
-        WriteStorage<'a, Renderable>,
-        WriteStorage<'a, CombatStats>,
-        WriteStorage<'a, Viewshed>,
-        WriteStorage<'a, OnlinePlayer>,
-        WriteStorage<'a, SimpleMarker<SerializeMe>>,
-        WriteExpect<'a, SimpleMarkerAllocator<SerializeMe>>,
         WriteStorage<'a, Connected>,
         WriteStorage<'a, PlayerInputComp>,
         WriteStorage<'a, PlayerInfo>,
-        WriteStorage<'a, BuildingChoice>,
         WriteStorage<'a, Item>,
         WriteExpect<'a, Map>,
         WriteExpect<'a, ToConstructList>,
@@ -41,25 +30,17 @@ impl<'a> System<'a> for OnlinePlayerSystem {
 
     fn run(&mut self, data: Self::SystemData) {
         let (
-            mut entities,
+            entities,
             _log,
-            mut names,
             mut _world_logs,
             mut player_hash,
             message_mutex,
-            mut positions,
-            mut renderables,
-            mut combat_stats,
-            mut viewsheds,
-            mut online_players,
-            mut storage,
-            mut alloc,
+            positions,
             mut connecteds,
             mut player_inputs,
             player_infos,
-            mut building_choices,
             items,
-            mut map,
+            map,
             mut to_construct,
         ) = data;
 
@@ -189,25 +170,8 @@ impl<'a> System<'a> for OnlinePlayerSystem {
 
         //create new player
         for uid in new_player_list {
-            let new_player;
-            {
-                new_player = spawn_online_player(
-                    &mut entities,
-                    &mut positions,
-                    &mut renderables,
-                    &mut combat_stats,
-                    &mut viewsheds,
-                    &mut online_players,
-                    &mut names,
-                    &mut building_choices,
-                    &mut storage,
-                    &mut alloc,
-                    &mut map,
-                    &mut to_construct,
-                    5,
-                    5,
-                );
-            }
+            let new_player = entities.create();
+            to_construct.request(5, 5, "Online Player".to_string(), new_player);
 
             player_hash.hash.insert(uid.clone(), new_player);
         }
@@ -254,77 +218,4 @@ impl UuidPlayerHash {
             hash: HashMap::new(),
         }
     }
-}
-
-/// Spawns the player and returns his/her entity object.
-/// TODO faire un vair system de spawn qui va chercher dans le json
-pub fn spawn_online_player<'a>(
-    entities: &mut Entities<'a>,
-    positions: &mut WriteStorage<'a, Position>,
-    renderables: &mut WriteStorage<'a, Renderable>,
-    combat_stats: &mut WriteStorage<'a, CombatStats>,
-    viewsheds: &mut WriteStorage<'a, Viewshed>,
-    online_players: &mut WriteStorage<'a, OnlinePlayer>,
-    names: &mut WriteStorage<'a, Name>,
-    building_choices: &mut WriteStorage<'a, BuildingChoice>,
-    storage: &mut WriteStorage<'a, SimpleMarker<SerializeMe>>,
-    alloc: &mut WriteExpect<'a, SimpleMarkerAllocator<SerializeMe>>,
-    map: &mut WriteExpect<'a, Map>,
-    to_construct: &mut WriteExpect<'a, ToConstructList>,
-    player_x: i32,
-    player_y: i32,
-) -> Entity {
-    let entity = entities.create();
-    to_construct.request(player_x, player_y, "Online Player".to_string(), entity);
-    entity
-    /*
-    entities
-        .build_entity()
-        .with(Position::new(player_x, player_y, &mut map.dirty), positions)
-        .with(
-            Renderable {
-                glyph: rltk::to_cp437('@'),
-                fg: RGB::named(rltk::YELLOW),
-                bg: RGB::named(rltk::BLACK),
-                render_order: 0,
-            },
-            renderables,
-        )
-        .with(
-            OnlinePlayer {
-                runstate: OnlineRunState::AwaitingInput,
-            },
-            online_players,
-        )
-        .with(
-            Viewshed {
-                visible_tiles: Vec::new(),
-                range: 30,
-                dirty: true,
-            },
-            viewsheds,
-        )
-        .with(
-            Name {
-                name: "Player".to_string(),
-            },
-            names,
-        )
-        .with(
-            CombatStats {
-                max_hp: 30,
-                hp: 30,
-                defense: 2,
-                power: 5,
-            },
-            combat_stats,
-        )
-        .with(
-            BuildingChoice {
-                plans: vec!["block".to_string()],
-            },
-            building_choices,
-        )
-        .marked(storage, alloc)
-        .build()*/
 }

@@ -17,7 +17,7 @@ pub enum TileType {
     UpStairs,
 }
 
-pub fn tile_walkable(tt: TileType) -> bool {
+pub fn _tile_walkable(tt: TileType) -> bool {
     match tt {
         TileType::Floor
         | TileType::DownStairs

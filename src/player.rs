@@ -2,26 +2,11 @@ extern crate rltk;
 use rltk::Point;
 extern crate specs;
 use super::{
-    gamelog::GameLog, CombatStats, Item, Map, Monster, Position, RunState, TileType, Viewshed,
+    gamelog::GameLog, CombatStats, Item, Map, Monster, Position, RunState, Viewshed,
     WantsToPickupItem,
 };
 use specs::prelude::*;
-/*
-pub fn _try_next_level(ecs: &mut World) -> bool {
-    let player_pos = ecs.fetch::<Point>();
-    let map = ecs.fetch::<Map>();
-    let player_idx = map.xy_idx(player_pos.x, player_pos.y);
-    if map.tiles[player_idx] == TileType::DownStairs {
-        true
-    } else {
-        let mut gamelog = ecs.fetch_mut::<GameLog>();
-        gamelog
-            .entries
-            .insert(0, "There is no way down from here.".to_string());
-        false
-    }
-}
-*/
+
 fn _get_item(ecs: &mut World) {
     let player_pos = ecs.fetch::<Point>();
     let player_entity = ecs.fetch::<Entity>();
