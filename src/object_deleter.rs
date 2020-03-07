@@ -1,5 +1,5 @@
 extern crate specs;
-use super::ToDelete;
+use super::{Map, Position, ToDelete};
 use specs::prelude::*;
 
 pub fn delete_entity_to_delete(ecs: &mut World) {
@@ -15,6 +15,14 @@ pub fn delete_entity_to_delete(ecs: &mut World) {
     }
 
     for victim in dead {
+        {
+            //need to refressh map
+            let positions = ecs.read_storage::<Position>();
+            if let Some(pos) = positions.get(victim) {
+                let mut map = ecs.write_resource::<Map>();
+                map.dirty.push((pos.x(), pos.y()));
+            }
+        }
         ecs.delete_entity(victim).expect("Unable to delete");
     }
 }
