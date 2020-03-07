@@ -104,7 +104,7 @@ fn fetch_carac(ecs: &World, tooltip: &mut Vec<String>, x: i32, y: i32) {
     )
         .join()
     {
-        if position.x == x && position.y == y {
+        if position.x() == x && position.y() == y {
             tooltip.push(format!("name {}", name.name));
             tooltip.push(format!("eng {}", energy.reserve));
             tooltip.push(format!("rprd {}", reprod.threshold()));
@@ -809,8 +809,8 @@ pub fn show_object_interaction_choice(
                         return (
                             InteractionMenuResult::Selected,
                             Some((
-                                player_pos.x,
-                                player_pos.y,
+                                player_pos.x(),
+                                player_pos.y(),
                                 possible_interactions[selection as usize].clone(),
                             )),
                         );
@@ -919,8 +919,8 @@ pub fn show_building_choice(
                         return (
                             BuildingMenuResult::Selected,
                             Some((
-                                player_pos.x,
-                                player_pos.y,
+                                player_pos.x(),
+                                player_pos.y(),
                                 possible_buildings[selection as usize].clone(),
                             )),
                         );

@@ -62,7 +62,7 @@ impl<'a> System<'a> for SpecieSystem {
                 for ent in member_list.iter() {
                     let pos = positions.get(*ent).unwrap();
                     //prepare vec for Kmeans
-                    let euclid = Euclid([pos.x as f64, pos.y as f64]);
+                    let euclid = Euclid([pos.x() as f64, pos.y() as f64]);
                     data.push(euclid);
                 }
                 //Do kmean

@@ -201,8 +201,8 @@ impl GameState for State {
             data.sort_by(|&a, &b| b.1.render_order.cmp(&a.1.render_order));
             for (pos, render) in data.iter() {
                 let vision_square = 20;
-                let entity_screen_x = pos.x - player_pos.x + vision_square;
-                let entity_screen_y = pos.y - player_pos.y + vision_square;
+                let entity_screen_x = pos.x() - player_pos.x() + vision_square;
+                let entity_screen_y = pos.y() - player_pos.y() + vision_square;
 
                 if entity_screen_x > 0
                     && entity_screen_x < vision_square * 2
@@ -309,25 +309,29 @@ fn main() {
     gs.ecs.register::<EntityToConvert>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
+    let map: Map = Map::new_map();
+    gs.ecs.insert(map);
 
     raws::load_raws();
-
-    let map: Map = Map::new_map();
-    let (player_x, player_y) = map.rooms[0].center();
+    let (player_x, player_y) = {
+        let map = gs.ecs.write_resource::<Map>();
+        map.rooms[0].center()
+    };
 
     let player_entity = spawner::player(&mut gs.ecs, player_x, player_y);
 
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
 
     let tree_start = time::Instant::now();
-    for room in map.rooms.iter() {
+
+    let rooms = gs.ecs.write_resource::<Map>().rooms.clone();
+    for room in rooms.iter() {
         spawner::spawn_trees(&mut gs.ecs, room);
     }
     let tree_end = time::Instant::now();
 
     println!("tree time {:?}", tree_end - tree_start);
 
-    gs.ecs.insert(map);
     gs.ecs.insert(Point::new(player_x, player_y));
     gs.ecs.insert(player_entity);
     gs.ecs.insert(RunState::AwaitingInput);

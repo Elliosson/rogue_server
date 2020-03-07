@@ -202,8 +202,10 @@ pub fn filter_component_distance<'a, W: Component>(
     for comp_entity in entity_list.iter() {
         if let Some(_component) = searched_component.get(*comp_entity) {
             if let Some(com_pos) = positions.get(*comp_entity) {
-                let distance = rltk::DistanceAlg::Pythagoras
-                    .distance2d(Point::new(pos.x, pos.y), Point::new(com_pos.x, com_pos.y));
+                let distance = rltk::DistanceAlg::Pythagoras.distance2d(
+                    Point::new(pos.x(), pos.y()),
+                    Point::new(com_pos.x(), com_pos.y()),
+                );
 
                 filtered_entities.push((distance, *comp_entity));
             }
@@ -293,7 +295,7 @@ fn choose_food<'a>(
                     //TODO add a flee if we are target to eat
                     predator: entity,
                     distance: min,
-                    predator_pos: Point::new(pos.x, pos.y),
+                    predator_pos: Point::new(pos.x(), pos.y()),
                 },
             )
             .expect("Unable ot insert");
@@ -374,8 +376,8 @@ pub fn hunt_gain<'a>(
 
     if my_speed.speed() > enemy_speed.speed() {
         let distance = rltk::DistanceAlg::Pythagoras.distance2d(
-            Point::new(my_pos.x, my_pos.y),
-            Point::new(enemy_pos.x, enemy_pos.y),
+            Point::new(my_pos.x(), my_pos.y()),
+            Point::new(enemy_pos.x(), enemy_pos.y()),
         );
 
         let chase_time: f32 = distance / (my_speed.speed() - enemy_speed.speed());

@@ -45,6 +45,7 @@ impl<'a> System<'a> for PlayerInfoSystem {
         //insert  a new player info in every conected player
         //effectively clean the thing
         player_infos.clear();
+        let mut dirty = Vec::new();
         //Todo check in player is connected and find a way to handle local player
         for (entity, _online_player, pos) in (&entities, &online_players, &positions).join() {
             player_infos
@@ -54,7 +55,7 @@ impl<'a> System<'a> for PlayerInfoSystem {
                         inventaire: Vec::new(),
                         close_interations: Vec::new(),
                         my_info: MyInfo {
-                            pos: Position { x: pos.x, y: pos.y },
+                            pos: Position::new(pos.x(), pos.y(), &mut dirty),
                         },
                         possible_builds: Vec::new(),
                     },
@@ -86,7 +87,7 @@ impl<'a> System<'a> for PlayerInfoSystem {
         )
             .join()
         {
-            if let Some(entities_on_pos) = map.tile_content.get(&map.xy_idx(pos.x, pos.y)) {
+            if let Some(entities_on_pos) = map.tile_content.get(&map.xy_idx(pos.x(), pos.y())) {
                 for on_pos_entity in entities_on_pos.iter() {
                     if let Some(interactable) = interactable_objects.get(*on_pos_entity) {
                         for intereraction in interactable.interactions.iter() {

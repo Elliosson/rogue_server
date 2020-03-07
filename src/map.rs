@@ -8,8 +8,8 @@ use serde::{Deserialize, Serialize};
 use specs::prelude::*;
 use std::collections::HashMap;
 
-pub const MAPWIDTH: usize = 1000;
-pub const MAPHEIGHT: usize = 1000;
+pub const MAPWIDTH: usize = 10000;
+pub const MAPHEIGHT: usize = 10000;
 pub const MAPCOUNT: usize = MAPHEIGHT * MAPWIDTH;
 
 #[derive(Default, Serialize, Deserialize, Clone)]
@@ -22,6 +22,8 @@ pub struct Map {
     pub visible_tiles: HashMap<usize, bool>,
     pub blocked: HashMap<usize, bool>,
     pub depth: i32,
+    //pub dirty: Vec<usize>, //a vec of the index that must be checked by map indexing
+    pub dirty: Vec<(i32, i32)>, //a vec of the x, y that must be checked by map indexing
 
     #[serde(skip_serializing)]
     #[serde(skip_deserializing)]
@@ -99,6 +101,7 @@ impl Map {
             tile_temperature: HashMap::new(),
             tile_humidity: HashMap::new(),
             depth: 0,
+            dirty: Vec::new(),
         };
 
         let new_room = Rect::new(1, 1, map.width - 4, map.height - 4);

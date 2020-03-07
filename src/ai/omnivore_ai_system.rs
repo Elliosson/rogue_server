@@ -314,8 +314,10 @@ fn choose_food<'a>(
         if let Some(targeted) = maybe_targeted_eat {
             competitor_distance = targeted.distance;
         }
-        let distance = rltk::DistanceAlg::Pythagoras
-            .distance2d(Point::new(pos.x, pos.y), Point::new(food_pos.x, food_pos.y));
+        let distance = rltk::DistanceAlg::Pythagoras.distance2d(
+            Point::new(pos.x(), pos.y()),
+            Point::new(food_pos.x(), food_pos.y()),
+        );
         if (distance < min) && (distance < competitor_distance) {
             //If food can fight, only go if I am stronger
             if let Some(_animal) = animals.get(food) {
@@ -339,7 +341,7 @@ fn choose_food<'a>(
                     //TODO add a flee if we are target to eat
                     predator: entity,
                     distance: min,
-                    predator_pos: Point::new(pos.x, pos.y),
+                    predator_pos: Point::new(pos.x(), pos.y()),
                 },
             )
             .expect("Unable ot insert");
@@ -362,8 +364,8 @@ fn choose_food<'a>(
 
 pub fn in_contact(pos1: &Position, pos2: &Position) -> bool {
     let mut ret = false;
-    if pos1.x >= pos2.x - 1 && pos1.x <= pos2.x + 1 {
-        if pos1.y >= pos2.y - 1 && pos1.y <= pos2.y + 1 {
+    if pos1.x() >= pos2.x() - 1 && pos1.x() <= pos2.x() + 1 {
+        if pos1.y() >= pos2.y() - 1 && pos1.y() <= pos2.y() + 1 {
             ret = true;
         }
     }
@@ -430,8 +432,8 @@ pub fn hunt_gain<'a>(
 
     if my_speed.speed() > enemy_speed.speed() {
         let distance = rltk::DistanceAlg::Pythagoras.distance2d(
-            Point::new(my_pos.x, my_pos.y),
-            Point::new(enemy_pos.x, enemy_pos.y),
+            Point::new(my_pos.x(), my_pos.y()),
+            Point::new(enemy_pos.x(), enemy_pos.y()),
         );
 
         let chase_time: f32 = distance / (my_speed.speed() - enemy_speed.speed());

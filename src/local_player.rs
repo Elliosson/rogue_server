@@ -184,7 +184,7 @@ fn get_item(ecs: &World) -> Option<Entity> {
     let entities = ecs.entities();
 
     for (item_entity, _item, position) in (&entities, &items, &positions).join() {
-        if position.x == player_pos.x && position.y == player_pos.y {
+        if position.x() == player_pos.x() && position.y() == player_pos.y() {
             target_item = Some(item_entity);
         }
     }

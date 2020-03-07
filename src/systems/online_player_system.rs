@@ -57,7 +57,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
             player_infos,
             mut building_choices,
             items,
-            map,
+            mut map,
         ) = data;
 
         let mut player_messages: Vec<(Entity, network::Message)> = Vec::new();
@@ -118,7 +118,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                         if let Some(entity) = player_entity {
                             if let Some(pos) = positions.get(*entity) {
                                 if let Some(tile_content) =
-                                    map.tile_content.get(&map.xy_idx(pos.x, pos.y))
+                                    map.tile_content.get(&map.xy_idx(pos.x(), pos.y()))
                                 {
                                     for item_entity in tile_content.iter() {
                                         if let Some(_item) = items.get(*item_entity) {
@@ -199,6 +199,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                     &mut building_choices,
                     &mut storage,
                     &mut alloc,
+                    &mut map,
                     5,
                     5,
                 );
@@ -264,18 +265,13 @@ pub fn spawn_online_player<'a>(
     building_choices: &mut WriteStorage<'a, BuildingChoice>,
     storage: &mut WriteStorage<'a, SimpleMarker<SerializeMe>>,
     alloc: &mut WriteExpect<'a, SimpleMarkerAllocator<SerializeMe>>,
+    map: &mut WriteExpect<'a, Map>,
     player_x: i32,
     player_y: i32,
 ) -> Entity {
     entities
         .build_entity()
-        .with(
-            Position {
-                x: player_x,
-                y: player_y,
-            },
-            positions,
-        )
+        .with(Position::new(player_x, player_y, &mut map.dirty), positions)
         .with(
             Renderable {
                 glyph: rltk::to_cp437('@'),

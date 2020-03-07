@@ -4,6 +4,7 @@ use super::{Raws, SexeChoice};
 use crate::birth::{BirthForm, Mutations};
 use crate::components::*;
 use crate::random_table::RandomTable;
+use crate::Map;
 use specs::prelude::*;
 use std::collections::{HashMap, HashSet}; //TODO se if we can suppress
 
@@ -71,13 +72,18 @@ impl RawMaster {
     }
 }
 
-fn spawn_position(pos: SpawnType, new_entity: EntityBuilder) -> EntityBuilder {
+fn spawn_position<'a>(
+    pos: SpawnType,
+    new_entity: EntityBuilder<'a>,
+    dirty: &mut Vec<(i32, i32)>,
+) -> EntityBuilder<'a> {
     let mut eb = new_entity;
 
     // Spawn in the specified location
     match pos {
         SpawnType::AtPosition { x, y } => {
-            eb = eb.with(Position { x, y });
+            let position = Position::new(x, y, dirty);
+            eb = eb.with(position);
         }
     }
 
@@ -100,6 +106,7 @@ pub fn spawn_named_item(
     new_entity: EntityBuilder,
     key: &str,
     pos: SpawnType,
+    dirty: &mut Vec<(i32, i32)>,
 ) -> Option<Entity> {
     if raws.item_index.contains_key(key) {
         let item_template = &raws.raws.items[raws.item_index[key]];
@@ -107,7 +114,7 @@ pub fn spawn_named_item(
         let mut eb = new_entity;
 
         // Spawn in the specified location
-        eb = spawn_position(pos, eb);
+        eb = spawn_position(pos, eb, dirty);
 
         // Renderable
         if let Some(renderable) = &item_template.renderable {
@@ -188,6 +195,7 @@ pub fn spawn_named_mob(
     new_entity: EntityBuilder,
     key: &str,
     pos: SpawnType,
+    dirty: &mut Vec<(i32, i32)>,
 ) -> Option<Entity> {
     if raws.mob_index.contains_key(key) {
         let mob_template = &raws.raws.mobs[raws.mob_index[key]];
@@ -195,7 +203,7 @@ pub fn spawn_named_mob(
         let mut eb = new_entity;
 
         // Spawn in the specified location
-        eb = spawn_position(pos, eb);
+        eb = spawn_position(pos, eb, dirty);
 
         // Renderable
         if let Some(renderable) = &mob_template.renderable {
@@ -234,6 +242,7 @@ pub fn spawn_named_prop(
     new_entity: EntityBuilder,
     key: &str,
     pos: SpawnType,
+    dirty: &mut Vec<(i32, i32)>,
 ) -> Option<Entity> {
     if raws.prop_index.contains_key(key) {
         let prop_template = &raws.raws.props[raws.prop_index[key]];
@@ -243,7 +252,7 @@ pub fn spawn_named_prop(
         eb = eb.with(UniqueId::new());
 
         // Spawn in the specified location
-        eb = spawn_position(pos, eb);
+        eb = spawn_position(pos, eb, dirty);
 
         // Renderable
         if let Some(renderable) = &prop_template.renderable {
@@ -386,13 +395,14 @@ pub fn spawn_named_entity(
     new_entity: EntityBuilder,
     key: &str,
     pos: SpawnType,
+    dirty: &mut Vec<(i32, i32)>,
 ) -> Option<Entity> {
     if raws.item_index.contains_key(key) {
-        return spawn_named_item(raws, new_entity, key, pos);
+        return spawn_named_item(raws, new_entity, key, pos, dirty);
     } else if raws.mob_index.contains_key(key) {
-        return spawn_named_mob(raws, new_entity, key, pos);
+        return spawn_named_mob(raws, new_entity, key, pos, dirty);
     } else if raws.prop_index.contains_key(key) {
-        return spawn_named_prop(raws, new_entity, key, pos);
+        return spawn_named_prop(raws, new_entity, key, pos, dirty);
     }
 
     None
@@ -427,10 +437,15 @@ pub fn spawn_born(
     mutations: Mutations,
 ) -> Option<Entity> {
     let pos = form.position;
-    let pos = SpawnType::AtPosition { x: pos.x, y: pos.y };
+    let pos = SpawnType::AtPosition {
+        x: pos.x(),
+        y: pos.y(),
+    };
 
     let key = &form.name.name;
     //TODO insert certificate or not ?
+
+    let mut dirty = Vec::new();
 
     if raws.prop_index.contains_key(key) {
         let prop_template = &raws.raws.props[raws.prop_index[key]];
@@ -440,7 +455,7 @@ pub fn spawn_born(
         eb = eb.with(UniqueId::new());
 
         // Spawn in the specified location
-        eb = spawn_position(pos, eb);
+        eb = spawn_position(pos, eb, &mut dirty);
 
         eb = eb.with(Name {
             name: prop_template.name.clone(),

@@ -58,9 +58,10 @@ pub fn spawn_named_prop_ingame(data: SpwanPropData, key: &str, pos: SpawnType) {
             .marked(simple_markers, simple_marker_allocators);
 
         // Spawn in the specified location
+        let mut dirty = Vec::new(); //TODO ADD THIS TO MAP
         match pos {
             SpawnType::AtPosition { x, y } => {
-                eb = eb.with(Position { x, y }, positions);
+                eb = eb.with(Position::new(x, y, &mut dirty), positions);
             }
         }
 
@@ -175,12 +176,13 @@ pub fn spawn_named_item_ingame(
         let item_template = &raws.raws.items[raws.item_index[key]];
 
         let new_entity = entities.create();
+        let mut dirty = Vec::new();
 
         // Spawn in the specified location
         match pos {
             SpawnType::AtPosition { x, y } => {
                 positions
-                    .insert(new_entity, Position { x, y })
+                    .insert(new_entity, Position::new(x, y, &mut dirty))
                     .expect("Unable to inser position");
             }
         }

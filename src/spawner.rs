@@ -2,8 +2,8 @@ extern crate rltk;
 use rltk::{RandomNumberGenerator, RGB};
 extern crate specs;
 use super::{
-    map::MAPWIDTH, raws::*, CombatStats, Name, Player, Position, Rect, Renderable, SerializeMe,
-    Viewshed,
+    map::MAPWIDTH, raws::*, CombatStats, Map, Name, Player, Position, Rect, Renderable,
+    SerializeMe, Viewshed,
 };
 use crate::components::*;
 use crate::specs::saveload::{MarkedBuilder, SimpleMarker};
@@ -12,11 +12,10 @@ use std::collections::HashMap;
 
 /// Spawns the player and returns his/her entity object.
 pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
-    ecs.create_entity()
-        .with(Position {
-            x: player_x,
-            y: player_y,
-        })
+    let mut dirty = Vec::new();
+    let entity = ecs
+        .create_entity()
+        .with(Position::new(player_x, player_y, &mut dirty))
         .with(Renderable {
             glyph: rltk::to_cp437('@'),
             fg: RGB::named(rltk::YELLOW),
@@ -45,7 +44,12 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
             plans: vec!["block".to_string()],
         })
         .marked::<SimpleMarker<SerializeMe>>()
-        .build()
+        .build();
+
+    let mut map = ecs.write_resource::<Map>();
+    map.dirty.append(&mut dirty);
+
+    entity
 }
 
 /// Fills a room with stuff!
@@ -57,7 +61,7 @@ pub fn spawn_trees(ecs: &mut World, room: &Rect) {
     {
         let mut rng = ecs.write_resource::<RandomNumberGenerator>();
         //let num_spawns = rng.roll_dice(600, 50);
-        let num_spawns = 100000;
+        let num_spawns = 1000000;
 
         for _i in 0..num_spawns {
             let mut added = false;
@@ -75,6 +79,7 @@ pub fn spawn_trees(ecs: &mut World, room: &Rect) {
             }
         }
     }
+    let mut dirty = Vec::new();
 
     // Actually spawn the monsters
     for spawn in spawn_points.iter() {
@@ -90,8 +95,14 @@ pub fn spawn_trees(ecs: &mut World, room: &Rect) {
                         ecs.create_entity().marked::<SimpleMarker<SerializeMe>>(),
                         spawn.1,
                         SpawnType::AtPosition { x, y },
+                        &mut dirty,
                     );
-                    if spawn_result.is_some() {
+                    if let Some(entity) = spawn_result {
+                        let mut map: specs::shred::FetchMut<Map> = ecs.write_resource::<Map>();
+                        let idx = map.xy_idx(x, y);
+                        let tile_content = map.tile_content.entry(idx).or_insert(Vec::new());
+                        tile_content.push(entity);
+                        map.dirty.append(&mut dirty);
                     } else {
                         println!("WARNING: We don't know how to spawn [{}]!", spawn.1);
                     }
@@ -102,6 +113,9 @@ pub fn spawn_trees(ecs: &mut World, room: &Rect) {
             _ => {}
         }
     }
+
+    let mut map = ecs.write_resource::<Map>();
+    map.dirty.append(&mut dirty);
 }
 
 pub struct ToSpawnList {
@@ -140,14 +154,22 @@ pub fn spawner_named(ecs: &mut World) {
 
 pub fn spawn_named(ecs: &mut World, key: &str, x: i32, y: i32) {
     let raws: &RawMaster = &RAWS.lock().unwrap();
+    let mut dirty = Vec::new();
     if raws.prop_index.contains_key(key) {
         let spawn_result = spawn_named_entity(
             raws,
             ecs.create_entity().marked::<SimpleMarker<SerializeMe>>(),
             key,
             SpawnType::AtPosition { x, y },
+            &mut dirty,
         );
-        if spawn_result.is_some() {
+        if let Some(entity) = spawn_result {
+            //todo honesstly the only good wa ywould be to be sure that the enity is insert on ly once in the vec of the hash map ut I don't now how to do that
+            let mut map: specs::shred::FetchMut<Map> = ecs.write_resource::<Map>();
+            let idx = map.xy_idx(x, y);
+            let tile_content = map.tile_content.entry(idx).or_insert(Vec::new());
+            tile_content.push(entity);
+            map.dirty.append(&mut dirty);
         } else {
             println!("WARNING: We don't know how to spawn [{}]!", key);
         }

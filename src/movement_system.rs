@@ -40,15 +40,19 @@ impl<'a> System<'a> for MovementSystem {
             (&entities, &apply_move, &mut position, &mut speeds).join()
         {
             if speed.move_point >= MOVE_COST {
-                let start_idx = map.xy_idx(pos.x, pos.y);
+                let start_idx = map.xy_idx(pos.x(), pos.y());
                 let dest_idx = movement.dest_idx as usize;
                 let is_blocking = blockers.get(entity);
                 if is_blocking.is_some() {
                     map.set_blocked(start_idx, false);
                     map.set_blocked(dest_idx, true);
                 }
-                pos.x = movement.dest_idx % map.width;
-                pos.y = movement.dest_idx / map.width;
+                pos.moving(
+                    movement.dest_idx % map.width,
+                    movement.dest_idx / map.width,
+                    &mut map.dirty,
+                );
+
                 if let Some(vs) = viewsheds.get_mut(entity) {
                     vs.dirty = true;
                 }

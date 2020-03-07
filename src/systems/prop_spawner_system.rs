@@ -55,7 +55,7 @@ impl<'a> System<'a> for PropSpawnerSystem {
             for (_entity, _want_to_duplicate, name, pos) in
                 (&entities, &want_to_duplicates, &mut names, &positions).join()
             {
-                to_spawn.push((name.name.clone(), pos.x, pos.y));
+                to_spawn.push((name.name.clone(), pos.x(), pos.y()));
             }
         }
 

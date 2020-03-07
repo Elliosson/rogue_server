@@ -32,7 +32,7 @@ fn _get_item(ecs: &mut World) {
 
     let mut target_item: Option<Entity> = None;
     for (item_entity, _item, position) in (&entities, &items, &positions).join() {
-        if position.x == player_pos.x && position.y == player_pos.y {
+        if position.x() == player_pos.x && position.y() == player_pos.y {
             target_item = Some(item_entity);
         }
     }

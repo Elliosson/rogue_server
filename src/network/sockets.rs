@@ -89,8 +89,8 @@ fn response(
                     string_to_send = format!(
                         "{} {} {} {} {} {} {} {} {} {} {}",
                         string_to_send,
-                        pos.x,
-                        pos.y,
+                        pos.x(),
+                        pos.y(),
                         renderable.glyph,
                         (renderable.fg.r * 255.0) as u8,
                         (renderable.fg.g * 255.0) as u8,

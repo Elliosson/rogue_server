@@ -21,6 +21,7 @@ impl<'a> System<'a> for SendMapSystem {
     fn run(&mut self, data: Self::SystemData) {
         let (entities, viewsheds, online_players, connecteds, map, map_to_send, renderables) = data;
 
+        let mut dirty = Vec::new();
         let mut map_send_guard = map_to_send.lock().unwrap();
         map_send_guard.clear();
 
@@ -36,8 +37,10 @@ impl<'a> System<'a> for SendMapSystem {
                 if let Some(tile_content) = map.tile_content.get(&idx) {
                     for entity in tile_content.iter() {
                         if let Some(renderable) = renderables.get(*entity) {
-                            my_viewed_map
-                                .push((Position { x: vis.x, y: vis.y }, renderable.clone()));
+                            my_viewed_map.push((
+                                Position::new(vis.x, vis.y, &mut dirty),
+                                renderable.clone(),
+                            )); //TODO to remplace by point
                         }
                     }
                 }

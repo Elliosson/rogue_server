@@ -87,8 +87,8 @@ impl<'a> System<'a> for CarnivorousAI {
                 let herbivore_pos = positions.get(herbivore).unwrap();
                 let pos = positions.get(entity).unwrap();
                 let distance = rltk::DistanceAlg::Pythagoras.distance2d(
-                    Point::new(pos.x, pos.y),
-                    Point::new(herbivore_pos.x, herbivore_pos.y),
+                    Point::new(pos.x(), pos.y()),
+                    Point::new(herbivore_pos.x(), herbivore_pos.y()),
                 );
                 if distance < min {
                     choosen_herbivore = Some(herbivore);
@@ -109,7 +109,7 @@ impl<'a> System<'a> for CarnivorousAI {
 
                 //tell the target to flee //TODO do a real system with done insert and all
                 let pos = positions.get(entity).unwrap();
-                let idx = map.xy_idx(pos.x, pos.y) as i32;
+                let idx = map.xy_idx(pos.x(), pos.y()) as i32;
                 let mut flee_list = Vec::new();
                 flee_list.push(idx);
 

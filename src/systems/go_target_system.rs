@@ -58,7 +58,7 @@ impl<'a> System<'a> for GoTargetSystem {
 
                     //Inblock the destination, if not he will never find a way to go on the target
                     //let mut path_map = map.clone();
-                    let dest_idx = map.xy_idx(target_pos.x, target_pos.y);
+                    let dest_idx = map.xy_idx(target_pos.x(), target_pos.y());
                     //path_map.blocked[dest_idx] = false;
                     //I can't copy the map because it's too heavy. This is a quick fix to unbloc the destination
                     //TODO I must create a astar that permit to go on a blocked destination
@@ -70,8 +70,8 @@ impl<'a> System<'a> for GoTargetSystem {
                     //let _now3 = Instant::now();
 
                     path = algo::a_star_search(
-                        map.xy_idx(pos.x, pos.y) as i32,
-                        map.xy_idx(target_pos.x, target_pos.y) as i32, //TODO change that, the "-1" is a dirty fix for the imposibility to go on a blicked tile
+                        map.xy_idx(pos.x(), pos.y()) as i32,
+                        map.xy_idx(target_pos.x(), target_pos.y()) as i32, //TODO change that, the "-1" is a dirty fix for the imposibility to go on a blicked tile
                         &mut *map,
                         max_step, //Max step for search, TODO thonk of a way to automatically find an acceptable number
                     );
@@ -108,14 +108,18 @@ impl<'a> System<'a> for GoTargetSystem {
                             //100 move point per tilde for now
                             if speed.move_point >= MOVE_COST {
                                 //aply move
-                                let start_idx = map.xy_idx(pos.x, pos.y);
+                                let start_idx = map.xy_idx(pos.x(), pos.y());
                                 let is_blocking = blockers.get(entity);
                                 if is_blocking.is_some() {
                                     map.set_blocked(start_idx, false);
                                     map.set_blocked(*dest_idx as usize, true);
                                 }
-                                pos.x = dest_idx % map.width;
-                                pos.y = dest_idx / map.width;
+                                pos.moving(
+                                    dest_idx % map.width,
+                                    dest_idx / map.width,
+                                    &mut map.dirty,
+                                );
+
                                 if let Some(vs) = viewsheds.get_mut(entity) {
                                     vs.dirty = true;
                                 }

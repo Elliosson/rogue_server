@@ -2,7 +2,7 @@ extern crate specs;
 use specs::prelude::*;
 extern crate rltk;
 extern crate specs_derive;
-use super::MOVE_COST;
+use super::{Map, MOVE_COST};
 use rltk::RGB;
 use serde::{Deserialize, Serialize};
 use specs::error::NoError;
@@ -12,8 +12,27 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Position {
-    pub x: i32,
-    pub y: i32,
+    x: i32,
+    y: i32,
+}
+
+impl Position {
+    pub fn moving(&mut self, x: i32, y: i32, dirty: &mut Vec<(i32, i32)>) {
+        dirty.push((self.x, self.y));
+        dirty.push((x, y));
+        self.x = x;
+        self.y = y;
+    }
+    pub fn x(&self) -> i32 {
+        self.x
+    }
+    pub fn y(&self) -> i32 {
+        self.y
+    }
+    pub fn new(x: i32, y: i32, dirty: &mut Vec<(i32, i32)>) -> Self {
+        dirty.push((x, y));
+        Position { x, y }
+    }
 }
 
 #[derive(Component, ConvertSaveload, Clone)]

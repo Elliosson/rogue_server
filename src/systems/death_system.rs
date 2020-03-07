@@ -49,12 +49,13 @@ impl<'a> System<'a> for DeathSystem {
 
         for (entity, dead, energy) in (&entities, &mut deads, &energies).join() {
             //create meat entity
+            let mut dirty = Vec::new();
             let x;
             let y;
             {
                 let pos = positions.get(entity).unwrap();
-                x = pos.x;
-                y = pos.y;
+                x = pos.x();
+                y = pos.y();
             }
             let mut eb = entities
                 .build_entity()
@@ -68,7 +69,7 @@ impl<'a> System<'a> for DeathSystem {
                     },
                     &mut renderables,
                 )
-                .with(Position { x, y }, &mut positions)
+                .with(Position::new(x, y, &mut dirty), &mut positions)
                 .with(
                     //add animal energy to the meat
                     Meat {

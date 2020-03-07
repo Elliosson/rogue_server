@@ -91,8 +91,10 @@ impl<'a> System<'a> for CowAI {
                 if let Some(targeted) = maybe_targeted_eat {
                     competitor_distance = targeted.distance;
                 }
-                let distance = rltk::DistanceAlg::Pythagoras
-                    .distance2d(Point::new(pos.x, pos.y), Point::new(leaf_pos.x, leaf_pos.y));
+                let distance = rltk::DistanceAlg::Pythagoras.distance2d(
+                    Point::new(pos.x(), pos.y()),
+                    Point::new(leaf_pos.x(), leaf_pos.y()),
+                );
                 if (distance < min) && (distance < competitor_distance) {
                     choosen_leaf = Some(leaf);
                     min = distance;
@@ -105,7 +107,7 @@ impl<'a> System<'a> for CowAI {
                         TargetedForEat {
                             predator: cow_entity,
                             distance: min,
-                            predator_pos: Point::new(pos.x, pos.y),
+                            predator_pos: Point::new(pos.x(), pos.y()),
                         },
                     )
                     .expect("Unable ot insert");

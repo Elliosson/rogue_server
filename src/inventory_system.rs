@@ -298,6 +298,7 @@ impl<'a> System<'a> for ItemDropSystem {
         ReadStorage<'a, Name>,
         WriteStorage<'a, Position>,
         WriteStorage<'a, InBackpack>,
+        WriteExpect<'a, Map>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -309,23 +310,17 @@ impl<'a> System<'a> for ItemDropSystem {
             names,
             mut positions,
             mut backpack,
+            mut map,
         ) = data;
 
         for (entity, to_drop) in (&entities, &wants_drop).join() {
-            let mut dropper_pos: Position = Position { x: 0, y: 0 };
-            {
+            let mut dropper_pos = {
                 let dropped_pos = positions.get(entity).unwrap();
-                dropper_pos.x = dropped_pos.x;
-                dropper_pos.y = dropped_pos.y;
-            }
+
+                Position::new(dropped_pos.x(), dropped_pos.y(), &mut map.dirty)
+            };
             positions
-                .insert(
-                    to_drop.item,
-                    Position {
-                        x: dropper_pos.x,
-                        y: dropper_pos.y,
-                    },
-                )
+                .insert(to_drop.item, dropper_pos)
                 .expect("Unable to insert position");
             backpack.remove(to_drop.item);
 

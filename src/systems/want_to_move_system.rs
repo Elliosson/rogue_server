@@ -16,23 +16,26 @@ impl<'a> System<'a> for WantToMoveSystem {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (entities, mut positions, map, mut viewshed, mut want_to_moves) = data;
+        let (entities, mut positions, mut map, mut viewshed, mut want_to_moves) = data;
 
         for (_entity, pos, viewshed, want_to_move) in
             (&entities, &mut positions, &mut viewshed, &mut want_to_moves).join()
         {
-            if pos.x + want_to_move.delta_x < 1
-                || pos.x + want_to_move.delta_x > map.width - 1
-                || pos.y + want_to_move.delta_y < 1
-                || pos.y + want_to_move.delta_y > map.height - 1
+            if pos.x() + want_to_move.delta_x < 1
+                || pos.x() + want_to_move.delta_x > map.width - 1
+                || pos.y() + want_to_move.delta_y < 1
+                || pos.y() + want_to_move.delta_y > map.height - 1
             {
                 break;
             }
-            let destination_idx =
-                map.xy_idx(pos.x + want_to_move.delta_x, pos.y + want_to_move.delta_y);
+            let destination_idx = map.xy_idx(
+                pos.x() + want_to_move.delta_x,
+                pos.y() + want_to_move.delta_y,
+            );
             if !map.is_blocked(destination_idx) {
-                pos.x = min(MAPWIDTH as i32 - 1, max(0, pos.x + want_to_move.delta_x));
-                pos.y = min(MAPHEIGHT as i32 - 1, max(0, pos.y + want_to_move.delta_y));
+                let x = min(MAPWIDTH as i32 - 1, max(0, pos.x() + want_to_move.delta_x));
+                let y = min(MAPHEIGHT as i32 - 1, max(0, pos.y() + want_to_move.delta_y));
+                pos.moving(x, y, &mut map.dirty);
                 viewshed.dirty = true;
             }
         }

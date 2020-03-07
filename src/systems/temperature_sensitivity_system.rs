@@ -28,7 +28,7 @@ impl<'a> System<'a> for TemperatureSensitivitySystem {
             .join()
         {
             //get temperature
-            let idx = map.xy_idx(pos.x, pos.y);
+            let idx = map.xy_idx(pos.x(), pos.y());
 
             if let Some(temp) = map.tile_temperature.get(&idx) {
                 //For now he just have a consuption proportionnal to square the distance with the optimum

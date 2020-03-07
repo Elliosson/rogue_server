@@ -100,8 +100,8 @@ impl<'a> System<'a> for SearchParterAI {
                         let mate_pos = positions.get(*mate).unwrap();
 
                         let distance = rltk::DistanceAlg::Pythagoras.distance2d(
-                            Point::new(pos.x, pos.y),
-                            Point::new(mate_pos.x, mate_pos.y),
+                            Point::new(pos.x(), pos.y()),
+                            Point::new(mate_pos.x(), mate_pos.y()),
                         );
                         if distance < min {
                             choosen_mate = Some(mate);
