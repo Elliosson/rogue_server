@@ -6,6 +6,7 @@ use crate::components::*;
 use crate::random_table::RandomTable;
 use crate::Map;
 use specs::prelude::*;
+use specs::saveload::{MarkedBuilder, Marker, MarkerAllocator};
 use std::collections::{HashMap, HashSet}; //TODO se if we can suppress
 
 pub enum SpawnType {
@@ -72,11 +73,7 @@ impl RawMaster {
     }
 }
 
-fn spawn_position<'a>(
-    pos: SpawnType,
-    new_entity: EntityBuilder<'a>,
-    dirty: &mut Vec<(i32, i32)>,
-) -> EntityBuilder<'a> {
+fn spawn_position<'a, T: Builder>(pos: SpawnType, new_entity: T, dirty: &mut Vec<(i32, i32)>) -> T {
     let mut eb = new_entity;
 
     // Spawn in the specified location
@@ -101,9 +98,66 @@ fn get_renderable_component(
     }
 }
 
-pub fn spawn_named_item(
+//my entity builder perso that can be constructed with an already existing entity
+pub struct EntityBuilderPerso<'a> {
+    /// The (already created) entity for which components will be inserted.
+    pub entity: Entity,
+    /// A reference to the `World` for component insertions.
+    pub world: &'a World,
+    built: bool,
+}
+
+impl<'a> EntityBuilderPerso<'a> {
+    pub fn new(entity: Entity, world: &'a World) -> Self {
+        EntityBuilderPerso {
+            entity,
+            world,
+            built: false,
+        }
+    }
+}
+
+impl<'a> MarkedBuilder for EntityBuilderPerso<'a> {
+    fn marked<M>(self) -> Self
+    where
+        M: Marker,
+    {
+        let mut alloc = self.world.write_resource::<M::Allocator>();
+        alloc.mark(self.entity, &mut self.world.write_storage::<M>());
+
+        self
+    }
+}
+
+impl<'a> Builder for EntityBuilderPerso<'a> {
+    /// Inserts a component for this entity.
+    ///
+    /// If a component was already associated with the entity, it will
+    /// overwrite the previous component.
+    #[inline]
+    fn with<T: Component>(self, c: T) -> Self {
+        {
+            let mut storage: WriteStorage<T> = SystemData::fetch(&self.world);
+            // This can't fail.  This is guaranteed by the lifetime 'a
+            // in the EntityBuilder.
+            storage.insert(self.entity, c).unwrap();
+        }
+
+        self
+    }
+
+    /// Finishes the building and returns the entity. As opposed to
+    /// `LazyBuilder`, the components are available immediately.
+    #[inline]
+    fn build(mut self) -> Entity {
+        self.built = true;
+        self.entity
+    }
+}
+
+pub fn spawn_named_item<T: Builder>(
     raws: &RawMaster,
-    new_entity: EntityBuilder,
+    new_entity: T,
     key: &str,
     pos: SpawnType,
     dirty: &mut Vec<(i32, i32)>,
@@ -190,9 +244,9 @@ pub fn spawn_named_item(
     None
 }
 
-pub fn spawn_named_mob(
+pub fn spawn_named_mob<T: Builder>(
     raws: &RawMaster,
-    new_entity: EntityBuilder,
+    new_entity: T,
     key: &str,
     pos: SpawnType,
     dirty: &mut Vec<(i32, i32)>,
@@ -237,9 +291,9 @@ pub fn spawn_named_mob(
 
 //key is just a string, it's just the name of the entity
 //TODO it's incomplete
-pub fn spawn_named_prop(
+pub fn spawn_named_prop<T: Builder>(
     raws: &RawMaster,
-    new_entity: EntityBuilder,
+    new_entity: T,
     key: &str,
     pos: SpawnType,
     dirty: &mut Vec<(i32, i32)>,
@@ -390,9 +444,9 @@ pub fn spawn_named_prop(
 }
 
 //key is just a string, it's just the name of the entity
-pub fn spawn_named_entity(
+pub fn spawn_named_entity<T: Builder>(
     raws: &RawMaster,
-    new_entity: EntityBuilder,
+    new_entity: T,
     key: &str,
     pos: SpawnType,
     dirty: &mut Vec<(i32, i32)>,

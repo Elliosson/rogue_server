@@ -8,6 +8,7 @@ use super::{
 use crate::components::*;
 use crate::specs::saveload::{MarkedBuilder, SimpleMarker};
 use specs::prelude::*;
+use specs::EntityBuilder;
 use std::collections::HashMap;
 
 /// Spawns the player and returns his/her entity object.
@@ -150,6 +151,36 @@ pub fn spawner_named(ecs: &mut World) {
     let mut to_spawns = ecs.write_resource::<ToSpawnList>();
 
     to_spawns.requests.clear();
+}
+
+// like create named but with an already existing entity
+pub fn construct_named(ecs: &mut World, key: &str, x: i32, y: i32, entity: Entity) {
+    let raws: &RawMaster = &RAWS.lock().unwrap();
+    //let mut entity_builder = ecs.create_entity();
+    //entity_builder.entity = entity; //TODO that seem ungly, I don't now if it's ok
+    let entity_builder = EntityBuilderPerso::new(entity, ecs);
+    let mut dirty = Vec::new();
+    if raws.prop_index.contains_key(key) {
+        let spawn_result = spawn_named_entity(
+            raws,
+            entity_builder.marked::<SimpleMarker<SerializeMe>>(),
+            key,
+            SpawnType::AtPosition { x, y },
+            &mut dirty,
+        );
+        if let Some(entity) = spawn_result {
+            //todo honesstly the only good wa ywould be to be sure that the enity is insert on ly once in the vec of the hash map ut I don't now how to do that
+            let mut map: specs::shred::FetchMut<Map> = ecs.write_resource::<Map>();
+            let idx = map.xy_idx(x, y);
+            let tile_content = map.tile_content.entry(idx).or_insert(Vec::new());
+            tile_content.push(entity);
+            map.dirty.append(&mut dirty);
+        } else {
+            println!("WARNING: We don't know how to spawn [{}]!", key);
+        }
+    } else {
+        println!("WARNING: No keys {} !", key);
+    }
 }
 
 pub fn spawn_named(ecs: &mut World, key: &str, x: i32, y: i32) {
