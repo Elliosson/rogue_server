@@ -359,19 +359,6 @@
             }
         },
         {
-            "name": "Door",
-            "renderable": {
-                "glyph": "+",
-                "fg": "#805A46",
-                "bg": "#000000",
-                "order": 2
-            },
-            "hidden": false,
-            "blocks_tile": true,
-            "blocks_visibility": true,
-            "door_open": true
-        },
-        {
             "name": "Cow",
             "renderable": {
                 "glyph": "0",
@@ -617,7 +604,8 @@
             },
             "building_choice": {
                 "plans": [
-                    "block"
+                    "block",
+                    "Door"
                 ]
             },
             "facing_direction": {
@@ -626,6 +614,27 @@
                     "x": 1,
                     "y": 0
                 }
+            }
+        },
+        {
+            "name": "Door",
+            "renderable": {
+                "glyph": "+",
+                "fg": "#FFFFFF",
+                "bg": "#000000",
+                "order": 0
+            },
+            "blocks_tile": true,
+            "interactable{}": true,
+            "interactable_object": {
+                "interactions": [
+                    {
+                        "name": "open_door"
+                    },
+                    {
+                        "name": "close_door"
+                    }
+                ]
             }
         }
     ]

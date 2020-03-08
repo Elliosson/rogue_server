@@ -618,6 +618,12 @@ impl FacingDirection {
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct WantDestroy {}
 
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Blocking {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Unblocking {}
+
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.
 pub struct SerializeMe;

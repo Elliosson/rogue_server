@@ -1,5 +1,7 @@
 extern crate specs;
-use crate::{gamelog::GameLog, ObjectBuilder, ToDelete};
+use crate::{
+    gamelog::GameLog, Blocking, BlocksTile, Map, ObjectBuilder, Position, ToDelete, Unblocking,
+};
 use specs::prelude::*;
 
 pub struct Interationv2System {}
@@ -11,10 +13,19 @@ impl<'a> System<'a> for Interationv2System {
         WriteExpect<'a, InteractionResquestListV2>,
         WriteExpect<'a, ObjectBuilder>,
         WriteStorage<'a, ToDelete>,
+        WriteStorage<'a, Blocking>,
+        WriteStorage<'a, Unblocking>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (_log, mut interaction_request_list, mut object_builder, mut to_deletes) = data;
+        let (
+            _log,
+            mut interaction_request_list,
+            mut object_builder,
+            mut to_deletes,
+            mut blockings,
+            mut unblockings,
+        ) = data;
 
         for interation_request in &interaction_request_list.requests {
             match interation_request.interaction.as_str() {
@@ -33,6 +44,16 @@ impl<'a> System<'a> for Interationv2System {
                     );
                     to_deletes
                         .insert(interation_request.interacted_entity, ToDelete {})
+                        .expect("Unable to insert delete entity");
+                }
+                "open_door" => {
+                    unblockings
+                        .insert(interation_request.interacted_entity, Unblocking {})
+                        .expect("Unable to insert delete entity");
+                }
+                "close_door" => {
+                    blockings
+                        .insert(interation_request.interacted_entity, Blocking {})
                         .expect("Unable to insert delete entity");
                 }
                 _ => {}

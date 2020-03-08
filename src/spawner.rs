@@ -42,7 +42,7 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
             runstate: OnlineRunState::AwaitingInput,
         })
         .with(BuildingChoice {
-            plans: vec!["block".to_string()],
+            plans: vec!["block".to_string(), "Door".to_string()],
         })
         .with(FacingDirection {
             orientation: Orientation::East,

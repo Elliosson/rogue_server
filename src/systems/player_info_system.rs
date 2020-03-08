@@ -87,18 +87,36 @@ impl<'a> System<'a> for PlayerInfoSystem {
         )
             .join()
         {
+            let mut close_entity: Vec<Entity> = Vec::new();
+            //Get entity on position
             if let Some(entities_on_pos) = map.tile_content.get(&map.xy_idx(pos.x(), pos.y())) {
-                for on_pos_entity in entities_on_pos.iter() {
-                    if let Some(interactable) = interactable_objects.get(*on_pos_entity) {
-                        for intereraction in interactable.interactions.iter() {
-                            player_info.close_interations.push(CloseInteration {
-                                interaction_name: intereraction.name.clone(),
-                                object_name: name.name.clone(),
-                                index: on_pos_entity.id(),
-                                generation: on_pos_entity.gen().id(),
-                                entity: Some(*on_pos_entity),
-                            })
-                        }
+                close_entity.extend(entities_on_pos);
+            }
+            //We get all the entity in the adjacent tiles
+            if let Some(entities_on_pos) = map.tile_content.get(&map.xy_idx(pos.x() + 1, pos.y())) {
+                close_entity.extend(entities_on_pos);
+            }
+            if let Some(entities_on_pos) = map.tile_content.get(&map.xy_idx(pos.x() - 1, pos.y())) {
+                close_entity.extend(entities_on_pos);
+            }
+            if let Some(entities_on_pos) = map.tile_content.get(&map.xy_idx(pos.x(), pos.y() + 1)) {
+                close_entity.extend(entities_on_pos);
+            }
+            if let Some(entities_on_pos) = map.tile_content.get(&map.xy_idx(pos.x(), pos.y() - 1)) {
+                close_entity.extend(entities_on_pos);
+            }
+
+            //interaction on position
+            for on_pos_entity in close_entity.iter() {
+                if let Some(interactable) = interactable_objects.get(*on_pos_entity) {
+                    for intereraction in interactable.interactions.iter() {
+                        player_info.close_interations.push(CloseInteration {
+                            interaction_name: intereraction.name.clone(),
+                            object_name: name.name.clone(),
+                            index: on_pos_entity.id(),
+                            generation: on_pos_entity.gen().id(),
+                            entity: Some(*on_pos_entity),
+                        })
                     }
                 }
             }

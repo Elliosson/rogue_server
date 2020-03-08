@@ -159,6 +159,8 @@ impl State {
         death_system.run_now(&self.ecs);
         let mut gendered_reprod = GenderedReproductionSystem {};
         gendered_reprod.run_now(&self.ecs);
+        let mut block_unblock_system = BlockUnblockSystem {};
+        block_unblock_system.run_now(&self.ecs);
 
         let mut want_destroy = DestroySystem {};
         want_destroy.run_now(&self.ecs);
@@ -312,6 +314,8 @@ fn main() {
     gs.ecs.register::<EntityToConvert>();
     gs.ecs.register::<FacingDirection>();
     gs.ecs.register::<WantDestroy>();
+    gs.ecs.register::<Blocking>();
+    gs.ecs.register::<Unblocking>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
     let map: Map = Map::new_map();
