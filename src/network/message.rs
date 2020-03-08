@@ -16,6 +16,7 @@ pub enum Message {
     Interact(Uuid, i32, i32, String, u32, i32), //x, y, name, id, gen
     PlayerInfo(Uuid),
     Build(Uuid, i32, i32, String),
+    Destroy(Uuid),
 }
 
 impl Message {
@@ -42,6 +43,7 @@ impl Message {
                 "player_info" => Some(Message::PlayerInfo(id)),
                 "exit" => Some(Message::Exit(id)),
                 "pickup" => Some(Message::PickUp(id)),
+                "destroy" => Some(Message::Destroy(id)),
                 "build" => {
                     let build: Vec<&str> = parts.collect();
                     let x: i32 = build[0].parse().unwrap();

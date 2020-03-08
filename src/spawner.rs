@@ -44,6 +44,10 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
         .with(BuildingChoice {
             plans: vec!["block".to_string()],
         })
+        .with(FacingDirection {
+            orientation: Orientation::East,
+            front_tile: rltk::Point { x: 1, y: 0 },
+        })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
 

@@ -1,5 +1,5 @@
 extern crate specs;
-use crate::{Map, Position, Viewshed, WantToMove, MAPHEIGHT, MAPWIDTH};
+use crate::{FacingDirection, Map, Position, Viewshed, WantToMove, MAPHEIGHT, MAPWIDTH};
 use specs::prelude::*;
 use std::cmp::{max, min};
 
@@ -13,14 +13,25 @@ impl<'a> System<'a> for WantToMoveSystem {
         WriteExpect<'a, Map>,
         WriteStorage<'a, Viewshed>,
         WriteStorage<'a, WantToMove>,
+        WriteStorage<'a, FacingDirection>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (entities, mut positions, mut map, mut viewshed, mut want_to_moves) = data;
+        let (
+            entities,
+            mut positions,
+            mut map,
+            mut viewshed,
+            mut want_to_moves,
+            mut facing_directions,
+        ) = data;
 
-        for (_entity, pos, viewshed, want_to_move) in
+        for (entity, pos, viewshed, want_to_move) in
             (&entities, &mut positions, &mut viewshed, &mut want_to_moves).join()
         {
+            if let Some(facing) = facing_directions.get_mut(entity) {
+                facing.update(want_to_move.delta_x, want_to_move.delta_y);
+            }
             if pos.x() + want_to_move.delta_x < 1
                 || pos.x() + want_to_move.delta_x > map.width - 1
                 || pos.y() + want_to_move.delta_y < 1

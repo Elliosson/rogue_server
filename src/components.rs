@@ -472,6 +472,7 @@ pub enum PlayerInput {
     PICKUP(Entity),
     INTERACT(i32, i32, String, Entity),
     BUILD(i32, i32, String),
+    DESTROY,
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
@@ -577,6 +578,45 @@ pub enum CommandToConvert {
     INTERACT(i32, i32, String, u32, i32),
     BUILD(i32, i32, String),
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum Orientation {
+    North,
+    South,
+    East,
+    Weast,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct FacingDirection {
+    pub orientation: Orientation,
+    pub front_tile: rltk::Point,
+}
+
+impl FacingDirection {
+    pub fn update(&mut self, delta_x: i32, delta_y: i32) {
+        if delta_x > 0 {
+            self.orientation = Orientation::East;
+            self.front_tile.x = 1;
+            self.front_tile.y = 0;
+        } else if delta_x < 0 {
+            self.orientation = Orientation::Weast;
+            self.front_tile.x = -1;
+            self.front_tile.y = 0;
+        } else if delta_y > 0 {
+            self.orientation = Orientation::South;
+            self.front_tile.x = 0;
+            self.front_tile.y = 1;
+        } else if delta_y < 0 {
+            self.orientation = Orientation::North;
+            self.front_tile.x = 0;
+            self.front_tile.y = -1;
+        }
+    }
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct WantDestroy {}
 
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.

@@ -57,8 +57,8 @@ pub fn local_client_base_state(ecs: &World, ctx: &mut Rltk) -> LocalClientRunsta
 
             VirtualKeyCode::Numpad1 => None,
 
-            // Skip Turn
-            VirtualKeyCode::Numpad5 | VirtualKeyCode::Space => None,
+            //destroy front block
+            VirtualKeyCode::Space => Some(PlayerInput::DESTROY),
 
             // Level changes
             VirtualKeyCode::Period => None,

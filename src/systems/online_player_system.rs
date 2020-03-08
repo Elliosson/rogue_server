@@ -89,6 +89,11 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                         player_entity = player_hash.hash.get(&uid.clone());
                         input = PlayerInput::UP
                     }
+                    network::Message::Destroy(uuid) => {
+                        uid = uuid.to_string();
+                        player_entity = player_hash.hash.get(&uid.clone());
+                        input = PlayerInput::DESTROY
+                    }
                     network::Message::DOWN(uuid) => {
                         uid = uuid.to_string();
                         player_entity = player_hash.hash.get(&uid.clone());

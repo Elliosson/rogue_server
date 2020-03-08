@@ -1,7 +1,7 @@
 extern crate specs;
 use crate::{
     gamelog::GameLog, InteractionResquestListV2, OnlinePlayer, OnlineRunState, PlayerInput,
-    PlayerInputComp, WantBuild, WantToMove, WantsToPickupItem,
+    PlayerInputComp, WantBuild, WantDestroy, WantToMove, WantsToPickupItem,
 };
 use specs::prelude::*;
 
@@ -20,6 +20,7 @@ impl<'a> System<'a> for PlayerCommandSystem {
         WriteStorage<'a, WantsToPickupItem>,
         WriteStorage<'a, WantBuild>,
         WriteExpect<'a, InteractionResquestListV2>,
+        WriteStorage<'a, WantDestroy>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -32,6 +33,7 @@ impl<'a> System<'a> for PlayerCommandSystem {
             mut pickups,
             mut want_builds,
             mut interaction_requestsv2,
+            mut want_destroys,
         ) = data;
 
         for (entity, player_input) in (&entities, &player_inputs).join() {
@@ -45,6 +47,7 @@ impl<'a> System<'a> for PlayerCommandSystem {
                     &mut pickups,
                     &mut interaction_requestsv2,
                     &mut want_builds,
+                    &mut want_destroys,
                 );
                 online_player.runstate = newrunstate;
             } else {
@@ -63,6 +66,7 @@ pub fn online_runstate_choice<'a>(
     pickups: &mut WriteStorage<'a, WantsToPickupItem>,
     interations_req: &mut WriteExpect<'a, InteractionResquestListV2>,
     want_builds: &mut WriteStorage<'a, WantBuild>,
+    want_destroys: &mut WriteStorage<'a, WantDestroy>,
 ) -> OnlineRunState {
     let newrunstate;
     match runstate {
@@ -74,6 +78,7 @@ pub fn online_runstate_choice<'a>(
                 pickups,
                 interations_req,
                 want_builds,
+                want_destroys,
             );
         }
         OnlineRunState::PlayerTurn => {
@@ -90,6 +95,7 @@ pub fn online_player_input<'a>(
     pickups: &mut WriteStorage<'a, WantsToPickupItem>,
     interations_req: &mut WriteExpect<'a, InteractionResquestListV2>,
     want_builds: &mut WriteStorage<'a, WantBuild>,
+    want_destroys: &mut WriteStorage<'a, WantDestroy>,
 ) -> OnlineRunState {
     // Player movement
 
@@ -158,6 +164,11 @@ pub fn online_player_input<'a>(
         PlayerInput::BUILD(x, y, name) => {
             want_builds
                 .insert(entity, WantBuild { x, y, name })
+                .expect("Unable to insert ");
+        }
+        PlayerInput::DESTROY => {
+            want_destroys
+                .insert(entity, WantDestroy {})
                 .expect("Unable to insert ");
         }
         _ => {}

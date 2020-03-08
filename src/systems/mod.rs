@@ -59,3 +59,6 @@ pub use player_json_system::PlayerJsonSystem;
 
 mod id_to_entity_interface_matching;
 pub use id_to_entity_interface_matching::IdEntityInterfaceMatching;
+
+mod destroy_system;
+pub use destroy_system::DestroySystem;

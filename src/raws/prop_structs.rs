@@ -31,6 +31,7 @@ pub struct Prop {
     pub combat: Option<CombatStats>,
     pub online_player: Option<OnlinePlayer>,
     pub building_choice: Option<BuildingChoice>,
+    pub facing_direction: Option<FacingDirection>,
 }
 
 #[derive(Deserialize, Debug)]

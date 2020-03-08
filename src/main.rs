@@ -160,6 +160,9 @@ impl State {
         let mut gendered_reprod = GenderedReproductionSystem {};
         gendered_reprod.run_now(&self.ecs);
 
+        let mut want_destroy = DestroySystem {};
+        want_destroy.run_now(&self.ecs);
+
         let mut want_build = BuildingSystem {};
         want_build.run_now(&self.ecs);
         let mut prop_spawmer = PropSpawnerSystem {};
@@ -307,6 +310,8 @@ fn main() {
     gs.ecs.register::<WantBuild>();
     gs.ecs.register::<PlayerInfo>();
     gs.ecs.register::<EntityToConvert>();
+    gs.ecs.register::<FacingDirection>();
+    gs.ecs.register::<WantDestroy>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
     let map: Map = Map::new_map();
