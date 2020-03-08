@@ -18,6 +18,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
         WriteExpect<'a, GameLog>,
         WriteExpect<'a, WorldStatLog>,
         WriteExpect<'a, UuidPlayerHash>,
+        WriteExpect<'a, NamePlayerHash>,
         WriteExpect<'a, Arc<Mutex<Vec<(network::Message, String)>>>>,
         WriteStorage<'a, Position>,
         WriteStorage<'a, Connected>,
@@ -34,6 +35,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
             _log,
             mut _world_logs,
             mut player_hash,
+            mut pseudo_player_hash,
             message_mutex,
             positions,
             mut connecteds,
@@ -61,7 +63,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                 let mut player_entity: Option<&Entity> = None;
                 let input;
                 match mes.clone() {
-                    network::Message::Registered(uuid) => {
+                    network::Message::Registered(uuid, name) => {
                         uid = uuid.to_string();
                         player_entity = player_hash.hash.get(&uid.clone());
                         match player_entity {
@@ -69,7 +71,7 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                                 println!("ERROR: someone want to register with an already use uuid")
                             }
                             None => {
-                                new_player_list.push(uid.clone());
+                                new_player_list.push((uid.clone(), name));
                             }
                         }
                         input = PlayerInput::NONE;
@@ -174,11 +176,29 @@ impl<'a> System<'a> for OnlinePlayerSystem {
         }
 
         //create new player
-        for uid in new_player_list {
-            let new_player = entities.create();
-            to_construct.request(5, 5, "Online Player".to_string(), new_player);
+        for (uid, pseudo) in new_player_list {
+            //connect to this pseudo if he is already used
+            let player_entity;
+            if let Some(&entity) = pseudo_player_hash.hash.get(&pseudo) {
+                //If he is still connected remove the old entity of uid_hash
+                if let Some(connected) = connecteds.get(entity) {
+                    player_hash.hash.remove(&connected.uuid);
 
-            player_hash.hash.insert(uid.clone(), new_player);
+                    connecteds
+                        .insert(entity, Connected { uuid: uid.clone() })
+                        .expect("Unable to insert");
+                }
+
+                player_entity = entity
+            } else {
+                let new_player = entities.create();
+                to_construct.request(5, 5, "Online Player".to_string(), new_player);
+                player_entity = new_player;
+            }
+            pseudo_player_hash
+                .hash
+                .insert(pseudo.clone(), player_entity);
+            player_hash.hash.insert(uid.clone(), player_entity);
         }
     }
 }
@@ -220,6 +240,20 @@ impl UuidPlayerHash {
     #[allow(clippy::new_without_default)]
     pub fn new() -> UuidPlayerHash {
         UuidPlayerHash {
+            hash: HashMap::new(),
+        }
+    }
+}
+
+//link the uiid with the correct player entity
+pub struct NamePlayerHash {
+    pub hash: HashMap<String, Entity>,
+}
+
+impl NamePlayerHash {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        NamePlayerHash {
             hash: HashMap::new(),
         }
     }

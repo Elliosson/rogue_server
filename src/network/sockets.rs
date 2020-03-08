@@ -77,10 +77,10 @@ fn response(
 
     match msg {
         //this is very tricky because since the uuid is created here we don't return the same message that the on we received
-        Message::Register => {
+        Message::Register(name) => {
             println!("register");
             let uuid = Uuid::new_v4();
-            (uuid.to_string(), Message::Registered(uuid))
+            (uuid.to_string(), Message::Registered(uuid, name))
         }
         Message::Map(uuid) => {
             let mut string_to_send = " ".to_string();

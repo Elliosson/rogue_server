@@ -39,7 +39,9 @@ pub use death_system::DeathSystem;
 mod food_preference_system;
 pub use food_preference_system::FoodPreferenceSystem;
 mod online_player_system;
-pub use online_player_system::{OnlinePlayerSystem, PlayerMessages, UuidPlayerHash};
+pub use online_player_system::{
+    NamePlayerHash, OnlinePlayerSystem, PlayerMessages, UuidPlayerHash,
+};
 mod want_to_move_system;
 pub use want_to_move_system::WantToMoveSystem;
 mod send_map_system;

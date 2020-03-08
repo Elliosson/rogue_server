@@ -352,6 +352,7 @@ fn main() {
     gs.ecs.insert(BirthRequetList::new());
     gs.ecs.insert(BirthRegistery::new());
     gs.ecs.insert(UuidPlayerHash::new());
+    gs.ecs.insert(NamePlayerHash::new());
     gs.ecs.insert(PlayerMessages::new());
     gs.ecs.insert(LocalClientInfo::new());
     gs.ecs.insert(InteractionResquestListV2::new());
