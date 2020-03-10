@@ -107,7 +107,6 @@ impl State {
         specie.run_now(&self.ecs);
         let mut vis = VisibilitySystem {};
         vis.run_now(&self.ecs);
-
         /***player turn ****/
         let mut online_player = OnlinePlayerSystem {};
         online_player.run_now(&self.ecs);
@@ -115,7 +114,6 @@ impl State {
         entity_matching.run_now(&self.ecs);
         let mut player_command = PlayerCommandSystem {};
         player_command.run_now(&self.ecs);
-
         let mut eating_killing_ai = EatingKillingAI {};
         eating_killing_ai.run_now(&self.ecs);
 
@@ -157,11 +155,10 @@ impl State {
         energy.run_now(&self.ecs);
         let mut death_system = DeathSystem {};
         death_system.run_now(&self.ecs);
-        let mut gendered_reprod = GenderedReproductionSystem {};
-        gendered_reprod.run_now(&self.ecs);
+        //let mut gendered_reprod = GenderedReproductionSystem {};
+        //gendered_reprod.run_now(&self.ecs);
         let mut block_unblock_system = BlockUnblockSystem {};
         block_unblock_system.run_now(&self.ecs);
-
         let mut want_destroy = DestroySystem {};
         want_destroy.run_now(&self.ecs);
 
@@ -179,12 +176,10 @@ impl State {
         stat.run_now(&self.ecs);
         let mut map_send = SendMapSystem {};
         map_send.run_now(&self.ecs);
-
         let mut player_info = PlayerInfoSystem {};
         player_info.run_now(&self.ecs);
         let mut player_json = PlayerJsonSystem {};
         player_json.run_now(&self.ecs);
-
         self.ecs.maintain();
         // println!("systems time = {}", now.elapsed().as_micros());
     }
@@ -349,8 +344,8 @@ fn main() {
     });
     gs.ecs.insert(ObjectBuilder::new());
     gs.ecs.insert(Date::new());
-    gs.ecs.insert(BirthRequetList::new());
-    gs.ecs.insert(BirthRegistery::new());
+    //gs.ecs.insert(BirthRequetList::new());
+    //gs.ecs.insert(BirthRegistery::new());
     gs.ecs.insert(UuidPlayerHash::new());
     gs.ecs.insert(NamePlayerHash::new());
     gs.ecs.insert(PlayerMessages::new());
@@ -405,7 +400,17 @@ fn common_tick(gs: &mut State) {
     //run game
     gs.run_systems();
     gs.ecs.maintain();
-
+    {
+        //clear log because i don't need them now
+        let mut a = gs.ecs.write_resource::<gamelog::GameLog>();
+        a.entries.clear();
+        let mut a = gs.ecs.write_resource::<gamelog::GeneralLog>();
+        a.entries.clear();
+        let mut a = gs.ecs.write_resource::<gamelog::WorldStatLog>();
+        a.entries.clear();
+        let mut a = gs.ecs.write_resource::<gamelog::SpeciesInstantLog>();
+        a.entries.clear();
+    }
     spawner::spawner_named(&mut gs.ecs);
     spawner::constructer_named(&mut gs.ecs);
     object_deleter::delete_entity_to_delete(&mut gs.ecs);

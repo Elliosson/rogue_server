@@ -25,6 +25,8 @@ pub fn delete_entity_to_delete(ecs: &mut World) {
         }
         ecs.delete_entity(victim).expect("Unable to delete");
     }
+
+    //TODO mayber clear to_delete
 }
 
 #[cfg(test)]

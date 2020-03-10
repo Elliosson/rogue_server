@@ -42,25 +42,15 @@ impl<'a> System<'a> for PlayerInfoSystem {
             map,
         ) = data;
 
-        //insert  a new player info in every conected player
-        //effectively clean the thing
-        player_infos.clear();
-        let mut dirty = Vec::new();
         //Todo check in player is connected and find a way to handle local player
-        for (entity, _online_player, pos) in (&entities, &online_players, &positions).join() {
-            player_infos
-                .insert(
-                    entity,
-                    PlayerInfo {
-                        inventaire: Vec::new(),
-                        close_interations: Vec::new(),
-                        my_info: MyInfo {
-                            pos: Position::new(pos.x(), pos.y(), &mut dirty),
-                        },
-                        possible_builds: Vec::new(),
-                    },
-                )
-                .expect("Unable to insert");
+        for (_entity, _online_player, pos, player_info) in
+            (&entities, &online_players, &positions, &mut player_infos).join()
+        {
+            player_info.inventaire.clear();
+            player_info.close_interations.clear();
+            player_info.possible_builds.clear();
+            player_info.my_info.pos.x = pos.x();
+            player_info.my_info.pos.y = pos.y();
         }
         //TODO these function are hightly ineficiant, to refactor if needed
         //fill inventory

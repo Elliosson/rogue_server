@@ -40,6 +40,7 @@ impl<'a> System<'a> for NamedCounterSystem {
 
         for (name, count) in names_stats.iter() {
             let buf = format!("There is {} {}", count, name);
+            //println!("There is {} {}", count, name);
             world_logs.entries.push(buf);
         }
     }

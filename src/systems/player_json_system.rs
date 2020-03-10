@@ -35,7 +35,6 @@ impl<'a> System<'a> for PlayerJsonSystem {
             let my_uiid = connected.uuid.clone();
 
             player_info_guard.insert(my_uiid, player_info_string);
-
             //test by writing in a real file
             //player_json(player_info_string).unwrap();
         }

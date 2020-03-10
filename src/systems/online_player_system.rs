@@ -215,7 +215,7 @@ fn get_interacted_entity(id: u32, gen: i32, player_info: &PlayerInfo) -> Option<
 }
 
 pub struct PlayerMessages {
-    requests: Vec<(Entity, network::Message)>,
+    pub requests: Vec<(Entity, network::Message)>,
 }
 
 impl PlayerMessages {

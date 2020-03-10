@@ -614,6 +614,17 @@
                     "x": 1,
                     "y": 0
                 }
+            },
+            "player_info": {
+                "inventaire": [],
+                "close_interations": [],
+                "my_info": {
+                    "pos": {
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                "possible_builds": []
             }
         },
         {

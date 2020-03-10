@@ -452,6 +452,10 @@ pub fn spawn_named_prop<T: Builder>(
             eb = eb.with(facing_direction.clone());
         }
 
+        // PlayerInfo
+        if let Some(player_info) = &prop_template.player_info {
+            eb = eb.with(player_info.clone());
+        }
         return Some(eb.build());
     }
     None
@@ -673,6 +677,11 @@ pub fn spawn_born(
         // Facing direction
         if let Some(facing_direction) = &prop_template.facing_direction {
             eb = eb.with(facing_direction.clone());
+        }
+
+        // PlayerInfo
+        if let Some(player_info) = &prop_template.player_info {
+            eb = eb.with(player_info.clone());
         }
 
         // Sexe

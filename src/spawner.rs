@@ -48,6 +48,14 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
             orientation: Orientation::East,
             front_tile: rltk::Point { x: 1, y: 0 },
         })
+        .with(PlayerInfo {
+            inventaire: Vec::new(),
+            close_interations: Vec::new(),
+            possible_builds: Vec::new(),
+            my_info: MyInfo {
+                pos: rltk::Point { x: 0, y: 0 },
+            },
+        })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
 
@@ -177,18 +185,18 @@ pub fn spawner_named(ecs: &mut World) {
 pub fn constructer_named(ecs: &mut World) {
     let mut spawns_temps: Vec<(i32, i32, String, Entity)> = Vec::new();
     {
-        let to_spawns = ecs.write_resource::<ToConstructList>();
+        let to_constructs = ecs.write_resource::<ToConstructList>();
 
-        for (x, y, name, entity) in to_spawns.requests.iter() {
+        for (x, y, name, entity) in to_constructs.requests.iter() {
             spawns_temps.push((*x, *y, name.clone(), *entity))
         }
     }
     for (x, y, name, entity) in spawns_temps.iter() {
         construct_named(ecs, &name.clone(), *x, *y, *entity)
     }
-    let mut to_spawns = ecs.write_resource::<ToConstructList>();
+    let mut to_constructs = ecs.write_resource::<ToConstructList>();
 
-    to_spawns.requests.clear();
+    to_constructs.requests.clear();
 }
 
 // like create named but with an already existing entity

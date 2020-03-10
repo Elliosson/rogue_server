@@ -1,9 +1,5 @@
 extern crate specs;
-use crate::{
-    gamelog::{GameLog, SpeciesInstantLog, WorldStatLog},
-    Aging, Carnivore, CombatStats, Date, EnergyReserve, Herbivore, HumiditySensitive, Name,
-    Renderable, Reproduction, Specie, Speed, TemperatureSensitive,
-};
+use crate::gamelog::{GameLog, GeneralLog, SpeciesInstantLog, WorldStatLog};
 use specs::prelude::*;
 
 pub struct StatSystem {}
@@ -13,22 +9,19 @@ impl<'a> System<'a> for StatSystem {
     type SystemData = (
         Entities<'a>,
         WriteExpect<'a, GameLog>,
-        ReadStorage<'a, Name>,
-        ReadStorage<'a, EnergyReserve>,
-        ReadStorage<'a, Reproduction>,
-        ReadExpect<'a, Date>,
         WriteExpect<'a, WorldStatLog>,
-        ReadStorage<'a, Specie>,
-        ReadStorage<'a, TemperatureSensitive>,
-        ReadStorage<'a, Renderable>,
+        WriteExpect<'a, GeneralLog>,
         WriteExpect<'a, SpeciesInstantLog>,
-        ReadStorage<'a, HumiditySensitive>,
-        ReadStorage<'a, Speed>,
-        ReadStorage<'a, Herbivore>,
-        ReadStorage<'a, Carnivore>,
-        ReadStorage<'a, CombatStats>,
-        ReadStorage<'a, Aging>,
     );
 
-    fn run(&mut self, _data: Self::SystemData) {}
+    fn run(&mut self, data: Self::SystemData) {
+        let (entities, mut log, mut wlog, mut glog, mut slog) = data;
+
+        //todo suppress
+        //for now i suppress log
+        log.entries.clear();
+        wlog.entries.clear();
+        glog.entries.clear();
+        slog.entries.clear();
+    }
 }

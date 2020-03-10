@@ -540,7 +540,7 @@ pub struct BuildingPlan {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MyInfo {
-    pub pos: Position,
+    pub pos: rltk::Point,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
