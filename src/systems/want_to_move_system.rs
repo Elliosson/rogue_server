@@ -1,5 +1,8 @@
 extern crate specs;
-use crate::{FacingDirection, Map, Position, Viewshed, WantToMove, MAPHEIGHT, MAPWIDTH};
+use crate::{
+    CombatStats, FacingDirection, Map, Position, Viewshed, WantToMove, WantsToMelee, MAPHEIGHT,
+    MAPWIDTH,
+};
 use specs::prelude::*;
 use std::cmp::{max, min};
 
@@ -14,6 +17,8 @@ impl<'a> System<'a> for WantToMoveSystem {
         WriteStorage<'a, Viewshed>,
         WriteStorage<'a, WantToMove>,
         WriteStorage<'a, FacingDirection>,
+        WriteStorage<'a, WantsToMelee>,
+        WriteStorage<'a, CombatStats>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -24,6 +29,8 @@ impl<'a> System<'a> for WantToMoveSystem {
             mut viewshed,
             mut want_to_moves,
             mut facing_directions,
+            mut wants_to_melees,
+            combat_stats,
         ) = data;
 
         for (entity, pos, viewshed, want_to_move) in
@@ -48,6 +55,20 @@ impl<'a> System<'a> for WantToMoveSystem {
                 let y = min(MAPHEIGHT as i32 - 1, max(0, pos.y() + want_to_move.delta_y));
                 pos.moving(x, y, &mut map.dirty);
                 viewshed.dirty = true;
+            } else {
+                //potential combat
+                for enemy_entity in map.tile_content[&destination_idx].iter() {
+                    if let Some(_combat_stat) = combat_stats.get(*enemy_entity) {
+                        wants_to_melees
+                            .insert(
+                                entity,
+                                WantsToMelee {
+                                    target: *enemy_entity,
+                                },
+                            )
+                            .expect("Unable to insert");
+                    }
+                }
             }
         }
 

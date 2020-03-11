@@ -1,7 +1,5 @@
 extern crate specs;
-use crate::{
-    gamelog::GameLog, Blocking, BlocksTile, Map, ObjectBuilder, Position, ToDelete, Unblocking,
-};
+use crate::{gamelog::GameLog, Blocking, ObjectBuilder, ToDelete, Unblocking};
 use specs::prelude::*;
 
 pub struct Interationv2System {}

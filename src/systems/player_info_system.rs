@@ -1,8 +1,7 @@
 extern crate specs;
 use crate::{
     gamelog::GameLog, BuildingChoice, BuildingPlan, CloseInteration, Connected, InBackpack,
-    InteractableObject, InventaireItem, Item, Map, MyInfo, Name, OnlinePlayer, PlayerInfo,
-    Position,
+    InteractableObject, InventaireItem, Item, Map, Name, OnlinePlayer, PlayerInfo, Position,
 };
 use specs::prelude::*;
 

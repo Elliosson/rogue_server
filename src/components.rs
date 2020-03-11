@@ -430,6 +430,7 @@ pub struct MyChoosenFood {
 pub enum DeathCause {
     Natural,
     Killed { killer: Entity },
+    Unknown,
 }
 
 #[derive(Component, Debug, ConvertSaveload, Clone)]

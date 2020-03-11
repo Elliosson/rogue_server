@@ -66,3 +66,9 @@ mod destroy_system;
 pub use destroy_system::DestroySystem;
 mod block_unblock_system;
 pub use block_unblock_system::BlockUnblockSystem;
+
+mod melee_combat_system;
+pub use melee_combat_system::MeleeCombatSystem;
+
+mod check_death_system;
+pub use check_death_system::CheckDeathSystem;

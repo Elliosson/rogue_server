@@ -153,12 +153,18 @@ impl State {
         veg_grow.run_now(&self.ecs);
         let mut energy = EnergySystem {};
         energy.run_now(&self.ecs);
+        let mut block_unblock_system = BlockUnblockSystem {};
+        block_unblock_system.run_now(&self.ecs);
+        let mut melee_combat_system = MeleeCombatSystem {};
+        melee_combat_system.run_now(&self.ecs);
+        let mut check_death_system = CheckDeathSystem {};
+        check_death_system.run_now(&self.ecs);
+
         let mut death_system = DeathSystem {};
         death_system.run_now(&self.ecs);
         //let mut gendered_reprod = GenderedReproductionSystem {};
         //gendered_reprod.run_now(&self.ecs);
-        let mut block_unblock_system = BlockUnblockSystem {};
-        block_unblock_system.run_now(&self.ecs);
+
         let mut want_destroy = DestroySystem {};
         want_destroy.run_now(&self.ecs);
 

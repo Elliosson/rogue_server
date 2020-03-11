@@ -47,6 +47,14 @@ impl<'a> System<'a> for DeathSystem {
             mut simple_marker_allocators,
         ) = data;
 
+        for (entity, dead) in (&entities, &mut deads).join() {
+            to_deletes
+                .insert(entity, ToDelete {})
+                .expect("Unable to insert");
+        }
+
+        deads.clear();
+        /*
         for (entity, dead, energy) in (&entities, &mut deads, &energies).join() {
             //create meat entity
             let mut dirty = Vec::new();
@@ -123,5 +131,6 @@ impl<'a> System<'a> for DeathSystem {
                 .insert(entity, ToDelete {})
                 .expect("Unable to insert");
         }
+        */
     }
 }
