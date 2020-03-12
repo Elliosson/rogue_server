@@ -153,15 +153,19 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                     Some(entity) => {
                         player_messages.push((*entity, mes));
 
-                        player_inputs
-                            .insert(*entity, PlayerInputComp { input })
-                            .expect("Unable to insert");
-
-                        // if we received message of the player he is connected
-                        //TODO have a timeout for the deconnection
-                        connecteds
-                            .insert(*entity, Connected { uuid: uid.clone() })
-                            .expect("Unable to insert");
+                        match player_inputs.insert(*entity, PlayerInputComp { input }) {
+                            Err(e) => {
+                                println!("Error: Can't find the player. {}", e)
+                                //TODO if the player have no entity I should either recreate one or suppress the entry from the hashmaps
+                            }
+                            Ok(_) => {
+                                // if we received message of the player he is connected
+                                //TODO have a timeout for the deconnection
+                                connecteds
+                                    .insert(*entity, Connected { uuid: uid.clone() })
+                                    .expect("Unable to insert");
+                            }
+                        }
                     }
                     None => {}
                 }
