@@ -627,6 +627,9 @@ pub struct Blocking {}
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Unblocking {}
 
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Respawn {}
+
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.
 pub struct SerializeMe;

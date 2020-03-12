@@ -72,3 +72,6 @@ pub use melee_combat_system::MeleeCombatSystem;
 
 mod check_death_system;
 pub use check_death_system::CheckDeathSystem;
+
+mod respawn_system;
+pub use respawn_system::RespawnSystem;
