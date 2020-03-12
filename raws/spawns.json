@@ -597,7 +597,7 @@
             },
             "blocks_tile": true,
             "combat": {
-                "max_hp": 0,
+                "max_hp": 30,
                 "hp": 30,
                 "defense": 2,
                 "power": 2
@@ -622,7 +622,9 @@
                     "pos": {
                         "x": 0,
                         "y": 0
-                    }
+                    },
+                    "hp": 0,
+                    "max_hp": 0
                 },
                 "possible_builds": []
             }

@@ -1,7 +1,8 @@
 extern crate specs;
 use crate::{
-    gamelog::GameLog, BuildingChoice, BuildingPlan, CloseInteration, Connected, InBackpack,
-    InteractableObject, InventaireItem, Item, Map, Name, OnlinePlayer, PlayerInfo, Position,
+    gamelog::GameLog, BuildingChoice, BuildingPlan, CloseInteration, CombatStats, Connected,
+    InBackpack, InteractableObject, InventaireItem, Item, Map, Name, OnlinePlayer, PlayerInfo,
+    Position,
 };
 use specs::prelude::*;
 
@@ -22,6 +23,7 @@ impl<'a> System<'a> for PlayerInfoSystem {
         ReadStorage<'a, Name>,
         ReadStorage<'a, Position>,
         ReadStorage<'a, BuildingChoice>,
+        ReadStorage<'a, CombatStats>,
         ReadExpect<'a, Map>,
     );
 
@@ -38,18 +40,27 @@ impl<'a> System<'a> for PlayerInfoSystem {
             names,
             positions,
             building_choices,
+            combat_stats,
             map,
         ) = data;
 
         //Todo check in player is connected and find a way to handle local player
-        for (_entity, _online_player, pos, player_info) in
-            (&entities, &online_players, &positions, &mut player_infos).join()
+        for (_entity, _online_player, pos, player_info, combat_stat) in (
+            &entities,
+            &online_players,
+            &positions,
+            &mut player_infos,
+            &combat_stats,
+        )
+            .join()
         {
             player_info.inventaire.clear();
             player_info.close_interations.clear();
             player_info.possible_builds.clear();
             player_info.my_info.pos.x = pos.x();
             player_info.my_info.pos.y = pos.y();
+            player_info.my_info.hp = combat_stat.hp;
+            player_info.my_info.max_hp = combat_stat.max_hp;
         }
         //TODO these function are hightly ineficiant, to refactor if needed
         //fill inventory

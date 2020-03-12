@@ -542,6 +542,8 @@ pub struct BuildingPlan {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MyInfo {
     pub pos: rltk::Point,
+    pub hp: i32,
+    pub max_hp: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
