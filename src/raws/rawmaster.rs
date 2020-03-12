@@ -456,6 +456,12 @@ pub fn spawn_named_prop<T: Builder>(
         if let Some(player_info) = &prop_template.player_info {
             eb = eb.with(player_info.clone());
         }
+
+        // Monster
+        if let Some(monster) = &prop_template.monster {
+            eb = eb.with(monster.clone());
+        }
+
         return Some(eb.build());
     }
     None
@@ -682,6 +688,11 @@ pub fn spawn_born(
         // PlayerInfo
         if let Some(player_info) = &prop_template.player_info {
             eb = eb.with(player_info.clone());
+        }
+
+        // Monster
+        if let Some(monster) = &prop_template.monster {
+            eb = eb.with(monster.clone());
         }
 
         // Sexe

@@ -69,14 +69,12 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
 
 /// Fills a room with stuff!
 #[allow(clippy::map_entry)]
-pub fn spawn_trees(ecs: &mut World, room: &Rect) {
+pub fn spawn_named_everywhere(ecs: &mut World, room: &Rect, name: String, num_spawns: i32) {
     let mut spawn_points: HashMap<usize, String> = HashMap::new();
 
     // Scope to keep the borrow checker happy
     {
         let mut rng = ecs.write_resource::<RandomNumberGenerator>();
-        //let num_spawns = rng.roll_dice(600, 50);
-        let num_spawns = 10000;
 
         for _i in 0..num_spawns {
             let mut added = false;
@@ -86,7 +84,7 @@ pub fn spawn_trees(ecs: &mut World, room: &Rect) {
                 let y = (room.y1 + rng.roll_dice(1, i32::abs(room.y2 - room.y1))) as usize;
                 let idx = (y * MAPWIDTH) + x;
                 if !spawn_points.contains_key(&idx) {
-                    spawn_points.insert(idx, "Tree".to_string());
+                    spawn_points.insert(idx, name.clone());
                     added = true;
                 } else {
                     tries += 1;
@@ -96,36 +94,31 @@ pub fn spawn_trees(ecs: &mut World, room: &Rect) {
     }
     let mut dirty = Vec::new();
 
-    // Actually spawn the monsters
+    // Actually spawn the named
     for spawn in spawn_points.iter() {
         let x = (*spawn.0 % MAPWIDTH) as i32;
         let y = (*spawn.0 / MAPWIDTH) as i32;
 
-        match spawn.1.as_ref() {
-            "Tree" => {
-                let raws: &RawMaster = &RAWS.lock().unwrap();
-                if raws.prop_index.contains_key(spawn.1) {
-                    let spawn_result = spawn_named_entity(
-                        raws,
-                        ecs.create_entity().marked::<SimpleMarker<SerializeMe>>(),
-                        spawn.1,
-                        SpawnType::AtPosition { x, y },
-                        &mut dirty,
-                    );
-                    if let Some(entity) = spawn_result {
-                        let mut map: specs::shred::FetchMut<Map> = ecs.write_resource::<Map>();
-                        let idx = map.xy_idx(x, y);
-                        let tile_content = map.tile_content.entry(idx).or_insert(Vec::new());
-                        tile_content.push(entity);
-                        map.dirty.append(&mut dirty);
-                    } else {
-                        println!("WARNING: We don't know how to spawn [{}]!", spawn.1);
-                    }
-                } else {
-                    println!("WARNING: No keys !");
-                }
+        let raws: &RawMaster = &RAWS.lock().unwrap();
+        if raws.prop_index.contains_key(spawn.1) {
+            let spawn_result = spawn_named_entity(
+                raws,
+                ecs.create_entity().marked::<SimpleMarker<SerializeMe>>(),
+                spawn.1,
+                SpawnType::AtPosition { x, y },
+                &mut dirty,
+            );
+            if let Some(entity) = spawn_result {
+                let mut map: specs::shred::FetchMut<Map> = ecs.write_resource::<Map>();
+                let idx = map.xy_idx(x, y);
+                let tile_content = map.tile_content.entry(idx).or_insert(Vec::new());
+                tile_content.push(entity);
+                map.dirty.append(&mut dirty);
+            } else {
+                println!("WARNING: We don't know how to spawn [{}]!", spawn.1);
             }
-            _ => {}
+        } else {
+            println!("WARNING: No keys !");
         }
     }
 

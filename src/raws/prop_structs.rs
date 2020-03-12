@@ -33,6 +33,7 @@ pub struct Prop {
     pub building_choice: Option<BuildingChoice>,
     pub facing_direction: Option<FacingDirection>,
     pub player_info: Option<PlayerInfo>,
+    pub monster: Option<Monster>,
 }
 
 #[derive(Deserialize, Debug)]
