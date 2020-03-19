@@ -75,3 +75,6 @@ pub use check_death_system::CheckDeathSystem;
 
 mod respawn_system;
 pub use respawn_system::RespawnSystem;
+
+mod in_player_view_system;
+pub use in_player_view_system::InPlayerViewSystem;

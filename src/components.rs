@@ -501,6 +501,11 @@ pub enum LocalClientRunstate {
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct WantsToApproach {
+    pub idx: i32,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct LocalClientInfo {
     pub local_runstate: LocalClientRunstate,
 }
@@ -629,6 +634,9 @@ pub struct Unblocking {}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Respawn {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct InPlayerView {}
 
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.

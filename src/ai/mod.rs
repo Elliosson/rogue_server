@@ -14,3 +14,8 @@ mod targeting_ai;
 pub use targeting_ai::TargetingAI;
 mod eating_ai;
 pub use eating_ai::EatingKillingAI;
+mod approach_ai_system;
+pub use approach_ai_system::ApproachAI;
+
+mod monster_ai_system;
+pub use monster_ai_system::MonsterAI;

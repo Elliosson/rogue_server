@@ -107,6 +107,9 @@ impl State {
         specie.run_now(&self.ecs);
         let mut vis = VisibilitySystem {};
         vis.run_now(&self.ecs);
+
+        let mut ipvis = InPlayerViewSystem {};
+        ipvis.run_now(&self.ecs);
         /***player turn ****/
         let mut online_player = OnlinePlayerSystem {};
         online_player.run_now(&self.ecs);
@@ -114,6 +117,13 @@ impl State {
         entity_matching.run_now(&self.ecs);
         let mut player_command = PlayerCommandSystem {};
         player_command.run_now(&self.ecs);
+
+        /****pnj ai ***/
+        let mut monster_ai = MonsterAI {};
+        monster_ai.run_now(&self.ecs);
+        let mut approach_ai = ApproachAI {};
+        approach_ai.run_now(&self.ecs);
+
         let mut eating_killing_ai = EatingKillingAI {};
         eating_killing_ai.run_now(&self.ecs);
 
@@ -318,6 +328,8 @@ fn main() {
     gs.ecs.register::<Blocking>();
     gs.ecs.register::<Unblocking>();
     gs.ecs.register::<Respawn>();
+    gs.ecs.register::<InPlayerView>();
+    gs.ecs.register::<WantsToApproach>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
     let map: Map = Map::new_map();
