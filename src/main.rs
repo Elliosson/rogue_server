@@ -331,6 +331,8 @@ fn main() {
     gs.ecs.register::<InPlayerView>();
     gs.ecs.register::<WantsToApproach>();
     gs.ecs.register::<PlayerLog>();
+    gs.ecs.register::<RespawnPoint>();
+    gs.ecs.register::<HaveRespawnPoint>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
     let map: Map = Map::new_map();

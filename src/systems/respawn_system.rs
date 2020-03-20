@@ -1,6 +1,8 @@
 extern crate specs;
 
-use crate::{gamelog::GameLog, CombatStats, Map, OnlinePlayer, Position, Respawn};
+use crate::{
+    gamelog::GameLog, CombatStats, HaveRespawnPoint, Map, OnlinePlayer, Position, Respawn,
+};
 
 use specs::prelude::*;
 
@@ -15,6 +17,7 @@ impl<'a> System<'a> for RespawnSystem {
         WriteStorage<'a, OnlinePlayer>,
         WriteStorage<'a, CombatStats>,
         WriteStorage<'a, Respawn>,
+        WriteStorage<'a, HaveRespawnPoint>,
         WriteExpect<'a, Map>,
     );
 
@@ -26,21 +29,36 @@ impl<'a> System<'a> for RespawnSystem {
             online_players,
             mut combat_stats,
             mut respawns,
+            have_respawn_points,
             mut map,
         ) = data;
 
-        for (_entity, _respawn, _online_player, pos, combat_stat) in (
-            &entities,
-            &respawns,
-            &online_players,
-            &mut positions,
-            &mut combat_stats,
-        )
-            .join()
-        {
-            //for now just reput him on the original positon, after it will need to be more complex
-            pos.moving(5, 5, &mut map.dirty);
-            combat_stat.hp = combat_stat.max_hp;
+        let mut to_respawn = Vec::new();
+
+        for (entity, _respawn, _online_player) in (&entities, &respawns, &online_players).join() {
+            if let Some(respawn_point) = have_respawn_points.get(entity) {
+                if let Some(pos) = positions.get(respawn_point.respawn_point) {
+                    to_respawn.push((entity, pos.x(), pos.y()));
+                } else {
+                    to_respawn.push((entity, 5, 5));
+                }
+            } else {
+                to_respawn.push((entity, 5, 5));
+            }
+        }
+
+        for (entity, x, y) in to_respawn.iter() {
+            if let Some(pos) = positions.get_mut(*entity) {
+                pos.moving(*x, *y, &mut map.dirty);
+            } else {
+                println!("Error: entity to respawn have no positon")
+            }
+
+            if let Some(combat_stat) = combat_stats.get_mut(*entity) {
+                combat_stat.hp = combat_stat.max_hp;
+            } else {
+                println!("Error: entity to respawn have no combat stat")
+            }
         }
 
         respawns.clear();

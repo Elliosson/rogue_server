@@ -1,5 +1,7 @@
 extern crate specs;
-use crate::{gamelog::GameLog, Blocking, ObjectBuilder, ToDelete, Unblocking};
+use crate::{
+    gamelog::GameLog, Blocking, HaveRespawnPoint, ObjectBuilder, RespawnPoint, ToDelete, Unblocking,
+};
 use specs::prelude::*;
 
 pub struct Interationv2System {}
@@ -13,6 +15,8 @@ impl<'a> System<'a> for Interationv2System {
         WriteStorage<'a, ToDelete>,
         WriteStorage<'a, Blocking>,
         WriteStorage<'a, Unblocking>,
+        WriteStorage<'a, RespawnPoint>,
+        WriteStorage<'a, HaveRespawnPoint>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -23,6 +27,8 @@ impl<'a> System<'a> for Interationv2System {
             mut to_deletes,
             mut blockings,
             mut unblockings,
+            mut respawn_points,
+            mut have_respawn_points,
         ) = data;
 
         for interation_request in &interaction_request_list.requests {
@@ -52,6 +58,24 @@ impl<'a> System<'a> for Interationv2System {
                 "close_door" => {
                     blockings
                         .insert(interation_request.interacted_entity, Blocking {})
+                        .expect("Unable to insert delete entity");
+                }
+                "respawn_here" => {
+                    respawn_points
+                        .insert(
+                            interation_request.interacted_entity,
+                            RespawnPoint {
+                                owner: interation_request.requester_entity,
+                            },
+                        )
+                        .expect("Unable to insert delete entity");
+                    have_respawn_points
+                        .insert(
+                            interation_request.requester_entity,
+                            HaveRespawnPoint {
+                                respawn_point: interation_request.interacted_entity,
+                            },
+                        )
                         .expect("Unable to insert delete entity");
                 }
                 _ => {}

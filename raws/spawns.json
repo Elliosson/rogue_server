@@ -605,7 +605,8 @@
             "building_choice": {
                 "plans": [
                     "block",
-                    "Door"
+                    "Door",
+                    "Bed"
                 ]
             },
             "facing_direction": {
@@ -688,6 +689,14 @@
                 "hp": 10,
                 "defense": 0,
                 "power": 0
+            },
+            "interactable{}": true,
+            "interactable_object": {
+                "interactions": [
+                    {
+                        "name": "respawn_here"
+                    }
+                ]
             }
         }
     ]

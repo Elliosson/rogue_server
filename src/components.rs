@@ -660,6 +660,16 @@ impl PlayerLog {
     }
 }
 
+#[derive(Component, Debug, ConvertSaveload, Clone)]
+pub struct RespawnPoint {
+    pub owner: Entity,
+}
+
+#[derive(Component, Debug, ConvertSaveload, Clone)]
+pub struct HaveRespawnPoint {
+    pub respawn_point: Entity,
+}
+
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.
 pub struct SerializeMe;
