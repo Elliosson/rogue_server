@@ -549,6 +549,7 @@ pub struct MyInfo {
     pub pos: rltk::Point,
     pub hp: i32,
     pub max_hp: i32,
+    pub player_log: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -637,6 +638,27 @@ pub struct Respawn {}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct InPlayerView {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct PlayerLog {
+    logs: Vec<String>,
+}
+
+pub const MAX_LOG_SIZE: usize = 10;
+impl PlayerLog {
+    pub fn logs(&self) -> &Vec<String> {
+        &self.logs
+    }
+
+    //ensure that the size of the log is 10 at max
+    pub fn set_logs(&mut self, log: String) {
+        if self.logs.len() > MAX_LOG_SIZE {
+            self.logs.remove(0);
+        }
+
+        self.logs.push(log);
+    }
+}
 
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.

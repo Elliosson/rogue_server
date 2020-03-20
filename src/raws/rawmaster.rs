@@ -462,6 +462,11 @@ pub fn spawn_named_prop<T: Builder>(
             eb = eb.with(monster.clone());
         }
 
+        // PlayerLog
+        if let Some(player_log) = &prop_template.player_log {
+            eb = eb.with(player_log.clone());
+        }
+
         return Some(eb.build());
     }
     None

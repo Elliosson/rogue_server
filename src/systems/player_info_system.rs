@@ -2,7 +2,7 @@ extern crate specs;
 use crate::{
     gamelog::GameLog, BuildingChoice, BuildingPlan, CloseInteration, CombatStats, Connected,
     InBackpack, InteractableObject, InventaireItem, Item, Map, Name, OnlinePlayer, PlayerInfo,
-    Position,
+    PlayerLog, Position,
 };
 use specs::prelude::*;
 
@@ -24,6 +24,7 @@ impl<'a> System<'a> for PlayerInfoSystem {
         ReadStorage<'a, Position>,
         ReadStorage<'a, BuildingChoice>,
         ReadStorage<'a, CombatStats>,
+        ReadStorage<'a, PlayerLog>,
         ReadExpect<'a, Map>,
     );
 
@@ -41,6 +42,7 @@ impl<'a> System<'a> for PlayerInfoSystem {
             positions,
             building_choices,
             combat_stats,
+            player_logs,
             map,
         ) = data;
 
@@ -62,6 +64,13 @@ impl<'a> System<'a> for PlayerInfoSystem {
             player_info.my_info.hp = combat_stat.hp;
             player_info.my_info.max_hp = combat_stat.max_hp;
         }
+
+        for (_entity, _online_player, player_log, player_info) in
+            (&entities, &online_players, &player_logs, &mut player_infos).join()
+        {
+            player_info.my_info.player_log = player_log.logs().clone();
+        }
+
         //TODO these function are hightly ineficiant, to refactor if needed
         //fill inventory
         for (entity, backpack, _item, name) in (&entities, &backpacks, &items, &names).join() {

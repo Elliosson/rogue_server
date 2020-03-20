@@ -624,9 +624,13 @@
                         "y": 0
                     },
                     "hp": 0,
-                    "max_hp": 0
+                    "max_hp": 0,
+                    "player_log": []
                 },
-                "possible_builds": []
+                "possible_builds": [],
+                "player_log": {
+                    "logs": []
+                }
             }
         },
         {

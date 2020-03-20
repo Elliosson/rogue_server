@@ -1,8 +1,5 @@
 extern crate specs;
-use crate::{
-    gamelog::GameLog, Blocking, BlocksTile, CombatStats, Dead, DeathCause, Map, Position,
-    Unblocking,
-};
+use crate::{gamelog::GameLog, CombatStats, Dead, DeathCause};
 use specs::prelude::*;
 
 pub struct CheckDeathSystem {}
@@ -21,12 +18,14 @@ impl<'a> System<'a> for CheckDeathSystem {
 
         for (entity, combat_stat) in (&entities, &combat_stats).join() {
             if combat_stat.hp <= 0 {
-                deads.insert(
-                    entity,
-                    Dead {
-                        cause: DeathCause::Unknown,
-                    },
-                );
+                deads
+                    .insert(
+                        entity,
+                        Dead {
+                            cause: DeathCause::Unknown,
+                        },
+                    )
+                    .expect("Unable to insert");
             }
         }
     }

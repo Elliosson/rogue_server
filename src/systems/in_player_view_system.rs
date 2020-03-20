@@ -38,8 +38,7 @@ impl<'a> System<'a> for InPlayerViewSystem {
             }
         }
 
-        for entity in viewed_entities.iter() {
-            println!("monster in views");
+        for entity in viewed_entities.iter() 
             in_views
                 .insert(*entity, InPlayerView {})
                 .expect("Unable to insert");

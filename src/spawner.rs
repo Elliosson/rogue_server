@@ -56,6 +56,7 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
                 pos: rltk::Point { x: 0, y: 0 },
                 hp: 0,
                 max_hp: 0,
+                player_log: Vec::new(),
             },
         })
         .marked::<SimpleMarker<SerializeMe>>()

@@ -34,6 +34,7 @@ pub struct Prop {
     pub facing_direction: Option<FacingDirection>,
     pub player_info: Option<PlayerInfo>,
     pub monster: Option<Monster>,
+    pub player_log: Option<PlayerLog>,
 }
 
 #[derive(Deserialize, Debug)]
