@@ -673,6 +673,22 @@
             "viewshed": {
                 "range": 8
             }
+        },
+        {
+            "name": "Bed",
+            "renderable": {
+                "glyph": "B",
+                "fg": "#FFFFFF",
+                "bg": "#000000",
+                "order": 0
+            },
+            "blocks_tile": true,
+            "combat": {
+                "max_hp": 10,
+                "hp": 10,
+                "defense": 0,
+                "power": 0
+            }
         }
     ]
 }
