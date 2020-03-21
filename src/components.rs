@@ -77,6 +77,16 @@ pub struct CombatStats {
     pub power: i32,
 }
 
+impl CombatStats {
+    pub fn change_hp(&mut self, change: i32) {
+        if self.hp + change > self.max_hp {
+            self.hp = self.max_hp;
+        } else {
+            self.hp += change;
+        }
+    }
+}
+
 #[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct WantsToMelee {
     pub target: Entity,
@@ -108,9 +118,6 @@ impl Interaction {
         Interaction { name: name }
     }
 }
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Consumable {}
 
 #[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct Ranged {
@@ -474,6 +481,8 @@ pub enum PlayerInput {
     INTERACT(i32, i32, String, Entity),
     BUILD(i32, i32, String),
     DESTROY,
+    CONSUME(Entity),
+    EQUIP(Entity),
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
@@ -677,6 +686,25 @@ pub struct Vegetable {
     pub product: Vec<String>,
 }
 
+#[derive(Component, Debug, ConvertSaveload, Clone)]
+pub struct WantConsume {
+    pub target: Entity,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Consumable {
+    pub effects: Vec<Effect>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum Effect {
+    Heal(i32),
+}
+
+#[derive(Component, Debug, ConvertSaveload, Clone)]
+pub struct WantEquip {
+    pub target: Entity,
+}
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.
 pub struct SerializeMe;

@@ -151,6 +151,9 @@ impl State {
         let mut interactionv2 = Interationv2System {};
         interactionv2.run_now(&self.ecs);
 
+        let mut consume = ConsumeSystem {};
+        consume.run_now(&self.ecs);
+
         let mut want_move = WantToMoveSystem {};
         want_move.run_now(&self.ecs);
         let mut go_target = GoTargetSystem {};
@@ -336,6 +339,8 @@ fn main() {
     gs.ecs.register::<RespawnPoint>();
     gs.ecs.register::<HaveRespawnPoint>();
     gs.ecs.register::<Vegetable>();
+    gs.ecs.register::<WantConsume>();
+    gs.ecs.register::<WantEquip>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
     let map: Map = Map::new_map();

@@ -81,3 +81,6 @@ pub use in_player_view_system::InPlayerViewSystem;
 
 mod vegetable_grow_systemv2;
 pub use vegetable_grow_systemv2::VegetableGrowSystemV2;
+
+mod consume_system;
+pub use consume_system::ConsumeSystem;

@@ -271,6 +271,7 @@ impl<'a> System<'a> for ItemUseSystem {
             }
 
             // If its a consumable, we delete it on use
+            //todo consumable system change, maybe to supress
             if used_item {
                 let consumable = consumables.get(useitem.item);
                 match consumable {

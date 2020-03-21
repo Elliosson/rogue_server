@@ -2,7 +2,7 @@
 //this way we can play the game directly on the server
 use super::{
     gui, CommandToConvert, EntityToConvert, Item, LocalClientInfo, LocalClientRunstate,
-    PlayerInput, PlayerInputComp, Position, WantsToUseItem,
+    PlayerInput, PlayerInputComp, Position, WantConsume, WantsToUseItem,
 };
 
 extern crate rltk;
@@ -130,6 +130,17 @@ pub fn local_client_inventory(ecs: &World, ctx: &mut Rltk) -> LocalClientRunstat
                     WantsToUseItem {
                         item: item_entity,
                         target: None,
+                    },
+                )
+                .expect("Unable to insert intent");
+
+            //provisory hanfling for debug
+            let mut intent = ecs.write_storage::<WantConsume>();
+            intent
+                .insert(
+                    *ecs.fetch::<Entity>(),
+                    WantConsume {
+                        target: item_entity,
                     },
                 )
                 .expect("Unable to insert intent");

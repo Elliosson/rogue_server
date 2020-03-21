@@ -1,11 +1,11 @@
+use crate::components;
 use serde::Deserialize;
 use std::collections::HashMap;
-
 #[derive(Deserialize, Debug)]
 pub struct Item {
     pub name: String,
     pub renderable: Option<Renderable>,
-    pub consumable: Option<Consumable>,
+    pub consumable: Option<components::Consumable>,
     pub weapon: Option<Weapon>,
     pub shield: Option<Shield>,
 }

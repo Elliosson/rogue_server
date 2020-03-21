@@ -34,7 +34,7 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
         })
         .with(CombatStats {
             max_hp: 30,
-            hp: 30,
+            hp: 20,
             defense: 2,
             power: 5,
         })
@@ -42,7 +42,11 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
             runstate: OnlineRunState::AwaitingInput,
         })
         .with(BuildingChoice {
-            plans: vec!["block".to_string(), "Door".to_string()],
+            plans: vec![
+                "block".to_string(),
+                "Door".to_string(),
+                "Garden".to_string(),
+            ],
         })
         .with(FacingDirection {
             orientation: Orientation::East,

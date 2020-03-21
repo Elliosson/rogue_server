@@ -180,46 +180,6 @@ pub fn spawn_named_item<T: Builder>(
 
         eb = eb.with(crate::components::Item {});
 
-        if let Some(consumable) = &item_template.consumable {
-            eb = eb.with(crate::components::Consumable {});
-            for effect in consumable.effects.iter() {
-                let effect_name = effect.0.as_str();
-                match effect_name {
-                    "provides_healing" => {
-                        eb = eb.with(ProvidesHealing {
-                            heal_amount: effect.1.parse::<i32>().unwrap(),
-                        })
-                    }
-                    "ranged" => {
-                        eb = eb.with(Ranged {
-                            range: effect.1.parse::<i32>().unwrap(),
-                        })
-                    }
-                    "damage" => {
-                        eb = eb.with(InflictsDamage {
-                            damage: effect.1.parse::<i32>().unwrap(),
-                        })
-                    }
-                    "area_of_effect" => {
-                        eb = eb.with(AreaOfEffect {
-                            radius: effect.1.parse::<i32>().unwrap(),
-                        })
-                    }
-                    "confusion" => {
-                        eb = eb.with(Confusion {
-                            turns: effect.1.parse::<i32>().unwrap(),
-                        })
-                    }
-                    _ => {
-                        println!(
-                            "Warning: consumable effect {} not implemented.",
-                            effect_name
-                        );
-                    }
-                }
-            }
-        }
-
         if let Some(weapon) = &item_template.weapon {
             eb = eb.with(Equippable {
                 slot: EquipmentSlot::Melee,
@@ -236,6 +196,10 @@ pub fn spawn_named_item<T: Builder>(
             eb = eb.with(DefenseBonus {
                 defense: shield.defense_bonus,
             });
+        }
+
+        if let Some(consumable) = &item_template.consumable {
+            eb = eb.with(consumable.clone());
         }
 
         return Some(eb.build());
