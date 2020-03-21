@@ -81,6 +81,8 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
         }
     }
 
+    show_equipped(ecs, ctx);
+
     // Draw mouse cursor
     let mouse_pos = ctx.mouse_pos();
     ctx.set_bg(mouse_pos.0, mouse_pos.1, RGB::named(rltk::MAGENTA));
@@ -929,6 +931,47 @@ pub fn show_building_choice(
                 }
             }
         }
+    }
+}
+
+//get all equipped
+pub fn show_equipped(ecs: &World, ctx: &mut Rltk) {
+    let x_pos = 100;
+    let width = 20;
+    let y_pos = 10;
+    let height = 20;
+    //get storage
+
+    let player_entity = *ecs.fetch::<Entity>();
+    let player_infos = ecs.read_storage::<PlayerInfo>();
+
+    //Draw the box to print the possible interaction
+    ctx.draw_box(
+        x_pos,
+        y_pos,
+        width,
+        height,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+    );
+    ctx.print_color(
+        x_pos,
+        y_pos,
+        RGB::named(rltk::YELLOW),
+        RGB::named(rltk::BLACK),
+        "Equippement",
+    );
+
+    let mut j = 0;
+
+    let player_info = player_infos.get(player_entity).unwrap();
+
+    let mut y = y_pos + 1;
+
+    for equipment in &player_info.equipement {
+        ctx.print(x_pos + 4, y, &format!("{}", equipment.name));
+        y += 1;
+        j += 1;
     }
 }
 

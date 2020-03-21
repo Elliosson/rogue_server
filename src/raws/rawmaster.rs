@@ -240,6 +240,9 @@ pub fn spawn_named_mob<T: Builder>(
             hp: mob_template.stats.hp,
             power: mob_template.stats.power,
             defense: mob_template.stats.defense,
+            base_att: 0,
+            base_def: 0,
+            att: 0,
         });
         eb = eb.with(Viewshed {
             visible_tiles: Vec::new(),

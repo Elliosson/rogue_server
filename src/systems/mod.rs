@@ -84,3 +84,9 @@ pub use vegetable_grow_systemv2::VegetableGrowSystemV2;
 
 mod consume_system;
 pub use consume_system::ConsumeSystem;
+
+mod equip_system;
+pub use equip_system::EquipSystem;
+
+mod equippmemt_bonus_system;
+pub use equippmemt_bonus_system::EquBonusSystem;

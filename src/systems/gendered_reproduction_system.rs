@@ -169,6 +169,9 @@ impl<'a> System<'a> for GenderedReproductionSystem {
                         power: (combat_stat.power + mate_combat_stat.power) / 2,
                         max_hp: 100,  //No heritance
                         defense: 100, //No heritance
+                        base_att: 100,
+                        base_def: 100,
+                        att: 0,
                     };
 
                     //get speed of parents //TODO add father

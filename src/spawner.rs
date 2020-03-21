@@ -37,6 +37,9 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
             hp: 20,
             defense: 2,
             power: 5,
+            base_att: 2,
+            base_def: 2,
+            att: 0,
         })
         .with(OnlinePlayer {
             runstate: OnlineRunState::AwaitingInput,
@@ -62,6 +65,7 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
                 max_hp: 0,
                 player_log: Vec::new(),
             },
+            equipement: Vec::new(),
         })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
@@ -105,7 +109,7 @@ pub fn spawn_named_everywhere(ecs: &mut World, room: &Rect, name: String, num_sp
         let y = (*spawn.0 / MAPWIDTH) as i32;
 
         let raws: &RawMaster = &RAWS.lock().unwrap();
-        if raws.prop_index.contains_key(spawn.1) {
+        if raws.prop_index.contains_key(spawn.1) || raws.item_index.contains_key(spawn.1) {
             let spawn_result = spawn_named_entity(
                 raws,
                 ecs.create_entity().marked::<SimpleMarker<SerializeMe>>(),

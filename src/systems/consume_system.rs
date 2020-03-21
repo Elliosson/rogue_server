@@ -31,6 +31,7 @@ impl<'a> System<'a> for ConsumeSystem {
                         Effect::Heal(hp_regain) => {
                             combat_stat.change_hp(*hp_regain);
                         }
+                        _ => {}
                     }
                 }
                 to_deletes
@@ -38,5 +39,7 @@ impl<'a> System<'a> for ConsumeSystem {
                     .expect("Unable to insert");
             }
         }
+
+        want_consumes.clear();
     }
 }

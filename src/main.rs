@@ -153,6 +153,8 @@ impl State {
 
         let mut consume = ConsumeSystem {};
         consume.run_now(&self.ecs);
+        let mut equip = EquipSystem {};
+        equip.run_now(&self.ecs);
 
         let mut want_move = WantToMoveSystem {};
         want_move.run_now(&self.ecs);
@@ -362,6 +364,7 @@ fn main() {
     for room in rooms.iter() {
         spawner::spawn_named_everywhere(&mut gs.ecs, room, "Tree".to_string(), 10000);
         spawner::spawn_named_everywhere(&mut gs.ecs, room, "Basic Monster".to_string(), 1000);
+        spawner::spawn_named_everywhere(&mut gs.ecs, room, "Dagger".to_string(), 1000);
     }
     let tree_end = time::Instant::now();
 

@@ -302,7 +302,10 @@
                 "max_hp": 100,
                 "hp": 100,
                 "defense": 50,
-                "power": 50
+                "power": 50,
+                "base_def": 100,
+                "base_att": 100,
+                "att": 100
             },
             "animal": {},
             "sexe": "Random"
@@ -362,7 +365,10 @@
                 "max_hp": 100,
                 "hp": 100,
                 "defense": 100,
-                "power": 100
+                "power": 100,
+                "base_def": 100,
+                "base_att": 100,
+                "att": 100
             },
             "animal": {},
             "sexe": "MaleStart"
@@ -422,7 +428,10 @@
                 "max_hp": 100,
                 "hp": 100,
                 "defense": 100,
-                "power": 100
+                "power": 100,
+                "base_def": 100,
+                "base_att": 100,
+                "att": 100
             },
             "animal": {},
             "sexe": "FemaleStart"
@@ -456,7 +465,10 @@
                 "max_hp": 0,
                 "hp": 0,
                 "defense": 0,
-                "power": 0
+                "power": 0,
+                "base_def": 100,
+                "base_att": 100,
+                "att": 100
             },
             "animal": {}
         },
@@ -489,7 +501,10 @@
                 "max_hp": 30,
                 "hp": 30,
                 "defense": 2,
-                "power": 2
+                "power": 2,
+                "base_def": 100,
+                "base_att": 100,
+                "att": 100
             },
             "building_choice": {
                 "plans": [
@@ -521,7 +536,8 @@
                 "possible_builds": [],
                 "player_log": {
                     "logs": []
-                }
+                },
+                "equipement": []
             }
         },
         {
@@ -559,7 +575,10 @@
                 "max_hp": 10,
                 "hp": 10,
                 "defense": 1,
-                "power": 1
+                "power": 1,
+                "base_def": 100,
+                "base_att": 100,
+                "att": 100
             },
             "viewshed": {
                 "range": 8
@@ -578,7 +597,10 @@
                 "max_hp": 10,
                 "hp": 10,
                 "defense": 0,
-                "power": 0
+                "power": 0,
+                "base_def": 100,
+                "base_att": 100,
+                "att": 100
             },
             "interactable{}": true,
             "interactable_object": {

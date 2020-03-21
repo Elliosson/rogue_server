@@ -1,8 +1,8 @@
 extern crate specs;
 use crate::{
     gamelog::GameLog, BuildingChoice, BuildingPlan, CloseInteration, CombatStats, Connected,
-    InBackpack, InteractableObject, InventaireItem, Item, Map, Name, OnlinePlayer, PlayerInfo,
-    PlayerLog, Position,
+    Equipped, InBackpack, InteractableObject, InventaireItem, Item, Map, Name, OnlinePlayer,
+    PlayerInfo, PlayerLog, Position,
 };
 use specs::prelude::*;
 
@@ -25,6 +25,7 @@ impl<'a> System<'a> for PlayerInfoSystem {
         ReadStorage<'a, BuildingChoice>,
         ReadStorage<'a, CombatStats>,
         ReadStorage<'a, PlayerLog>,
+        ReadStorage<'a, Equipped>,
         ReadExpect<'a, Map>,
     );
 
@@ -43,6 +44,7 @@ impl<'a> System<'a> for PlayerInfoSystem {
             building_choices,
             combat_stats,
             player_logs,
+            equippeds,
             map,
         ) = data;
 
@@ -59,6 +61,7 @@ impl<'a> System<'a> for PlayerInfoSystem {
             player_info.inventaire.clear();
             player_info.close_interations.clear();
             player_info.possible_builds.clear();
+            player_info.equipement.clear();
             player_info.my_info.pos.x = pos.x();
             player_info.my_info.pos.y = pos.y();
             player_info.my_info.hp = combat_stat.hp;
@@ -71,11 +74,23 @@ impl<'a> System<'a> for PlayerInfoSystem {
             player_info.my_info.player_log = player_log.logs().clone();
         }
 
-        //TODO these function are hightly ineficiant, to refactor if needed
+        //TODO these functions are hightly ineficiant, to refactor if needed
         //fill inventory
         for (entity, backpack, _item, name) in (&entities, &backpacks, &items, &names).join() {
             if let Some(player_info) = player_infos.get_mut(backpack.owner) {
                 player_info.inventaire.push(InventaireItem {
+                    name: name.name.clone(),
+                    index: entity.id(),
+                    generation: entity.gen().id(),
+
+                    entity: Some(entity),
+                })
+            }
+        }
+
+        for (entity, equipped, name) in (&entities, &equippeds, &names).join() {
+            if let Some(player_info) = player_infos.get_mut(equipped.owner) {
+                player_info.equipement.push(InventaireItem {
                     name: name.name.clone(),
                     index: entity.id(),
                     generation: entity.gen().id(),

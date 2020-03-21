@@ -75,6 +75,9 @@ pub struct CombatStats {
     pub hp: i32,
     pub defense: i32,
     pub power: i32,
+    pub base_def: i32,
+    pub base_att: i32,
+    pub att: i32,
 }
 
 impl CombatStats {
@@ -186,6 +189,11 @@ pub enum EquipmentSlot {
 #[derive(Component, Serialize, Deserialize, Clone)]
 pub struct Equippable {
     pub slot: EquipmentSlot,
+}
+
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct EquipmentEffect {
+    pub effects: Vec<Effect>,
 }
 
 #[derive(Component, ConvertSaveload, Clone)]
@@ -546,6 +554,7 @@ pub struct PlayerInfo {
     pub close_interations: Vec<CloseInteration>,
     pub my_info: MyInfo,
     pub possible_builds: Vec<BuildingPlan>,
+    pub equipement: Vec<InventaireItem>, //handled the same way that an inventaire item
 }
 
 #[derive(Component, Serialize, Deserialize, Debug, Clone)]
@@ -699,6 +708,8 @@ pub struct Consumable {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Effect {
     Heal(i32),
+    Defense(i32),
+    Melee(i32),
 }
 
 #[derive(Component, Debug, ConvertSaveload, Clone)]
