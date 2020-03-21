@@ -254,6 +254,15 @@
             }
         },
         {
+            "name": "Carrot",
+            "renderable": {
+                "glyph": "*",
+                "fg": "#FF0000",
+                "bg": "#000000",
+                "order": 2
+            }
+        },
+        {
             "name": "Tower Shield",
             "renderable": {
                 "glyph": "[",
@@ -606,7 +615,8 @@
                 "plans": [
                     "block",
                     "Door",
-                    "Bed"
+                    "Bed",
+                    "Garden"
                 ]
             },
             "facing_direction": {
@@ -681,7 +691,7 @@
                 "glyph": "B",
                 "fg": "#FFFFFF",
                 "bg": "#000000",
-                "order": 0
+                "order": 3
             },
             "blocks_tile": true,
             "combat": {
@@ -696,6 +706,43 @@
                     {
                         "name": "respawn_here"
                     }
+                ]
+            }
+        },
+        {
+            "name": "Garden",
+            "renderable": {
+                "glyph": "G",
+                "fg": "#FFFFFF",
+                "bg": "#000000",
+                "order": 4
+            },
+            "interactable{}": true,
+            "interactable_object": {
+                "interactions": [
+                    {
+                        "name": "plant_carrot"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Carrot Plant",
+            "renderable": {
+                "glyph": "C",
+                "fg": "#FFFFFF",
+                "bg": "#000000",
+                "order": 3
+            },
+            "interactable{}": true,
+            "interactable_object": {
+                "interactions": []
+            },
+            "vegetable": {
+                "grow_time": 100,
+                "completion": 0.0,
+                "product": [
+                    "Carrot"
                 ]
             }
         }

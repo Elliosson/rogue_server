@@ -670,6 +670,13 @@ pub struct HaveRespawnPoint {
     pub respawn_point: Entity,
 }
 
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Vegetable {
+    pub grow_time: i32,
+    pub completion: f32,
+    pub product: Vec<String>,
+}
+
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.
 pub struct SerializeMe;

@@ -78,3 +78,6 @@ pub use respawn_system::RespawnSystem;
 
 mod in_player_view_system;
 pub use in_player_view_system::InPlayerViewSystem;
+
+mod vegetable_grow_systemv2;
+pub use vegetable_grow_systemv2::VegetableGrowSystemV2;

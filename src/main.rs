@@ -161,6 +161,8 @@ impl State {
         eating.run_now(&self.ecs);
         let mut veg_grow = VegetableGrowSystem {};
         veg_grow.run_now(&self.ecs);
+        let mut veg_growv2 = VegetableGrowSystemV2 {};
+        veg_growv2.run_now(&self.ecs);
         let mut energy = EnergySystem {};
         energy.run_now(&self.ecs);
         let mut block_unblock_system = BlockUnblockSystem {};
@@ -333,6 +335,7 @@ fn main() {
     gs.ecs.register::<PlayerLog>();
     gs.ecs.register::<RespawnPoint>();
     gs.ecs.register::<HaveRespawnPoint>();
+    gs.ecs.register::<Vegetable>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
     let map: Map = Map::new_map();

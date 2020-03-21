@@ -1,6 +1,7 @@
 extern crate specs;
 use crate::{
-    gamelog::GameLog, Blocking, HaveRespawnPoint, ObjectBuilder, RespawnPoint, ToDelete, Unblocking,
+    gamelog::GameLog, Blocking, HaveRespawnPoint, ObjectBuilder, RespawnPoint, ToDelete,
+    ToSpawnList, Unblocking,
 };
 use specs::prelude::*;
 
@@ -17,6 +18,7 @@ impl<'a> System<'a> for Interationv2System {
         WriteStorage<'a, Unblocking>,
         WriteStorage<'a, RespawnPoint>,
         WriteStorage<'a, HaveRespawnPoint>,
+        WriteExpect<'a, ToSpawnList>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -29,6 +31,7 @@ impl<'a> System<'a> for Interationv2System {
             mut unblockings,
             mut respawn_points,
             mut have_respawn_points,
+            mut to_spawns,
         ) = data;
 
         for interation_request in &interaction_request_list.requests {
@@ -78,6 +81,11 @@ impl<'a> System<'a> for Interationv2System {
                         )
                         .expect("Unable to insert delete entity");
                 }
+                "plant_carrot" => to_spawns.request(
+                    interation_request.x,
+                    interation_request.y,
+                    "Carrot Plant".to_string(),
+                ),
                 _ => {}
             }
         }
