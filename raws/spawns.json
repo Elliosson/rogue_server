@@ -137,6 +137,15 @@
             }
         },
         {
+            "name": "Iron",
+            "renderable": {
+                "glyph": "*",
+                "fg": "#808080",
+                "bg": "#000000",
+                "order": 2
+            }
+        },
+        {
             "name": "Apple",
             "renderable": {
                 "glyph": "*",
@@ -249,6 +258,23 @@
             },
             "leaf": true,
             "tree": true
+        },
+        {
+            "name": "Iron Deposit",
+            "renderable": {
+                "glyph": "^",
+                "fg": "#808080",
+                "bg": "#000000",
+                "order": 3
+            },
+            "interactable{}": true,
+            "interactable_object": {
+                "interactions": [
+                    {
+                        "name": "mine iron"
+                    }
+                ]
+            }
         },
         {
             "name": "Bear Trap",

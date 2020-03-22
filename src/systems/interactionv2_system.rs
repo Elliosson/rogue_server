@@ -55,6 +55,16 @@ impl<'a> System<'a> for Interationv2System {
                         .insert(interation_request.interacted_entity, ToDelete {})
                         .expect("Unable to insert delete entity");
                 }
+                "mine iron" => {
+                    object_builder.request(
+                        interation_request.x,
+                        interation_request.y,
+                        "Iron".to_string(),
+                    );
+                    to_deletes
+                        .insert(interation_request.interacted_entity, ToDelete {})
+                        .expect("Unable to insert delete entity");
+                }
                 "open_door" => {
                     unblockings
                         .insert(interation_request.interacted_entity, Unblocking {})
