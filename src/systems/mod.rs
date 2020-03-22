@@ -90,3 +90,6 @@ pub use equip_system::EquipSystem;
 
 mod equippmemt_bonus_system;
 pub use equippmemt_bonus_system::EquBonusSystem;
+
+mod craft_system;
+pub use craft_system::CraftSystem;

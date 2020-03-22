@@ -180,18 +180,18 @@ pub struct WantsToRemoveItem {
     pub item: Entity,
 }
 
-#[derive(PartialEq, Copy, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Copy, Clone, Serialize, Deserialize)]
 pub enum EquipmentSlot {
     Melee,
     Shield,
 }
 
-#[derive(Component, Serialize, Deserialize, Clone)]
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Equippable {
     pub slot: EquipmentSlot,
 }
 
-#[derive(Component, Serialize, Deserialize, Clone)]
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct EquipmentEffect {
     pub effects: Vec<Effect>,
 }
@@ -710,6 +710,16 @@ pub enum Effect {
     Heal(i32),
     Defense(i32),
     Melee(i32),
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct WantCraft {
+    pub name: String,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Craftable {
+    pub cost: Vec<(String, i32)>, // name, quantity
 }
 
 #[derive(Component, Debug, ConvertSaveload, Clone)]

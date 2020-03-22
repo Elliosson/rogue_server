@@ -8,6 +8,8 @@ pub struct Item {
     pub consumable: Option<components::Consumable>,
     pub weapon: Option<Weapon>,
     pub shield: Option<Shield>,
+    pub equipment_effects: Option<components::EquipmentEffect>,
+    pub equippable: Option<components::Equippable>,
 }
 
 #[derive(Deserialize, Debug)]

@@ -150,6 +150,8 @@ impl State {
 
         let mut interactionv2 = Interationv2System {};
         interactionv2.run_now(&self.ecs);
+        let mut craft = CraftSystem {};
+        craft.run_now(&self.ecs);
 
         let mut consume = ConsumeSystem {};
         consume.run_now(&self.ecs);
@@ -343,6 +345,8 @@ fn main() {
     gs.ecs.register::<Vegetable>();
     gs.ecs.register::<WantConsume>();
     gs.ecs.register::<WantEquip>();
+    gs.ecs.register::<WantCraft>();
+    gs.ecs.register::<EquipmentEffect>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
     let map: Map = Map::new_map();

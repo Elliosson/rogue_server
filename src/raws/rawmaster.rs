@@ -202,6 +202,13 @@ pub fn spawn_named_item<T: Builder>(
             eb = eb.with(consumable.clone());
         }
 
+        if let Some(equipment_effects) = &item_template.equipment_effects {
+            eb = eb.with(equipment_effects.clone());
+        }
+
+        if let Some(equippable) = &item_template.equippable {
+            eb = eb.with(equippable.clone());
+        }
         return Some(eb.build());
     }
     None

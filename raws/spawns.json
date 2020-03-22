@@ -71,6 +71,25 @@
             }
         },
         {
+            "name": "Wooden Spear",
+            "renderable": {
+                "glyph": "/",
+                "fg": "#FFAAAA",
+                "bg": "#000000",
+                "order": 2
+            },
+            "equipment_effects": {
+                "effects": [
+                    {
+                        "Melee": 4
+                    }
+                ]
+            },
+            "equippable": {
+                "slot": "Melee"
+            }
+        },
+        {
             "name": "Longsword",
             "renderable": {
                 "glyph": "/",
@@ -645,6 +664,23 @@
                 "completion": 0.0,
                 "product": [
                     "Carrot"
+                ]
+            }
+        },
+        {
+            "name": "Craft Shop",
+            "renderable": {
+                "glyph": "S",
+                "fg": "#FFFFFF",
+                "bg": "#000000",
+                "order": 3
+            },
+            "interactable{}": true,
+            "interactable_object": {
+                "interactions": [
+                    {
+                        "name": "wooden_spear"
+                    }
                 ]
             }
         }

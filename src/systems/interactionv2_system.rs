@@ -1,7 +1,7 @@
 extern crate specs;
 use crate::{
     gamelog::GameLog, Blocking, HaveRespawnPoint, ObjectBuilder, RespawnPoint, ToDelete,
-    ToSpawnList, Unblocking,
+    ToSpawnList, Unblocking, WantCraft,
 };
 use specs::prelude::*;
 
@@ -18,6 +18,7 @@ impl<'a> System<'a> for Interationv2System {
         WriteStorage<'a, Unblocking>,
         WriteStorage<'a, RespawnPoint>,
         WriteStorage<'a, HaveRespawnPoint>,
+        WriteStorage<'a, WantCraft>,
         WriteExpect<'a, ToSpawnList>,
     );
 
@@ -31,6 +32,7 @@ impl<'a> System<'a> for Interationv2System {
             mut unblockings,
             mut respawn_points,
             mut have_respawn_points,
+            mut want_crafts,
             mut to_spawns,
         ) = data;
 
@@ -86,6 +88,17 @@ impl<'a> System<'a> for Interationv2System {
                     interation_request.y,
                     "Carrot Plant".to_string(),
                 ),
+                "wooden_spear" => {
+                    //todo I will need a specific commant for craft it will be to heavy to have it in interaction
+                    want_crafts
+                        .insert(
+                            interation_request.requester_entity,
+                            WantCraft {
+                                name: "Wooden Spear".to_string(),
+                            },
+                        )
+                        .expect("Unable to insert");
+                }
                 _ => {}
             }
         }
