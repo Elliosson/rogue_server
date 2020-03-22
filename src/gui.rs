@@ -82,6 +82,7 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
     }
 
     show_equipped(ecs, ctx);
+    show_charac(ecs, ctx);
 
     // Draw mouse cursor
     let mouse_pos = ctx.mouse_pos();
@@ -973,6 +974,45 @@ pub fn show_equipped(ecs: &World, ctx: &mut Rltk) {
         y += 1;
         j += 1;
     }
+}
+
+//get all equipped
+pub fn show_charac(ecs: &World, ctx: &mut Rltk) {
+    let x_pos = 100;
+    let width = 20;
+    let y_pos = 30;
+    let height = 20;
+    //get storage
+
+    let player_entity = *ecs.fetch::<Entity>();
+    let player_infos = ecs.read_storage::<PlayerInfo>();
+
+    //Draw the box to print the possible interaction
+    ctx.draw_box(
+        x_pos,
+        y_pos,
+        width,
+        height,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+    );
+    ctx.print_color(
+        x_pos,
+        y_pos,
+        RGB::named(rltk::YELLOW),
+        RGB::named(rltk::BLACK),
+        "Charac",
+    );
+
+    let player_info = player_infos.get(player_entity).unwrap();
+    let cstat = &player_info.combat_stats;
+
+    ctx.print(x_pos + 1, y_pos + 2, &format!("attaque: {} ", cstat.att));
+    ctx.print(
+        x_pos + 1,
+        y_pos + 3,
+        &format!("defense: {} ", cstat.defense),
+    );
 }
 
 #[derive(PartialEq, Copy, Clone)]

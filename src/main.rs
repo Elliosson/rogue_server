@@ -148,6 +148,7 @@ impl State {
         let mut object_spawn = ObjectSpawnSystem {};
         object_spawn.run_now(&self.ecs);
 
+        /*interaction*/
         let mut interactionv2 = Interationv2System {};
         interactionv2.run_now(&self.ecs);
         let mut craft = CraftSystem {};
@@ -193,6 +194,9 @@ impl State {
         prop_spawmer.run_now(&self.ecs);
         let mut aging = AgingSystem {};
         aging.run_now(&self.ecs);
+        let mut equ_bonus = EquBonusSystem {};
+        equ_bonus.run_now(&self.ecs);
+
         let mut named_counter = NamedCounterSystem {};
         named_counter.run_now(&self.ecs);
         let mut action_point = ActionPointSystem {};

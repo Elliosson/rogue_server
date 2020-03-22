@@ -67,6 +67,7 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
                 player_log: Vec::new(),
             },
             equipement: Vec::new(),
+            combat_stats: Default::default(),
         })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();

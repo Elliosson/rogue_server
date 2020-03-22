@@ -66,6 +66,8 @@ impl<'a> System<'a> for PlayerInfoSystem {
             player_info.my_info.pos.y = pos.y();
             player_info.my_info.hp = combat_stat.hp;
             player_info.my_info.max_hp = combat_stat.max_hp;
+
+            player_info.combat_stats = combat_stat.clone();
         }
 
         for (_entity, _online_player, player_log, player_info) in

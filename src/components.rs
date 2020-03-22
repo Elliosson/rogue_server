@@ -69,7 +69,7 @@ pub struct Connected {
     pub uuid: String,
 }
 
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+#[derive(Component, Debug, Serialize, Deserialize, Clone, Default)]
 pub struct CombatStats {
     pub max_hp: i32,
     pub hp: i32,
@@ -555,6 +555,8 @@ pub struct PlayerInfo {
     pub my_info: MyInfo,
     pub possible_builds: Vec<BuildingPlan>,
     pub equipement: Vec<InventaireItem>, //handled the same way that an inventaire item
+    #[serde(default)]
+    pub combat_stats: CombatStats,
 }
 
 #[derive(Component, Serialize, Deserialize, Debug, Clone)]
