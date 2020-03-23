@@ -108,6 +108,9 @@ impl State {
         let mut vis = VisibilitySystem {};
         vis.run_now(&self.ecs);
 
+        let mut horde = HordeSystem {};
+        horde.run_now(&self.ecs);
+
         let mut ipvis = InPlayerViewSystem {};
         ipvis.run_now(&self.ecs);
         /***player turn ****/
@@ -159,12 +162,16 @@ impl State {
         let mut equip = EquipSystem {};
         equip.run_now(&self.ecs);
 
+        /*movement*/
+        let mut go_step = GoStepSystem {};
+        go_step.run_now(&self.ecs);
         let mut want_move = WantToMoveSystem {};
         want_move.run_now(&self.ecs);
         let mut go_target = GoTargetSystem {};
         go_target.run_now(&self.ecs);
         let mut movement = MovementSystem {};
         movement.run_now(&self.ecs);
+
         let mut eating = EatingSystem {};
         eating.run_now(&self.ecs);
         let mut veg_grow = VegetableGrowSystem {};
@@ -204,6 +211,8 @@ impl State {
         let mut stat = StatSystem {};
         stat.run_now(&self.ecs);
         let mut map_send = SendMapSystem {};
+
+        /* network info system*/
         map_send.run_now(&self.ecs);
         let mut player_info = PlayerInfoSystem {};
         player_info.run_now(&self.ecs);
@@ -351,6 +360,10 @@ fn main() {
     gs.ecs.register::<WantEquip>();
     gs.ecs.register::<WantCraft>();
     gs.ecs.register::<EquipmentEffect>();
+    gs.ecs.register::<GoByStep>();
+    gs.ecs.register::<InHorde>();
+    gs.ecs.register::<Horde>();
+    gs.ecs.register::<HordeTarget>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
     let map: Map = Map::new_map();
@@ -426,6 +439,11 @@ fn main() {
     gs.ecs.insert(map_to_send.clone());
     gs.ecs.insert(player_info_to_send.clone());
 
+    //Spawn the artifact
+    {
+        let mut to_spawn = gs.ecs.write_resource::<ToSpawnList>();
+        to_spawn.request(10, 10, "Artifact".to_string());
+    }
     thread::spawn(move || {
         network::run(config, message_list, map_to_send, player_info_to_send);
     });

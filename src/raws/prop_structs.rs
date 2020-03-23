@@ -36,6 +36,8 @@ pub struct Prop {
     pub monster: Option<Monster>,
     pub player_log: Option<PlayerLog>,
     pub vegetable: Option<Vegetable>,
+    pub horde_target: Option<HordeTarget>,
+    pub in_horde: Option<InHorde>,
 }
 
 #[derive(Deserialize, Debug)]

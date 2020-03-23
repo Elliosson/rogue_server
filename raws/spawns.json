@@ -630,6 +630,30 @@
             }
         },
         {
+            "name": "Basic Horde Monster",
+            "renderable": {
+                "glyph": "M",
+                "fg": "#FF0000",
+                "bg": "#000000",
+                "order": 0
+            },
+            "blocks_tile": true,
+            "monster": {},
+            "combat": {
+                "max_hp": 10,
+                "hp": 10,
+                "defense": 1,
+                "power": 1,
+                "base_def": 100,
+                "base_att": 100,
+                "att": 100
+            },
+            "viewshed": {
+                "range": 8
+            },
+            "in_horde": {}
+        },
+        {
             "name": "Bed",
             "renderable": {
                 "glyph": "B",
@@ -709,6 +733,34 @@
                     }
                 ]
             }
+        },
+        {
+            "name": "Artifact",
+            "renderable": {
+                "glyph": "A",
+                "fg": "#FFFFFF",
+                "bg": "#000000",
+                "order": 3
+            },
+            "interactable{}": true,
+            "interactable_object": {
+                "interactions": [
+                    {
+                        "name": "provoc assault"
+                    }
+                ]
+            },
+            "horde_target": {},
+            "combat": {
+                "max_hp": 100,
+                "hp": 100,
+                "defense": 0,
+                "power": 0,
+                "base_def": 0,
+                "base_att": 0,
+                "att": 0
+            },
+            "blocks_tile": true
         }
     ]
 }

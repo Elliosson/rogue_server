@@ -441,9 +441,19 @@ pub fn spawn_named_prop<T: Builder>(
             eb = eb.with(player_log.clone());
         }
 
-        // PlayerLog
+        // Vegetable
         if let Some(vegetable) = &prop_template.vegetable {
             eb = eb.with(vegetable.clone());
+        }
+
+        // HordeTarget
+        if let Some(horde_target) = &prop_template.horde_target {
+            eb = eb.with(horde_target.clone());
+        }
+
+        // InHorde
+        if let Some(in_horde) = &prop_template.in_horde {
+            eb = eb.with(in_horde.clone());
         }
 
         return Some(eb.build());

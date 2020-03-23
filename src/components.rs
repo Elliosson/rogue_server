@@ -719,15 +719,27 @@ pub struct WantCraft {
     pub name: String,
 }
 
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Craftable {
-    pub cost: Vec<(String, i32)>, // name, quantity
-}
-
 #[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct WantEquip {
     pub target: Entity,
 }
+
+#[derive(Component, Debug, ConvertSaveload, Clone)]
+pub struct GoByStep {
+    pub target: Entity,
+}
+
+#[derive(Component, Debug, ConvertSaveload, Clone)]
+pub struct Horde {
+    pub target: Entity,
+    pub timer: i32,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct HordeTarget {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct InHorde {}
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.
 pub struct SerializeMe;
