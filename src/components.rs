@@ -736,6 +736,11 @@ pub struct Horde {
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Faction {
+    pub name: String,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct HordeTarget {}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]

@@ -556,7 +556,8 @@
                     "block",
                     "Door",
                     "Bed",
-                    "Garden"
+                    "Garden",
+                    "Artifact"
                 ]
             },
             "facing_direction": {
@@ -579,10 +580,10 @@
                     "player_log": []
                 },
                 "possible_builds": [],
-                "player_log": {
-                    "logs": []
-                },
                 "equipement": []
+            },
+            "player_log": {
+                "logs": []
             }
         },
         {
@@ -651,7 +652,10 @@
             "viewshed": {
                 "range": 8
             },
-            "in_horde": {}
+            "in_horde": {},
+            "faction": {
+                "name": "horde"
+            }
         },
         {
             "name": "Bed",
@@ -752,8 +756,8 @@
             },
             "horde_target": {},
             "combat": {
-                "max_hp": 100,
-                "hp": 100,
+                "max_hp": 1000000,
+                "hp": 1000000,
                 "defense": 0,
                 "power": 0,
                 "base_def": 0,

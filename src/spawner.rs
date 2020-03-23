@@ -50,6 +50,7 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
                 "Door".to_string(),
                 "Garden".to_string(),
                 "Craft Shop".to_string(),
+                "Artifact".to_string(),
             ],
         })
         .with(FacingDirection {

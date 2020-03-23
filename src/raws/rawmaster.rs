@@ -456,6 +456,11 @@ pub fn spawn_named_prop<T: Builder>(
             eb = eb.with(in_horde.clone());
         }
 
+        // Faction
+        if let Some(faction) = &prop_template.faction {
+            eb = eb.with(faction.clone());
+        }
+
         return Some(eb.build());
     }
     None
