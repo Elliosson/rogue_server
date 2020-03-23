@@ -25,7 +25,7 @@ impl<'a> System<'a> for CraftSystem {
         //for now this a list a all craftable thing and ressource needed
         //it sould be moved in a json as soon as possible
         let craft_cost: HashMap<String, Vec<(String, i32)>> =
-            vec![("Wooden Spear".to_string(), vec![("Wood".to_string(), 2)])]
+            vec![("WoodenSpear".to_string(), vec![("Wood".to_string(), 2)])]
                 .into_iter()
                 .collect();
 

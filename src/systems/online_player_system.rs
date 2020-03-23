@@ -146,6 +146,23 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                             input = PlayerInput::NONE
                         }
                     }
+                    network::Message::Consume(uuid, id, gen) => {
+                        uid = uuid.to_string();
+                        player_entity = player_hash.hash.get(&uid.clone());
+                        if let Some(entity) = player_entity {
+                            let player_info = player_infos.get(*entity).unwrap();
+                            let interacted_entity = get_inventory_entity(id, gen, player_info);
+                            println!("pass 1");
+                            if let Some(inte_entity) = interacted_entity {
+                                println!("pass 2");
+                                input = PlayerInput::CONSUME(inte_entity)
+                            } else {
+                                input = PlayerInput::NONE
+                            }
+                        } else {
+                            input = PlayerInput::NONE
+                        }
+                    }
                     _ => input = PlayerInput::NONE,
                 }
 
@@ -216,6 +233,17 @@ fn get_interacted_entity(id: u32, gen: i32, player_info: &PlayerInfo) -> Option<
         }
     }
     interacted_entity
+}
+
+fn get_inventory_entity(id: u32, gen: i32, player_info: &PlayerInfo) -> Option<Entity> {
+    let mut item_entity: Option<Entity> = None;
+    for item in player_info.inventaire.iter() {
+        if id == item.index && gen == item.generation {
+            item_entity = Some(item.entity.unwrap());
+            break;
+        }
+    }
+    item_entity
 }
 
 pub struct PlayerMessages {

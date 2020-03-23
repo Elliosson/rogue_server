@@ -123,27 +123,16 @@ pub fn local_client_inventory(ecs: &World, ctx: &mut Rltk) -> LocalClientRunstat
         gui::ItemMenuResult::Selected => {
             let item_entity = result.1.unwrap();
 
-            let mut intent = ecs.write_storage::<WantsToUseItem>();
-            intent
+            let mut player_inputs = ecs.write_storage::<PlayerInputComp>();
+            player_inputs
                 .insert(
                     *ecs.fetch::<Entity>(),
-                    WantsToUseItem {
-                        item: item_entity,
-                        target: None,
+                    PlayerInputComp {
+                        input: PlayerInput::CONSUME(item_entity),
                     },
                 )
                 .expect("Unable to insert intent");
 
-            //provisory hanfling for debug
-            let mut intent = ecs.write_storage::<WantConsume>();
-            intent
-                .insert(
-                    *ecs.fetch::<Entity>(),
-                    WantConsume {
-                        target: item_entity,
-                    },
-                )
-                .expect("Unable to insert intent");
             newrunstate = LocalClientRunstate::BaseState;
         }
     }

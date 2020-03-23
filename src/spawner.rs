@@ -49,7 +49,7 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
                 "block".to_string(),
                 "Door".to_string(),
                 "Garden".to_string(),
-                "Craft Shop".to_string(),
+                "CraftShop".to_string(),
                 "Artifact".to_string(),
             ],
         })

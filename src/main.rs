@@ -385,8 +385,8 @@ fn main() {
     let rooms = gs.ecs.write_resource::<Map>().rooms.clone();
     for room in rooms.iter() {
         spawner::spawn_named_everywhere(&mut gs.ecs, room, "Tree".to_string(), 10000);
-        spawner::spawn_named_everywhere(&mut gs.ecs, room, "Iron Deposit".to_string(), 1000);
-        spawner::spawn_named_everywhere(&mut gs.ecs, room, "Basic Monster".to_string(), 1000);
+        spawner::spawn_named_everywhere(&mut gs.ecs, room, "IronDeposit".to_string(), 1000);
+        spawner::spawn_named_everywhere(&mut gs.ecs, room, "BasicMonster".to_string(), 1000);
     }
     let tree_end = time::Instant::now();
 

@@ -55,7 +55,7 @@ impl<'a> System<'a> for Interationv2System {
                         .insert(interation_request.interacted_entity, ToDelete {})
                         .expect("Unable to insert delete entity");
                 }
-                "mine iron" => {
+                "mine_iron" => {
                     object_builder.request(
                         interation_request.x,
                         interation_request.y,
@@ -96,7 +96,7 @@ impl<'a> System<'a> for Interationv2System {
                 "plant_carrot" => to_spawns.request(
                     interation_request.x,
                     interation_request.y,
-                    "Carrot Plant".to_string(),
+                    "CarrotPlant".to_string(),
                 ),
                 "wooden_spear" => {
                     //todo I will need a specific commant for craft it will be to heavy to have it in interaction
@@ -104,7 +104,7 @@ impl<'a> System<'a> for Interationv2System {
                         .insert(
                             interation_request.requester_entity,
                             WantCraft {
-                                name: "Wooden Spear".to_string(),
+                                name: "WoodenSpear".to_string(),
                             },
                         )
                         .expect("Unable to insert");

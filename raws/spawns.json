@@ -71,7 +71,7 @@
             }
         },
         {
-            "name": "Wooden Spear",
+            "name": "WoodenSpear",
             "renderable": {
                 "glyph": "/",
                 "fg": "#FFAAAA",
@@ -260,7 +260,7 @@
             "tree": true
         },
         {
-            "name": "Iron Deposit",
+            "name": "IronDeposit",
             "renderable": {
                 "glyph": "^",
                 "fg": "#808080",
@@ -271,13 +271,13 @@
             "interactable_object": {
                 "interactions": [
                     {
-                        "name": "mine iron"
+                        "name": "mine_iron"
                     }
                 ]
             }
         },
         {
-            "name": "Bear Trap",
+            "name": "BearTrap",
             "renderable": {
                 "glyph": "^",
                 "fg": "#FF0000",
@@ -545,11 +545,11 @@
             "combat": {
                 "max_hp": 30,
                 "hp": 30,
-                "defense": 2,
-                "power": 2,
-                "base_def": 100,
-                "base_att": 100,
-                "att": 100
+                "defense": 0,
+                "power": 0,
+                "base_def": 0,
+                "base_att": 2,
+                "att": 2
             },
             "building_choice": {
                 "plans": [
@@ -557,7 +557,8 @@
                     "Door",
                     "Bed",
                     "Garden",
-                    "Artifact"
+                    "Artifact",
+                    "CraftShop"
                 ]
             },
             "facing_direction": {
@@ -608,7 +609,7 @@
             }
         },
         {
-            "name": "Basic Monster",
+            "name": "BasicMonster",
             "renderable": {
                 "glyph": "M",
                 "fg": "#FF0000",
@@ -620,11 +621,11 @@
             "combat": {
                 "max_hp": 10,
                 "hp": 10,
-                "defense": 1,
-                "power": 1,
-                "base_def": 100,
-                "base_att": 100,
-                "att": 100
+                "defense": 0,
+                "power": 0,
+                "base_def": 0,
+                "base_att": 1,
+                "att": 1
             },
             "viewshed": {
                 "range": 8
@@ -643,11 +644,11 @@
             "combat": {
                 "max_hp": 10,
                 "hp": 10,
-                "defense": 1,
-                "power": 1,
-                "base_def": 100,
-                "base_att": 100,
-                "att": 100
+                "defense": 0,
+                "power": 0,
+                "base_def": 0,
+                "base_att": 1,
+                "att": 1
             },
             "viewshed": {
                 "range": 8
@@ -702,7 +703,7 @@
             }
         },
         {
-            "name": "Carrot Plant",
+            "name": "CarrotPlant",
             "renderable": {
                 "glyph": "C",
                 "fg": "#FFFFFF",
@@ -722,7 +723,7 @@
             }
         },
         {
-            "name": "Craft Shop",
+            "name": "CraftShop",
             "renderable": {
                 "glyph": "S",
                 "fg": "#FFFFFF",
@@ -750,7 +751,7 @@
             "interactable_object": {
                 "interactions": [
                     {
-                        "name": "provoc assault"
+                        "name": "provoc_assault"
                     }
                 ]
             },

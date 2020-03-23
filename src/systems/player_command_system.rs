@@ -154,6 +154,11 @@ pub fn online_runstate_choice<'a>(
                     want_consumes
                         .insert(entity, WantConsume { target })
                         .expect("Unable to insert ");
+
+                    //todo this is a provisory system util I have a specific equipment panel
+                    want_equips
+                        .insert(entity, WantEquip { target })
+                        .expect("Unable to insert ");
                 }
                 PlayerInput::EQUIP(target) => {
                     want_equips
