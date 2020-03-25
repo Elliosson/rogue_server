@@ -7,13 +7,6 @@
             "max_depth": 100
         },
         {
-            "name": "Orc",
-            "weight": 1,
-            "min_depth": 0,
-            "max_depth": 100,
-            "add_map_depth_to_weight": true
-        },
-        {
             "name": "Dagger",
             "weight": 3,
             "min_depth": 0,
@@ -131,7 +124,25 @@
             }
         },
         {
+            "name": "BlackWood",
+            "renderable": {
+                "glyph": "*",
+                "fg": "#582900",
+                "bg": "#000000",
+                "order": 2
+            }
+        },
+        {
             "name": "Iron",
+            "renderable": {
+                "glyph": "*",
+                "fg": "#808080",
+                "bg": "#000000",
+                "order": 2
+            }
+        },
+        {
+            "name": "BlackIron",
             "renderable": {
                 "glyph": "*",
                 "fg": "#808080",
@@ -150,6 +161,15 @@
         },
         {
             "name": "BasicBone",
+            "renderable": {
+                "glyph": "*",
+                "fg": "#FFFFFF",
+                "bg": "#000000",
+                "order": 2
+            }
+        },
+        {
+            "name": "BlackBone",
             "renderable": {
                 "glyph": "*",
                 "fg": "#FFFFFF",
@@ -187,23 +207,6 @@
         }
     ],
     "mobs": [
-        {
-            "name": "Orc",
-            "renderable": {
-                "glyph": "o",
-                "fg": "#FF0000",
-                "bg": "#000000",
-                "order": 1
-            },
-            "blocks_tile": true,
-            "stats": {
-                "max_hp": 16,
-                "hp": 16,
-                "defense": 1,
-                "power": 4
-            },
-            "vision_range": 8
-        },
         {
             "name": "Goblin",
             "renderable": {
@@ -259,8 +262,36 @@
                     }
                 ]
             },
-            "leaf": true,
-            "tree": true
+            "death_loot": {
+                "loots": [
+                    "Wood"
+                ]
+            }
+        },
+        {
+            "name": "BlackTree",
+            "renderable": {
+                "glyph": "T",
+                "fg": "#008000",
+                "bg": "#000000",
+                "order": 3
+            },
+            "interactable{}": true,
+            "interactable_object": {
+                "interactions": [
+                    {
+                        "name": "pick_apple"
+                    },
+                    {
+                        "name": "chop_tree"
+                    }
+                ]
+            },
+            "death_loot": {
+                "loots": [
+                    "BlackWood"
+                ]
+            }
         },
         {
             "name": "IronDeposit",
@@ -276,6 +307,33 @@
                     {
                         "name": "mine_iron"
                     }
+                ]
+            },
+            "death_loot": {
+                "loots": [
+                    "Iron"
+                ]
+            }
+        },
+        {
+            "name": "BlackIronDeposit",
+            "renderable": {
+                "glyph": "D",
+                "fg": "#808080",
+                "bg": "#000000",
+                "order": 3
+            },
+            "interactable{}": true,
+            "interactable_object": {
+                "interactions": [
+                    {
+                        "name": "mine_iron"
+                    }
+                ]
+            },
+            "death_loot": {
+                "loots": [
+                    "BlackIron"
                 ]
             }
         },
@@ -636,6 +694,34 @@
             "death_loot": {
                 "loots": [
                     "BasicBone"
+                ]
+            }
+        },
+        {
+            "name": "BlackOrc",
+            "renderable": {
+                "glyph": "O",
+                "fg": "#FF0000",
+                "bg": "#000000",
+                "order": 0
+            },
+            "blocks_tile": true,
+            "monster": {},
+            "combat": {
+                "max_hp": 10,
+                "hp": 10,
+                "defense": 0,
+                "power": 0,
+                "base_def": 0,
+                "base_att": 1,
+                "att": 1
+            },
+            "viewshed": {
+                "range": 8
+            },
+            "death_loot": {
+                "loots": [
+                    "BlackBone"
                 ]
             }
         },

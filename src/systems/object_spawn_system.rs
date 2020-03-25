@@ -29,26 +29,8 @@ impl<'a> System<'a> for ObjectSpawnSystem {
             mut to_spawn,
         ) = data;
         for request in object_builder.requests.iter() {
+            //for now it's just call to_spawn, but it's could be useful to have this level of abstraction in case I have something to do here
             to_spawn.request(request.x, request.y, request.name.clone());
-            /*
-            //Get raw(json data) and build the object according to the json
-            let raws: &RawMaster = &RAWS.lock().unwrap();
-            spawn_named_item_ingame(
-                (
-                    &entities,
-                    &mut positions, //TODO suppress the tuple
-                    &mut renderables,
-                    &mut names,
-                    &mut items,
-                ),
-                raws,
-                request.name.as_ref(),
-                SpawnType::AtPosition {
-                    x: request.x,
-                    y: request.y,
-                },
-            )
-            */
         }
 
         object_builder.requests.clear();

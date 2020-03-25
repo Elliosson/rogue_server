@@ -1,6 +1,6 @@
 extern crate specs;
 use crate::{
-    gamelog::GameLog, Blocking, HaveRespawnPoint, ObjectBuilder, RespawnPoint, ToDelete,
+    gamelog::GameLog, Blocking, DeathLoot, HaveRespawnPoint, ObjectBuilder, RespawnPoint, ToDelete,
     ToSpawnList, Unblocking, WantCraft,
 };
 use specs::prelude::*;
@@ -19,6 +19,7 @@ impl<'a> System<'a> for Interationv2System {
         WriteStorage<'a, RespawnPoint>,
         WriteStorage<'a, HaveRespawnPoint>,
         WriteStorage<'a, WantCraft>,
+        WriteStorage<'a, DeathLoot>,
         WriteExpect<'a, ToSpawnList>,
     );
 
@@ -33,6 +34,7 @@ impl<'a> System<'a> for Interationv2System {
             mut respawn_points,
             mut have_respawn_points,
             mut want_crafts,
+            death_loots,
             mut to_spawns,
         ) = data;
 
@@ -46,21 +48,31 @@ impl<'a> System<'a> for Interationv2System {
                     );
                 }
                 "chop_tree" => {
-                    object_builder.request(
-                        interation_request.x,
-                        interation_request.y,
-                        "Wood".to_string(),
-                    );
+                    if let Some(death_loot) = death_loots.get(interation_request.interacted_entity)
+                    {
+                        for loot in &death_loot.loots {
+                            object_builder.request(
+                                interation_request.x,
+                                interation_request.y,
+                                loot.clone(),
+                            );
+                        }
+                    }
                     to_deletes
                         .insert(interation_request.interacted_entity, ToDelete {})
                         .expect("Unable to insert delete entity");
                 }
                 "mine_iron" => {
-                    object_builder.request(
-                        interation_request.x,
-                        interation_request.y,
-                        "Iron".to_string(),
-                    );
+                    if let Some(death_loot) = death_loots.get(interation_request.interacted_entity)
+                    {
+                        for loot in &death_loot.loots {
+                            object_builder.request(
+                                interation_request.x,
+                                interation_request.y,
+                                loot.clone(),
+                            );
+                        }
+                    }
                     to_deletes
                         .insert(interation_request.interacted_entity, ToDelete {})
                         .expect("Unable to insert delete entity");
