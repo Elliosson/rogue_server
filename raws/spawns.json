@@ -1,46 +1,40 @@
 {
     "spawn_table": [
         {
-            "name": "Goblin",
+            "name": "Tree",
             "weight": 10,
             "min_depth": 0,
-            "max_depth": 100
+            "max_depth": 1
         },
         {
-            "name": "Dagger",
-            "weight": 3,
-            "min_depth": 0,
-            "max_depth": 100
-        },
-        {
-            "name": "Shield",
-            "weight": 3,
-            "min_depth": 0,
-            "max_depth": 100
-        },
-        {
-            "name": "Longsword",
-            "weight": 1,
-            "min_depth": 1,
-            "max_depth": 100
-        },
-        {
-            "name": "Tower Shield",
-            "weight": 1,
-            "min_depth": 1,
-            "max_depth": 100
-        },
-        {
-            "name": "Battleaxe",
-            "weight": 1,
+            "name": "BlackTree",
+            "weight": 10,
             "min_depth": 2,
-            "max_depth": 100
+            "max_depth": 2
         },
         {
-            "name": "Kobold",
-            "weight": 15,
-            "min_depth": 0,
-            "max_depth": 3
+            "name": "IronDeposit",
+            "weight": 3,
+            "min_depth": 1,
+            "max_depth": 1
+        },
+        {
+            "name": "BlackIronDeposit",
+            "weight": 3,
+            "min_depth": 2,
+            "max_depth": 2
+        },
+        {
+            "name": "BasicMonster",
+            "weight": 3,
+            "min_depth": 1,
+            "max_depth": 1
+        },
+        {
+            "name": "BlackOrc",
+            "weight": 3,
+            "min_depth": 2,
+            "max_depth": 2
         }
     ],
     "items": [

@@ -1,5 +1,8 @@
 use rltk::RandomNumberGenerator;
 
+use super::map::Biome;
+use std::collections::HashMap;
+
 pub struct RandomEntry {
     name: String,
     weight: i32,

@@ -2,8 +2,8 @@ extern crate rltk;
 use rltk::{RandomNumberGenerator, RGB};
 extern crate specs;
 use super::{
-    map::MAPWIDTH, raws::*, CombatStats, Map, Name, Player, Position, Rect, Renderable,
-    SerializeMe, Viewshed,
+    map::Biome, map::MAPWIDTH, random_table::RandomTable, raws::*, CombatStats, Map, Name, Player,
+    Position, Rect, Renderable, SerializeMe, Viewshed,
 };
 use crate::components::*;
 use crate::specs::saveload::{MarkedBuilder, SimpleMarker};
@@ -112,11 +112,12 @@ pub fn spawn_named_everywhere(ecs: &mut World, room: &Rect, name: String, num_sp
         let y = (*spawn.0 / MAPWIDTH) as i32;
 
         let raws: &RawMaster = &RAWS.lock().unwrap();
-        if raws.prop_index.contains_key(spawn.1) || raws.item_index.contains_key(spawn.1) {
+        let key = spawn.1;
+        if raws.prop_index.contains_key(key) || raws.item_index.contains_key(key) {
             let spawn_result = spawn_named_entity(
                 raws,
                 ecs.create_entity().marked::<SimpleMarker<SerializeMe>>(),
-                spawn.1,
+                key,
                 SpawnType::AtPosition { x, y },
                 &mut dirty,
             );
@@ -127,10 +128,10 @@ pub fn spawn_named_everywhere(ecs: &mut World, room: &Rect, name: String, num_sp
                 tile_content.push(entity);
                 map.dirty.append(&mut dirty);
             } else {
-                println!("WARNING: We don't know how to spawn [{}]!", spawn.1);
+                println!("WARNING: We don't know how to spawn [{}]!", key);
             }
         } else {
-            println!("WARNING: No keys !");
+            println!("WARNING: No keys {} !", key);
         }
     }
 
@@ -281,7 +282,94 @@ pub fn world_spawn_initialisation(ecs: &mut World, room: &Rect) {
         to_spawn.request(center_x, center_y, "Artifact".to_string());
     }
 
-    spawn_named_everywhere(ecs, room, "Tree".to_string(), 10000);
-    spawn_named_everywhere(ecs, room, "IronDeposit".to_string(), 1000);
-    spawn_named_everywhere(ecs, room, "BasicMonster".to_string(), 1000);
+    // spawn_named_everywhere(ecs, room, "Tree".to_string(), 10000);
+    // spawn_named_everywhere(ecs, room, "IronDeposit".to_string(), 1000);
+    // spawn_named_everywhere(ecs, room, "BasicMonster".to_string(), 1000);
+    spawn_biomes(ecs, room, 20000);
+}
+
+fn room_table(map_depth: i32) -> RandomTable {
+    get_spawn_table_for_depth(&RAWS.lock().unwrap(), map_depth)
+}
+
+pub fn generate_biome_spawn_table() -> HashMap<Biome, RandomTable> {
+    // for now the diferent biome juste correstpond to different depth
+    //todo change rawmater to directly define the different biome spawn
+    let mut biome_table = HashMap::new();
+    biome_table.insert(
+        Biome::Safe,
+        get_spawn_table_for_depth(&RAWS.lock().unwrap(), 0),
+    );
+    biome_table.insert(
+        Biome::Basic,
+        get_spawn_table_for_depth(&RAWS.lock().unwrap(), 1),
+    );
+    biome_table.insert(
+        Biome::Black,
+        get_spawn_table_for_depth(&RAWS.lock().unwrap(), 2),
+    );
+
+    biome_table
+}
+
+#[allow(clippy::map_entry)]
+pub fn spawn_biomes(ecs: &mut World, room: &Rect, num_spawns: i32) {
+    let mut spawn_points: HashMap<usize, String> = HashMap::new();
+    let spawn_table = generate_biome_spawn_table();
+    // Scope to keep the borrow checker happy
+    {
+        let map = ecs.fetch::<Map>();
+        let mut rng = ecs.write_resource::<RandomNumberGenerator>();
+
+        for _i in 0..num_spawns {
+            let mut added = false;
+            let mut tries = 0;
+            while !added && tries < 20 {
+                let x = (room.x1 + rng.roll_dice(1, i32::abs(room.x2 - room.x1))) as usize;
+                let y = (room.y1 + rng.roll_dice(1, i32::abs(room.y2 - room.y1))) as usize;
+                let idx = (y * MAPWIDTH) + x;
+                if !spawn_points.contains_key(&idx) {
+                    let (x, y) = map.idx_xy(idx);
+                    let biome = map.get_biome(x, y);
+                    spawn_points.insert(idx, spawn_table.get(&biome).unwrap().roll(&mut rng));
+                    added = true;
+                } else {
+                    tries += 1;
+                }
+            }
+        }
+    }
+    let mut dirty = Vec::new();
+
+    // Actually spawn the named
+    for spawn in spawn_points.iter() {
+        let x = (*spawn.0 % MAPWIDTH) as i32;
+        let y = (*spawn.0 / MAPWIDTH) as i32;
+
+        let raws: &RawMaster = &RAWS.lock().unwrap();
+        let key = spawn.1;
+        if raws.prop_index.contains_key(key) || raws.item_index.contains_key(key) {
+            let spawn_result = spawn_named_entity(
+                raws,
+                ecs.create_entity().marked::<SimpleMarker<SerializeMe>>(),
+                key,
+                SpawnType::AtPosition { x, y },
+                &mut dirty,
+            );
+            if let Some(entity) = spawn_result {
+                let mut map: specs::shred::FetchMut<Map> = ecs.write_resource::<Map>();
+                let idx = map.xy_idx(x, y);
+                let tile_content = map.tile_content.entry(idx).or_insert(Vec::new());
+                tile_content.push(entity);
+                map.dirty.append(&mut dirty);
+            } else {
+                println!("WARNING: We don't know how to spawn [{}]!", key);
+            }
+        } else {
+            println!("WARNING: No keys {} !", key);
+        }
+    }
+
+    let mut map = ecs.write_resource::<Map>();
+    map.dirty.append(&mut dirty);
 }

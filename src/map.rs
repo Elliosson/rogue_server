@@ -12,6 +12,13 @@ pub const MAPWIDTH: usize = 1000;
 pub const MAPHEIGHT: usize = 1000;
 pub const MAPCOUNT: usize = MAPHEIGHT * MAPWIDTH;
 
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Hash)]
+pub enum Biome {
+    Safe,
+    Basic,
+    Black,
+}
+
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct Map {
     pub tiles: HashMap<usize, TileType>, //tile handle the apparence of the soil and the opacity, desactived for now
@@ -54,9 +61,34 @@ impl Map {
             false
         }
     }
+
     pub fn set_blocked(&mut self, idx: usize, is_blocked: bool) {
         let blocked = self.blocked.entry(idx).or_insert(is_blocked);
         *blocked = is_blocked;
+    }
+
+    pub fn get_biome(&self, x: i32, y: i32) -> Biome {
+        //for now the biome is juste choosen  according to the distance from the player spawn point
+
+        let pos = Point { x, y };
+
+        let middle = Point {
+            x: self.width / 2,
+            y: self.height / 2,
+        };
+
+        let distance = rltk::DistanceAlg::Pythagoras.distance2d(pos, middle);
+
+        let ret;
+        if distance < 20.0 {
+            ret = Biome::Safe;
+        } else if distance < 100.0 {
+            ret = Biome::Basic;
+        } else {
+            ret = Biome::Black;
+        }
+
+        return ret;
     }
 
     fn apply_room_to_map(&mut self, room: &Rect) {
