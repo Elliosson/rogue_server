@@ -54,24 +54,26 @@ impl<'a> System<'a> for WantToMoveSystem {
                 let x = min(MAPWIDTH as i32 - 1, max(0, pos.x() + want_to_move.delta_x));
                 let y = min(MAPHEIGHT as i32 - 1, max(0, pos.y() + want_to_move.delta_y));
                 pos.moving(x, y, &mut map.dirty);
+                map.set_blocked(destination_idx, true);
                 viewshed.dirty = true;
             } else {
                 //potential combat
-                for enemy_entity in map.tile_content[&destination_idx].iter() {
-                    if let Some(_combat_stat) = combat_stats.get(*enemy_entity) {
-                        wants_to_melees
-                            .insert(
-                                entity,
-                                WantsToMelee {
-                                    target: *enemy_entity,
-                                },
-                            )
-                            .expect("Unable to insert");
+                if let Some(tile_content) = map.tile_content.get(&destination_idx) {
+                    for enemy_entity in tile_content.iter() {
+                        if let Some(_combat_stat) = combat_stats.get(*enemy_entity) {
+                            wants_to_melees
+                                .insert(
+                                    entity,
+                                    WantsToMelee {
+                                        target: *enemy_entity,
+                                    },
+                                )
+                                .expect("Unable to insert");
+                        }
                     }
                 }
             }
         }
-
         want_to_moves.clear();
     }
 }

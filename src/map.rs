@@ -37,6 +37,12 @@ impl Map {
         (y as usize * self.width as usize) + x as usize
     }
 
+    pub fn idx_xy(&self, idx: usize) -> (i32, i32) {
+        let x = idx as i32 % self.width;
+        let y = idx as i32 / self.width;
+        (x, y)
+    }
+
     pub fn is_blocked(&self, idx: usize) -> bool {
         if let Some(blocked) = self.blocked.get(&idx) {
             if *blocked {
@@ -51,12 +57,6 @@ impl Map {
     pub fn set_blocked(&mut self, idx: usize, is_blocked: bool) {
         let blocked = self.blocked.entry(idx).or_insert(is_blocked);
         *blocked = is_blocked;
-    }
-
-    pub fn idx_xy(&self, idx: usize) -> (i32, i32) {
-        let x = idx as i32 % self.width;
-        let y = idx as i32 / self.width;
-        (x, y)
     }
 
     fn apply_room_to_map(&mut self, room: &Rect) {
