@@ -365,6 +365,7 @@ fn main() {
     gs.ecs.register::<Horde>();
     gs.ecs.register::<HordeTarget>();
     gs.ecs.register::<Faction>();
+    gs.ecs.register::<DeathLoot>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
     let map: Map = Map::new_map();

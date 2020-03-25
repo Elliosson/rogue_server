@@ -461,6 +461,11 @@ pub fn spawn_named_prop<T: Builder>(
             eb = eb.with(faction.clone());
         }
 
+        // DeathLoot
+        if let Some(death_loot) = &prop_template.death_loot {
+            eb = eb.with(death_loot.clone());
+        }
+
         return Some(eb.build());
     }
     None

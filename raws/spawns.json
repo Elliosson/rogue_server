@@ -149,6 +149,15 @@
             }
         },
         {
+            "name": "BasicBone",
+            "renderable": {
+                "glyph": "*",
+                "fg": "#FFFFFF",
+                "bg": "#000000",
+                "order": 2
+            }
+        },
+        {
             "name": "Carrot",
             "renderable": {
                 "glyph": "*",
@@ -623,6 +632,11 @@
             },
             "viewshed": {
                 "range": 8
+            },
+            "death_loot": {
+                "loots": [
+                    "BasicBone"
+                ]
             }
         },
         {
