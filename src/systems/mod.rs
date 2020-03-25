@@ -40,7 +40,8 @@ mod food_preference_system;
 pub use food_preference_system::FoodPreferenceSystem;
 mod online_player_system;
 pub use online_player_system::{
-    NamePlayerHash, OnlinePlayerSystem, PlayerMessages, UuidPlayerHash,
+    NamePlayerHash, OnlinePlayerSystem, PlayerMessages, UuidPlayerHash, STARTING_POS_X,
+    STARTING_POS_Y,
 };
 mod want_to_move_system;
 pub use want_to_move_system::WantToMoveSystem;

@@ -376,21 +376,11 @@ fn main() {
         map.rooms[0].center()
     };
 
-    let player_entity = spawner::player(&mut gs.ecs, 5, 5);
+    let player_entity = spawner::player(&mut gs.ecs, 500, 500);
 
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
 
-    let tree_start = time::Instant::now();
-
-    let rooms = gs.ecs.write_resource::<Map>().rooms.clone();
-    for room in rooms.iter() {
-        spawner::spawn_named_everywhere(&mut gs.ecs, room, "Tree".to_string(), 10000);
-        spawner::spawn_named_everywhere(&mut gs.ecs, room, "IronDeposit".to_string(), 1000);
-        spawner::spawn_named_everywhere(&mut gs.ecs, room, "BasicMonster".to_string(), 1000);
-    }
-    let tree_end = time::Instant::now();
-
-    println!("tree time {:?}", tree_end - tree_start);
+    let spawn_start = time::Instant::now();
 
     gs.ecs.insert(Point::new(player_x, player_y));
     gs.ecs.insert(player_entity);
@@ -440,11 +430,14 @@ fn main() {
     gs.ecs.insert(map_to_send.clone());
     gs.ecs.insert(player_info_to_send.clone());
 
-    //Spawn the artifact
-    {
-        let mut to_spawn = gs.ecs.write_resource::<ToSpawnList>();
-        to_spawn.request(10, 10, "Artifact".to_string());
+    let rooms = gs.ecs.write_resource::<Map>().rooms.clone();
+    for room in rooms.iter() {
+        spawner::world_spawn_initialisation(&mut gs.ecs, room);
     }
+    let spawn_end = time::Instant::now();
+
+    println!("spawn time {:?}", spawn_end - spawn_start);
+
     thread::spawn(move || {
         network::run(config, message_list, map_to_send, player_info_to_send);
     });

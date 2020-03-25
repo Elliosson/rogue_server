@@ -2,6 +2,7 @@ extern crate specs;
 
 use crate::{
     gamelog::GameLog, CombatStats, HaveRespawnPoint, Map, OnlinePlayer, Position, Respawn,
+    STARTING_POS_X, STARTING_POS_Y,
 };
 
 use specs::prelude::*;
@@ -40,10 +41,10 @@ impl<'a> System<'a> for RespawnSystem {
                 if let Some(pos) = positions.get(respawn_point.respawn_point) {
                     to_respawn.push((entity, pos.x(), pos.y()));
                 } else {
-                    to_respawn.push((entity, 5, 5));
+                    to_respawn.push((entity, STARTING_POS_X, STARTING_POS_Y));
                 }
             } else {
-                to_respawn.push((entity, 5, 5));
+                to_respawn.push((entity, STARTING_POS_X, STARTING_POS_Y));
             }
         }
 

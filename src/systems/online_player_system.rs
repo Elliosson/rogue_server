@@ -9,6 +9,9 @@ use specs::prelude::*;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
+pub const STARTING_POS_X: i32 = 505;
+pub const STARTING_POS_Y: i32 = 505;
+
 pub struct OnlinePlayerSystem {}
 
 impl<'a> System<'a> for OnlinePlayerSystem {
@@ -213,7 +216,12 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                 player_entity = entity
             } else {
                 let new_player = entities.create();
-                to_construct.request(5, 5, "Online Player".to_string(), new_player);
+                to_construct.request(
+                    STARTING_POS_X,
+                    STARTING_POS_Y,
+                    "Online Player".to_string(),
+                    new_player,
+                );
                 player_entity = new_player;
             }
             pseudo_player_hash

@@ -270,3 +270,18 @@ pub fn spawn_named(ecs: &mut World, key: &str, x: i32, y: i32) {
         println!("WARNING: No keys {} !", key);
     }
 }
+
+pub fn world_spawn_initialisation(ecs: &mut World, room: &Rect) {
+    let center_x = (room.x2 - room.x1) / 2;
+    let center_y = (room.y2 - room.y1) / 2;
+    //place artefact on the center of the map
+    //Spawn the artifact
+    {
+        let mut to_spawn = ecs.write_resource::<ToSpawnList>();
+        to_spawn.request(center_x, center_y, "Artifact".to_string());
+    }
+
+    spawn_named_everywhere(ecs, room, "Tree".to_string(), 10000);
+    spawn_named_everywhere(ecs, room, "IronDeposit".to_string(), 1000);
+    spawn_named_everywhere(ecs, room, "BasicMonster".to_string(), 1000);
+}
