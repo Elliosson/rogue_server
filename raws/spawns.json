@@ -71,6 +71,44 @@
             }
         },
         {
+            "name": "Spear",
+            "renderable": {
+                "glyph": "/",
+                "fg": "#FFAAAA",
+                "bg": "#000000",
+                "order": 2
+            },
+            "equipment_effects": {
+                "effects": [
+                    {
+                        "Melee": 6
+                    }
+                ]
+            },
+            "equippable": {
+                "slot": "Melee"
+            }
+        },
+        {
+            "name": "BlackSpear",
+            "renderable": {
+                "glyph": "/",
+                "fg": "#FFAAAA",
+                "bg": "#000000",
+                "order": 2
+            },
+            "equipment_effects": {
+                "effects": [
+                    {
+                        "Melee": 8
+                    }
+                ]
+            },
+            "equippable": {
+                "slot": "Melee"
+            }
+        },
+        {
             "name": "Longsword",
             "renderable": {
                 "glyph": "/",
@@ -583,6 +621,25 @@
             "blocks_tile": true
         },
         {
+            "name": "Wall",
+            "renderable": {
+                "glyph": "X",
+                "fg": "#FFFFFF",
+                "bg": "#000000",
+                "order": 2
+            },
+            "blocks_tile": true,
+            "combat": {
+                "max_hp": 100,
+                "hp": 100,
+                "defense": 0,
+                "power": 0,
+                "base_def": 0,
+                "base_att": 0,
+                "att": 0
+            }
+        },
+        {
             "name": "Online Player",
             "renderable": {
                 "glyph": "@",
@@ -608,7 +665,7 @@
             },
             "building_choice": {
                 "plans": [
-                    "block",
+                    "Wall",
                     "Door",
                     "Bed",
                     "Garden",

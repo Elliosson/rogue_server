@@ -24,10 +24,19 @@ impl<'a> System<'a> for CraftSystem {
         //todo this must be deserialised from a json
         //for now this a list a all craftable thing and ressource needed
         //it sould be moved in a json as soon as possible
-        let craft_cost: HashMap<String, Vec<(String, i32)>> =
-            vec![("WoodenSpear".to_string(), vec![("Wood".to_string(), 2)])]
-                .into_iter()
-                .collect();
+        let craft_cost: HashMap<String, Vec<(String, i32)>> = vec![
+            ("WoodenSpear".to_string(), vec![("Wood".to_string(), 2)]),
+            (
+                "Spear".to_string(),
+                vec![("Wood".to_string(), 2), ("Iron".to_string(), 1)],
+            ),
+            (
+                "BlackSpear".to_string(),
+                vec![("BlackWood".to_string(), 2), ("BlackIron".to_string(), 1)],
+            ),
+        ]
+        .into_iter()
+        .collect();
 
         for (_entity, want_craft, pos, info) in
             (&entities, &mut want_crafts, &mut positions, &player_infos).join()
