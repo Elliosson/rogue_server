@@ -420,7 +420,7 @@ fn main() {
     let message_list: Arc<Mutex<Vec<(network::Message, String)>>> =
         Arc::new(Mutex::new(Vec::new()));
 
-    let map_to_send: Arc<Mutex<HashMap<String, Vec<(Position, Renderable)>>>> =
+    let map_to_send: Arc<Mutex<HashMap<String, Vec<(u32, i32, Position, Renderable)>>>> =
         Arc::new(Mutex::new(HashMap::new()));
 
     let player_info_to_send: Arc<Mutex<HashMap<String, String>>> =

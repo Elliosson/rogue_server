@@ -23,7 +23,7 @@ impl Config {
 pub fn run(
     config: Config,
     message_list: Arc<Mutex<Vec<(Message, String)>>>,
-    map_to_send: Arc<Mutex<HashMap<String, Vec<(Position, Renderable)>>>>,
+    map_to_send: Arc<Mutex<HashMap<String, Vec<(u32, i32, Position, Renderable)>>>>,
     player_info_to_send: Arc<Mutex<HashMap<String, String>>>,
 ) {
     ws::listen(config.url, move |out| {
@@ -69,7 +69,7 @@ pub fn run(
 
 fn response(
     msg: Message,
-    map_to_send: Arc<Mutex<HashMap<String, Vec<(Position, Renderable)>>>>,
+    map_to_send: Arc<Mutex<HashMap<String, Vec<(u32, i32, Position, Renderable)>>>>,
     player_info_to_send: Arc<Mutex<HashMap<String, String>>>,
 ) -> (String, Message) {
     let map_guard = map_to_send.lock().unwrap();
@@ -85,10 +85,12 @@ fn response(
         Message::Map(uuid) => {
             let mut string_to_send = " ".to_string();
             if let Some(my_map) = map_guard.get(&uuid.to_string()) {
-                for (pos, renderable) in my_map.iter() {
+                for (id, gen, pos, renderable) in my_map.iter() {
                     string_to_send = format!(
-                        "{} {} {} {} {} {} {} {} {} {} {}",
+                        "{} {} {} {} {} {} {} {} {} {} {} {} {}",
                         string_to_send,
+                        id,
+                        gen,
                         pos.x(),
                         pos.y(),
                         renderable.glyph,

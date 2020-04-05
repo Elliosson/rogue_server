@@ -14,7 +14,7 @@ impl<'a> System<'a> for SendMapSystem {
         WriteStorage<'a, OnlinePlayer>,
         WriteStorage<'a, Connected>,
         ReadExpect<'a, Map>,
-        WriteExpect<'a, Arc<Mutex<HashMap<String, Vec<(Position, Renderable)>>>>>,
+        WriteExpect<'a, Arc<Mutex<HashMap<String, Vec<(u32, i32, Position, Renderable)>>>>>,
         WriteStorage<'a, Renderable>,
     );
 
@@ -38,6 +38,8 @@ impl<'a> System<'a> for SendMapSystem {
                     for entity in tile_content.iter() {
                         if let Some(renderable) = renderables.get(*entity) {
                             my_viewed_map.push((
+                                entity.id(),
+                                entity.gen().id(),
                                 Position::new(vis.x, vis.y, &mut dirty),
                                 renderable.clone(),
                             )); //TODO to remplace by point
