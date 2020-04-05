@@ -733,6 +733,7 @@ pub struct GoByStep {
 pub struct Horde {
     pub target: Entity,
     pub timer: i32,
+    pub wave: i32,
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
