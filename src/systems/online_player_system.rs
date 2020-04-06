@@ -207,10 +207,6 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                 //If he is still connected remove the old entity of uid_hash
                 if let Some(connected) = connecteds.get(entity) {
                     player_hash.hash.remove(&connected.uuid);
-
-                    connecteds
-                        .insert(entity, Connected { uuid: uid.clone() })
-                        .expect("Unable to insert");
                 }
 
                 player_entity = entity
@@ -224,6 +220,9 @@ impl<'a> System<'a> for OnlinePlayerSystem {
                 );
                 player_entity = new_player;
             }
+            connecteds
+                .insert(player_entity, Connected { uuid: uid.clone() })
+                .expect("Unable to insert");
             pseudo_player_hash
                 .hash
                 .insert(pseudo.clone(), player_entity);

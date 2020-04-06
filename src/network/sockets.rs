@@ -103,6 +103,8 @@ fn response(
                         renderable.render_order
                     );
                 }
+            } else {
+                println!("Error: Can't find a map for this Uuid {}", uuid.to_string());
             }
 
             (string_to_send, msg)
