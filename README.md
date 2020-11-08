@@ -1,6 +1,6 @@
 # roguelike_project
 
-This is a simple roguelike toy project which aim to "simulate" an evolution system with species diversification.
+This is a simple multiplayer roguelike toy project.
 
 This is curently work in progress and far to be completed.
 
@@ -21,7 +21,7 @@ git clone https://github.com/Elliosson/roguelike_project.git
 
 cd roguelike_project
 
-cargo run --release
+cargo run --release 0.0.0.0:4321
 
 Try it on http://www.elliosson.com/
 
