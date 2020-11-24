@@ -1,10 +1,13 @@
 extern crate specs;
 use crate::{
-    CombatStats, FacingDirection, Map, Position, Viewshed, WantToMove, WantsToMelee, MAPHEIGHT,
-    MAPWIDTH,
+    CombatStats, FacingDirection, LastMove, Map, Position, Viewshed, WantToMove, WantsToMelee,
+    MAPHEIGHT, MAPWIDTH,
 };
 use specs::prelude::*;
 use std::cmp::{max, min};
+use std::time::Instant;
+
+const MOVE_PEDIOD_MS: u128 = 100;
 
 pub struct WantToMoveSystem {}
 
@@ -19,6 +22,7 @@ impl<'a> System<'a> for WantToMoveSystem {
         WriteStorage<'a, FacingDirection>,
         WriteStorage<'a, WantsToMelee>,
         WriteStorage<'a, CombatStats>,
+        WriteStorage<'a, LastMove>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -31,11 +35,22 @@ impl<'a> System<'a> for WantToMoveSystem {
             mut facing_directions,
             mut wants_to_melees,
             combat_stats,
+            mut last_moves,
         ) = data;
 
         for (entity, pos, viewshed, want_to_move) in
             (&entities, &mut positions, &mut viewshed, &mut want_to_moves).join()
         {
+            //arbitrary limite to the frequency of movement for some entity, for now
+            if let Some(last_move) = last_moves.get_mut(entity) {
+                if let Some(last_time) = last_move.time {
+                    if last_time.elapsed().as_millis() < MOVE_PEDIOD_MS {
+                        break;
+                    }
+                }
+                last_move.time = Some(Instant::now());
+            }
+
             if let Some(facing) = facing_directions.get_mut(entity) {
                 facing.update(want_to_move.delta_x, want_to_move.delta_y);
             }

@@ -9,6 +9,7 @@ use specs::error::NoError;
 use specs::saveload::{ConvertSaveload, Marker};
 use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::time::{Duration, Instant};
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Position {
@@ -751,6 +752,12 @@ pub struct HordeTarget {}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct InHorde {}
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct LastMove {
+    #[serde(skip_serializing)]
+    #[serde(skip_deserializing)]
+    pub time: Option<Instant>,
+}
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.
 pub struct SerializeMe;

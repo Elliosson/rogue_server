@@ -466,6 +466,11 @@ pub fn spawn_named_prop<T: Builder>(
             eb = eb.with(death_loot.clone());
         }
 
+        // LastMove
+        if let Some(last_move) = &prop_template.last_move {
+            eb = eb.with(last_move.clone());
+        }
+
         return Some(eb.build());
     }
     None
@@ -697,6 +702,11 @@ pub fn spawn_born(
         // Monster
         if let Some(monster) = &prop_template.monster {
             eb = eb.with(monster.clone());
+        }
+
+        // LastMove
+        if let Some(last_move) = &prop_template.last_move {
+            eb = eb.with(last_move.clone());
         }
 
         // Sexe

@@ -40,6 +40,7 @@ pub struct Prop {
     pub in_horde: Option<InHorde>,
     pub faction: Option<Faction>,
     pub death_loot: Option<DeathLoot>,
+    pub last_move: Option<LastMove>,
 }
 
 #[derive(Deserialize, Debug)]
