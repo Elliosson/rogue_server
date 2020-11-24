@@ -167,6 +167,7 @@ impl State {
         go_step.run_now(&self.ecs);
         let mut want_move = WantToMoveSystem {};
         want_move.run_now(&self.ecs);
+
         let mut go_target = GoTargetSystem {};
         go_target.run_now(&self.ecs);
         let mut movement = MovementSystem {};

@@ -7,7 +7,7 @@ use specs::prelude::*;
 use std::cmp::{max, min};
 use std::time::Instant;
 
-const MOVE_PEDIOD_MS: u128 = 100;
+const MOVE_PEDIOD_MS: u128 = 90;
 
 pub struct WantToMoveSystem {}
 
