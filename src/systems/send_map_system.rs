@@ -25,7 +25,7 @@ impl<'a> System<'a> for SendMapSystem {
         let mut map_send_guard = map_to_send.lock().unwrap();
         map_send_guard.clear();
 
-        for (_entity, viewshed, _online_player, connected) in
+        for (my_entity, viewshed, _online_player, connected) in
             (&entities, &viewsheds, &online_players, &connecteds).join()
         {
             let my_uiid = connected.uuid.clone();
@@ -36,13 +36,16 @@ impl<'a> System<'a> for SendMapSystem {
 
                 if let Some(tile_content) = map.tile_content.get(&idx) {
                     for entity in tile_content.iter() {
-                        if let Some(renderable) = renderables.get(*entity) {
-                            my_viewed_map.push((
-                                entity.id(),
-                                entity.gen().id(),
-                                Position::new(vis.x, vis.y, &mut dirty),
-                                renderable.clone(),
-                            )); //TODO to remplace by point
+                        //filter out my character to avoid desinc with the camera
+                        if *entity != my_entity {
+                            if let Some(renderable) = renderables.get(*entity) {
+                                my_viewed_map.push((
+                                    entity.id(),
+                                    entity.gen().id(),
+                                    Position::new(vis.x, vis.y, &mut dirty),
+                                    renderable.clone(),
+                                )); //TODO to remplace by point
+                            }
                         }
                     }
                 }

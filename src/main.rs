@@ -210,12 +210,12 @@ impl State {
         action_point.run_now(&self.ecs);
         let mut stat = StatSystem {};
         stat.run_now(&self.ecs);
-        let mut map_send = SendMapSystem {};
 
         /* network info system*/
-        map_send.run_now(&self.ecs);
         let mut player_info = PlayerInfoSystem {};
         player_info.run_now(&self.ecs);
+        let mut map_send = SendMapSystem {};
+        map_send.run_now(&self.ecs);
         let mut player_json = PlayerJsonSystem {};
         player_json.run_now(&self.ecs);
         self.ecs.maintain();
@@ -366,6 +366,7 @@ fn main() {
     gs.ecs.register::<HordeTarget>();
     gs.ecs.register::<Faction>();
     gs.ecs.register::<DeathLoot>();
+    gs.ecs.register::<LastMove>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
     let map: Map = Map::new_map();
