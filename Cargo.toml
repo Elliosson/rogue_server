@@ -18,6 +18,7 @@ rand = "0.7.3"
 cogset = "0.2.0"
 ws = "0.8.0"
 uuid = { version = "0.7", features = ["v4"] }
+phf = { version = "0.8", features = ["macros"] }
 
 [target.'cfg(any(target_arch = "wasm32"))'.dependencies]
 web-sys = { version = "0.3", features=["console"] }
