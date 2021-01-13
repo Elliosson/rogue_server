@@ -135,9 +135,9 @@ impl<'a> System<'a> for PlayerInfoSystem {
             //interaction on position
             for on_pos_entity in close_entity.iter() {
                 if let Some(interactable) = interactable_objects.get(*on_pos_entity) {
-                    for intereraction in interactable.interactions.iter() {
+                    for interaction in interactable.interactions.iter() {
                         player_info.close_interations.push(CloseInteration {
-                            interaction_name: intereraction.name.clone(),
+                            interaction_name: interaction.name.clone(),
                             object_name: name.name.clone(),
                             index: on_pos_entity.id(),
                             generation: on_pos_entity.gen().id(),

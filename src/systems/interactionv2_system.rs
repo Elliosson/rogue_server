@@ -121,6 +121,17 @@ impl<'a> System<'a> for Interationv2System {
                         )
                         .expect("Unable to insert");
                 }
+                "wall_block" => {
+                    //todo I will need a specific commant for craft it will be to heavy to have it in interaction
+                    want_crafts
+                        .insert(
+                            interation_request.requester_entity,
+                            WantCraft {
+                                name: "WallBlock".to_string(),
+                            },
+                        )
+                        .expect("Unable to insert");
+                }
                 _ => {}
             }
         }

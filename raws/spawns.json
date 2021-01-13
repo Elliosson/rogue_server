@@ -147,6 +147,15 @@
             }
         },
         {
+            "name": "WallBlock",
+            "renderable": {
+                "glyph": "*",
+                "fg": "#582900",
+                "bg": "#000000",
+                "order": 2
+            }
+        },
+        {
             "name": "Wood",
             "renderable": {
                 "glyph": "*",
@@ -881,6 +890,9 @@
                 "interactions": [
                     {
                         "name": "wooden_spear"
+                    },
+                    {
+                        "name": "wall_block"
                     }
                 ]
             }

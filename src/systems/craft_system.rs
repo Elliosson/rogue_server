@@ -34,6 +34,7 @@ impl<'a> System<'a> for CraftSystem {
                 "BlackSpear".to_string(),
                 vec![("BlackWood".to_string(), 2), ("BlackIron".to_string(), 1)],
             ),
+            ("WallBlock".to_string(), vec![("Wood".to_string(), 2)]),
         ]
         .into_iter()
         .collect();
