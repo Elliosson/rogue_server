@@ -62,6 +62,22 @@ impl<'a> System<'a> for Interationv2System {
                         .insert(interation_request.interacted_entity, ToDelete {})
                         .expect("Unable to insert delete entity");
                 }
+                "cut" => {
+                    // todo will destroy everithing, I need to add a control to check if this comand is allowed for the user
+                    if let Some(death_loot) = death_loots.get(interation_request.interacted_entity)
+                    {
+                        for loot in &death_loot.loots {
+                            object_builder.request(
+                                interation_request.x,
+                                interation_request.y,
+                                loot.clone(),
+                            );
+                        }
+                    }
+                    to_deletes
+                        .insert(interation_request.interacted_entity, ToDelete {})
+                        .expect("Unable to insert delete entity");
+                }
                 "mine_iron" => {
                     if let Some(death_loot) = death_loots.get(interation_request.interacted_entity)
                     {
