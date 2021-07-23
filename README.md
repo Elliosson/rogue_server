@@ -1,4 +1,4 @@
-# roguelike_project
+# rogue_server
 
 This is a simple multiplayer roguelike toy project.
 
@@ -17,14 +17,11 @@ How to launch:
 
 2 - On a shell, type:
 
-git clone https://github.com/Elliosson/roguelike_project.git
+git clone https://github.com/Elliosson/rogue_server.git
 
-cd roguelike_project
+cd rogue_server
 
 cargo run --release 0.0.0.0:4321
-
-Try it on http://www.elliosson.com/
-
 
 
 
