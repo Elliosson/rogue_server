@@ -131,7 +131,7 @@ pub fn spawn_named_everywhere(ecs: &mut World, room: &Rect, name: String, num_sp
                 println!("WARNING: We don't know how to spawn [{}]!", key);
             }
         } else {
-            println!("WARNING: No keys {} !", key);
+            // println!("WARNING: No keys {} !", key);
         }
     }
 
@@ -268,7 +268,7 @@ pub fn spawn_named(ecs: &mut World, key: &str, x: i32, y: i32) {
             println!("WARNING: We don't know how to spawn [{}]!", key);
         }
     } else {
-        println!("WARNING: No keys {} !", key);
+        // println!("WARNING: No keys {} !", key);
     }
 }
 
@@ -366,7 +366,7 @@ pub fn spawn_biomes(ecs: &mut World, room: &Rect, num_spawns: i32) {
                 println!("WARNING: We don't know how to spawn [{}]!", key);
             }
         } else {
-            println!("WARNING: No keys {} !", key);
+            // println!("WARNING: No keys {} !", key);
         }
     }
 
